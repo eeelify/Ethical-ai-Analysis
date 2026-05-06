@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const compression = require('compression');
@@ -62,9 +62,9 @@ app.use((req, res, next) => {
 });
 
 // --- 1. VERİTABANI BAĞLANTISI ---
-const MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGO_URL || process.env.mongo_url;
 if (!MONGO_URI) {
-  throw new Error("❌ MONGO_URI environment variable bulunamadı!");
+  throw new Error("❌ MONGO_URI veya MONGO_URL environment variable bulunamadı!");
 }
 
 // Optimize MongoDB connection with connection pooling
@@ -285,32 +285,41 @@ const TensionSchema = new mongoose.Schema({
   createdBy: String,
   createdAt: { type: Date, default: Date.now },
 
-  votes: [{
-    userId: String,
-    voteType: { type: String, enum: ['agree', 'disagree'] }
-  }],
-
-  comments: [{
-    text: String,
-    authorId: String,
-    authorName: String,
-    date: { type: Date, default: Date.now }
-  }],
-
-  evidences: [{
-    title: String,
-    description: String,
-    fileName: String,
-    fileData: String, // Base64 Data
-    uploadedBy: String,
-    uploadedAt: { type: Date, default: Date.now },
-    type: { type: String, required: false }, // Evidence type: Policy, Test, User feedback, Log, Incident, Other (optional)
-    comments: [{
+  votes: {
+    type: [{
       userId: String,
+      voteType: { type: String, enum: ['agree', 'disagree'] }
+    }],
+    default: []
+  },
+
+  comments: {
+    type: [{
       text: String,
-      createdAt: { type: Date, default: Date.now }
-    }]
-  }],
+      authorId: String,
+      authorName: String,
+      date: { type: Date, default: Date.now }
+    }],
+    default: []
+  },
+
+  evidences: {
+    type: [{
+      title: String,
+      description: String,
+      fileName: String,
+      fileData: String, // Base64 Data
+      uploadedBy: String,
+      uploadedAt: { type: Date, default: Date.now },
+      type: { type: String, required: false }, // Evidence type: Policy, Test, User feedback, Log, Incident, Other (optional)
+      comments: [{
+        userId: String,
+        text: String,
+        createdAt: { type: Date, default: Date.now }
+      }]
+    }],
+    default: []
+  },
 
   // Impact & Stakeholders
   impact: {
@@ -1028,8 +1037,9 @@ app.post('/api/tensions', async (req, res) => {
     const tensionData = {
       projectId, principle1, principle2, claimStatement, description,
       severity, status, createdBy,
-      evidences: initialEvidences,
-      comments: []
+      evidences: initialEvidences || [],
+      comments: [],
+      votes: []
     };
 
     // Add evidenceType if provided (backward compatible)
@@ -1137,7 +1147,8 @@ app.delete('/api/tensions/:id', async (req, res) => {
 app.get('/api/tensions/:projectId', async (req, res) => {
   try {
     const { userId } = req.query;
-    const tensions = await Tension.find({ projectId: req.params.projectId });
+    // Exclude massive fileData payloads to prevent server/event-loop freezing
+    const tensions = await Tension.find({ projectId: req.params.projectId }).select('-evidences.fileData');
     const formattedTensions = tensions.map(t => {
       const agreeCount = t.votes ? t.votes.filter(v => v.voteType === 'agree').length : 0;
       const disagreeCount = t.votes ? t.votes.filter(v => v.voteType === 'disagree').length : 0;
@@ -1167,6 +1178,7 @@ app.post('/api/tensions/:id/vote', async (req, res) => {
     } else {
       tension.votes.push({ userId, voteType });
     }
+    tension.markModified('votes');
     await tension.save();
     res.json({ success: true });
   } catch (err) {

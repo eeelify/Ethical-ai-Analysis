@@ -191,7 +191,7 @@ export function UserDashboard({
     if (projects.length > 0 && currentUser.id) {
       fetchAllProgresses();
       // Progress'i periyodik olarak güncelle (her 3 saniyede bir)
-      const interval = setInterval(fetchAllProgresses, 3000);
+      const interval = setInterval(fetchAllProgresses, 30000); // Changed for performance
       return () => clearInterval(interval);
     }
   }, [projects, currentUser]);
@@ -333,7 +333,7 @@ export function UserDashboard({
     if (projects.length > 0 && currentUser.id) {
       checkProjectReports();
       // Check reports periodically (every 10 seconds)
-      const interval = setInterval(checkProjectReports, 10000);
+      const interval = setInterval(checkProjectReports, 30000); // Changed for performance
       return () => clearInterval(interval);
     }
   }, [projects, currentUser.id]);

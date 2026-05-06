@@ -1075,7 +1075,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
     fetchProgress();
 
     // Cevaplar değiştiğinde veya kaydetme işlemi sonrasında progress'i güncelle
-    const interval = setInterval(fetchProgress, 2000); // Her 2 saniyede bir güncelle
+    const interval = setInterval(fetchProgress, 30000); // Changed for performance
 
     return () => {
       mounted = false;

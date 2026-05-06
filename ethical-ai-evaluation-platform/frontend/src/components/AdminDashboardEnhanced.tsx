@@ -73,7 +73,7 @@ const ProjectCard: React.FC<{
 
     fetchProgress();
     // Progress'i periyodik olarak güncelle (her 3 saniyede bir)
-    const interval = setInterval(fetchProgress, 3000);
+    const interval = setInterval(fetchProgress, 30000); // Changed for performance
     return () => {
       mounted = false;
       clearInterval(interval);
@@ -2403,7 +2403,7 @@ function ReportsTab({ projects, currentUser, users }: any) {
 
     if (projects.length > 0 && users && users.length > 0) {
       fetchAllProgresses();
-      const interval = setInterval(fetchAllProgresses, 5000);
+      const interval = setInterval(fetchAllProgresses, 30000); // Changed for performance
       return () => clearInterval(interval);
     } else {
       setProjectProgresses({});

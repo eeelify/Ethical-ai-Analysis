@@ -337,7 +337,7 @@ export function ProjectDetail({
     if (assignedUserDetails.length > 0) {
       loadAllMemberProgresses();
       // Progress'i periyodik olarak güncelle (her 5 saniyede bir)
-      const interval = setInterval(loadAllMemberProgresses, 5000);
+      const interval = setInterval(loadAllMemberProgresses, 60000); // Changed from 5000 to 60000 for performance
       return () => clearInterval(interval);
     }
   }, [project, assignedUserDetails]);
@@ -357,7 +357,7 @@ export function ProjectDetail({
     };
     loadUserProgress();
     // Progress'i periyodik olarak güncelle (her 3 saniyede bir)
-    const interval = setInterval(loadUserProgress, 3000);
+    const interval = setInterval(loadUserProgress, 30000); // Changed from 3000 to 30000 for performance
     return () => clearInterval(interval);
   }, [project, currentUser, users]);
 
@@ -372,11 +372,14 @@ export function ProjectDetail({
         claimStatement: data.claimStatement,
         description: data.description,
         evidenceDescription: data.evidenceDescription,
+        evidenceType: data.evidenceType,
         evidenceFileName: data.evidenceFileName,
         evidenceFileData: data.evidenceFileData,
         severity: severityString,
         status: 'ongoing',
-        createdBy: currentUser.id
+        createdBy: currentUser.id,
+        impact: data.impact,
+        mitigation: data.mitigation
       };
 
       const response = await fetch(api('/api/tensions'), {
@@ -389,8 +392,20 @@ export function ProjectDetail({
         await fetchTensions();
         setShowAddTension(false);
       } else {
-        const err = await response.json();
-        alert("❌ Error: " + (err.error || "Unknown"));
+        // Some servers return HTML/text on errors; try JSON first, then fallback to text.
+        let message = `HTTP ${response.status}`;
+        try {
+          const err = await response.json();
+          message = err?.error || err?.message || message;
+        } catch {
+          try {
+            const txt = await response.text();
+            if (txt) message = txt;
+          } catch {
+            // ignore
+          }
+        }
+        alert("❌ Error: " + message);
       }
     } catch (error) {
       alert("❌ Cannot connect to server.");
