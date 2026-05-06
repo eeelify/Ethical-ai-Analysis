@@ -1,5 +1,13 @@
 const mongoose = require('mongoose');
 const fs = require('fs');
+const path = require('path');
+const dotenv = require('dotenv');
+
+dotenv.config({ path: path.join(__dirname, '.env') });
+const uri = process.env.MONGO_URI;
+if (!uri) {
+    throw new Error('MONGO_URI environment variable bulunamadı (.env yüklenmedi olabilir).');
+}
 
 function log(msg) {
     console.log(msg);
@@ -34,8 +42,7 @@ const ProjectSchema = new mongoose.Schema({
 async function run() {
     fs.writeFileSync('fix_responses.log', '');
     try {
-        const uri = 'mongodb+srv://admin_merve:Sifre123@cluster0.tg8voq1.mongodb.net/zinspection?retryWrites=true&w=majority&appName=Cluster0';
-        await mongoose.connect(uri);
+        await mongoose.connect(uri.replace(/&appName=[^&]*/i, ''));
         log('Connected to DB');
 
         const Project = mongoose.model('Project', ProjectSchema);

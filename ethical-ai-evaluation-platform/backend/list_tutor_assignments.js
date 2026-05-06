@@ -1,10 +1,16 @@
 const mongoose = require('mongoose');
+const path = require('path');
+const dotenv = require('dotenv');
 
-const uri = 'mongodb+srv://admin_merve:Sifre123@cluster0.tg8voq1.mongodb.net/zinspection?retryWrites=true&w=majority&appName=Cluster0';
+dotenv.config({ path: path.join(__dirname, '.env') });
+const uri = process.env.MONGO_URI;
+if (!uri) {
+    throw new Error('MONGO_URI environment variable bulunamadı (.env yüklenmedi olabilir).');
+}
 
 async function run() {
     try {
-        await mongoose.connect(uri);
+        await mongoose.connect(uri.replace(/&appName=[^&]*/i, ''));
         console.log('✅ Connected\n');
 
         const db = mongoose.connection.db;

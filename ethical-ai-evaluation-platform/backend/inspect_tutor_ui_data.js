@@ -1,4 +1,12 @@
 const mongoose = require('mongoose');
+const path = require('path');
+const dotenv = require('dotenv');
+
+dotenv.config({ path: path.join(__dirname, '.env') });
+const uri = process.env.MONGO_URI;
+if (!uri) {
+    throw new Error('MONGO_URI environment variable bulunamadı (.env yüklenmedi olabilir).');
+}
 
 // Use minimal schema to avoid dependency issues
 const ScoreSchema = new mongoose.Schema({
@@ -15,8 +23,7 @@ const ProjectSchema = new mongoose.Schema({
 
 async function run() {
     try {
-        const uri = 'mongodb+srv://admin_merve:Sifre123@cluster0.tg8voq1.mongodb.net/zinspection?retryWrites=true&w=majority&appName=Cluster0';
-        await mongoose.connect(uri);
+        await mongoose.connect(uri.replace(/&appName=[^&]*/i, ''));
         console.log('Connected to DB (Production/Atlas)');
 
         const Project = mongoose.model('Project', ProjectSchema);
