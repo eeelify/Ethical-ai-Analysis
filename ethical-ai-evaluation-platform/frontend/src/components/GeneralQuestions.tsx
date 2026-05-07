@@ -48,6 +48,7 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
   const [loading, setLoading] = useState(true);
   const [generalQuestions, setGeneralQuestions] = useState<GeneralQuestion[]>([]);
   const [completionPercentage, setCompletionPercentage] = useState(0);
+  const [hasLoadedAnswers, setHasLoadedAnswers] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // Convert backend question format to frontend format
@@ -147,7 +148,7 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
             return aOrder - bOrder;
           });
           setGeneralQuestions(convertedQuestions);
-          setLoading(false);
+          // Don't set loading to false here; wait for loadAnswers
         } else {
           console.error('No questions found');
           setLoading(false);
@@ -183,35 +184,34 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
         if (response.ok) {
           const data = await response.json();
           // Load from principles structure if available, otherwise from flat structure
-          if (data.principles) {
-            const loadedAnswers: Record<string, string> = {};
-            const loadedRisks: Record<string, 0 | 1 | 2 | 3 | 4> = {};
-            Object.keys(data.principles).forEach(principle => {
-              if (data.principles[principle].answers) {
-                Object.assign(loadedAnswers, data.principles[principle].answers);
-              }
-              if (data.principles[principle].risks) {
-                Object.keys(data.principles[principle].risks).forEach(key => {
-                  const riskValue = data.principles[principle].risks[key];
-                  if (riskValue >= 0 && riskValue <= 4) {
-                    loadedRisks[key] = riskValue as 0 | 1 | 2 | 3 | 4;
-                  }
-                });
-              }
-            });
-
             // Map answers and risks to all possible question key formats for easier lookup
             const mappedAnswers: Record<string, string> = {};
             const mappedRisks: Record<string, 0 | 1 | 2 | 3 | 4> = {};
 
+            // Always load flat answers/risks if available (highest compatibility)
+            const baseAnswers = data.answers || {};
+            const baseRisks = data.risks || {};
+
+            // If principles exists, merge its answers/risks into base
+            if (data.principles) {
+              Object.keys(data.principles).forEach(principle => {
+                if (data.principles[principle].answers) {
+                  Object.assign(baseAnswers, data.principles[principle].answers);
+                }
+                if (data.principles[principle].risks) {
+                  Object.assign(baseRisks, data.principles[principle].risks);
+                }
+              });
+            }
+
             generalQuestions.forEach(q => {
               const questionKey = getQuestionKey(q);
-              // Find answer/risk by matching code, id, or _id
-              const answerValue = loadedAnswers[q.code] || loadedAnswers[q.id] || loadedAnswers[q._id || ''] || loadedAnswers[questionKey];
-              const riskValue = loadedRisks[q.code] !== undefined ? loadedRisks[q.code] :
-                (loadedRisks[q.id] !== undefined ? loadedRisks[q.id] :
-                  (loadedRisks[q._id || ''] !== undefined ? loadedRisks[q._id || ''] :
-                    loadedRisks[questionKey]));
+              // Find answer/risk by matching code, id, or _id in the base collections
+              const answerValue = baseAnswers[q.code] || baseAnswers[q.id] || baseAnswers[q._id || ''] || baseAnswers[questionKey];
+              const riskValue = baseRisks[q.code] !== undefined ? baseRisks[q.code] :
+                (baseRisks[q.id] !== undefined ? baseRisks[q.id] :
+                  (baseRisks[q._id || ''] !== undefined ? baseRisks[q._id || ''] :
+                    baseRisks[questionKey]));
 
               if (answerValue) {
                 // Store under all possible keys for reliable lookup
@@ -222,56 +222,27 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
               }
 
               if (riskValue !== undefined) {
-                // Store under all possible keys for reliable lookup
-                mappedRisks[q.id] = riskValue;
-                mappedRisks[questionKey] = riskValue;
-                if (q.code) mappedRisks[q.code] = riskValue;
-                if (q._id) mappedRisks[q._id] = riskValue;
+                const numRisk = Number(riskValue);
+                if (numRisk >= 0 && numRisk <= 4) {
+                  const safeRisk = numRisk as 0 | 1 | 2 | 3 | 4;
+                  mappedRisks[q.id] = safeRisk;
+                  mappedRisks[questionKey] = safeRisk;
+                  if (q.code) mappedRisks[q.code] = safeRisk;
+                  if (q._id) mappedRisks[q._id] = safeRisk;
+                }
               }
             });
 
-            // Merge with loaded answers/risks to preserve any that don't match questions
-            setAnswers({ ...loadedAnswers, ...mappedAnswers });
-            setRisks({ ...loadedRisks, ...mappedRisks });
+            setAnswers(mappedAnswers);
+            setRisks(mappedRisks);
           } else {
-            // Fallback to flat structure
-            const mappedAnswers: Record<string, string> = {};
-            const mappedRisks: Record<string, 0 | 1 | 2 | 3 | 4> = {};
-
-            if (data.answers) {
-              generalQuestions.forEach(q => {
-                const questionKey = getQuestionKey(q);
-                const answerValue = data.answers[q.code] || data.answers[q.id] || data.answers[q._id || ''] || data.answers[questionKey];
-                if (answerValue) {
-                  mappedAnswers[q.id] = answerValue;
-                  mappedAnswers[questionKey] = answerValue;
-                  if (q.code) mappedAnswers[q.code] = answerValue;
-                  if (q._id) mappedAnswers[q._id] = answerValue;
-                }
-              });
-              setAnswers({ ...data.answers, ...mappedAnswers });
-            }
-            if (data.risks) {
-              generalQuestions.forEach(q => {
-                const questionKey = getQuestionKey(q);
-                const riskValue = data.risks[q.code] !== undefined ? data.risks[q.code] :
-                  (data.risks[q.id] !== undefined ? data.risks[q.id] :
-                    (data.risks[q._id || ''] !== undefined ? data.risks[q._id || ''] :
-                      data.risks[questionKey]));
-                if (riskValue !== undefined) {
-                  mappedRisks[q.id] = riskValue;
-                  mappedRisks[questionKey] = riskValue;
-                  if (q.code) mappedRisks[q.code] = riskValue;
-                  if (q._id) mappedRisks[q._id] = riskValue;
-                }
-              });
-              setRisks({ ...data.risks, ...mappedRisks });
-            }
+            setAnswers({});
+            setRisks({});
           }
-        }
-      } catch (error) {
-        console.error('Error loading general questions:', error);
-      } finally {
+        } catch (error) {
+          console.error('Error loading general questions:', error);
+        } finally {
+        setHasLoadedAnswers(true);
         setLoading(false);
       }
     };
@@ -317,6 +288,10 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
   };
 
   const saveAnswers = async () => {
+    if (!hasLoadedAnswers) {
+      console.warn('Skipping saveAnswers: Answers not yet loaded');
+      return;
+    }
     setSaving(true);
     try {
       const projectId = project.id || (project as any)._id;

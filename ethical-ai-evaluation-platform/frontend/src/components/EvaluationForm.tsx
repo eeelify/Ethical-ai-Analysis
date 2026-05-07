@@ -235,10 +235,21 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
       result.answer = answerData.multiChoiceKeys;
     }
 
-    // Map risk score (score in Response is 0-4, which maps to riskScores)
-    // Only map if it's a valid score (not the default 2 for unanswered)
+    // Map risk score
+    // Primary source: score (0-4), Secondary source: answerScore (0.0-1.0, map to 0-4)
     if (responseAnswer.score !== undefined && responseAnswer.score !== null) {
       result.riskScore = responseAnswer.score as 0 | 1 | 2 | 3 | 4;
+    } else if (responseAnswer.answerScore !== undefined && responseAnswer.answerScore !== null) {
+      // If it's 0-1, map to 0-4
+      result.riskScore = Math.round(responseAnswer.answerScore * 4) as 0 | 1 | 2 | 3 | 4;
+    }
+
+    // Map importance score (1-3) to priority ('low', 'medium', 'high')
+    if (responseAnswer.importanceScore !== undefined && responseAnswer.importanceScore !== null) {
+      const importance = Number(responseAnswer.importanceScore);
+      if (importance >= 3) result.priority = 'high';
+      else if (importance === 2) result.priority = 'medium';
+      else result.priority = 'low';
     }
 
     console.log('🔄 mapResponseAnswerToLocalState output:', result);
@@ -610,6 +621,16 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                   loadedRiskScores[String(question._id)] = mapped.riskScore;
                 }
               }
+
+              if (mapped.priority !== undefined) {
+                loadedPriorities[questionKey] = mapped.priority;
+                if (question.code) {
+                  loadedPriorities[question.code] = mapped.priority;
+                }
+                if (question._id) {
+                  loadedPriorities[String(question._id)] = mapped.priority;
+                }
+              }
             });
           } else {
             console.log(`⚠️ No answers found in response for ${questionnaireKey}`);
@@ -628,7 +649,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
         }
 
         // Update state
-        if (Object.keys(loadedAnswers).length > 0 || Object.keys(loadedRiskScores).length > 0) {
+        if (Object.keys(loadedAnswers).length > 0 || Object.keys(loadedRiskScores).length > 0 || Object.keys(loadedPriorities).length > 0) {
           setAnswers(prev => {
             const updated = { ...prev, ...loadedAnswers };
             console.log(`✅ Answers state updated. Total keys: ${Object.keys(updated).length}`);
@@ -1115,6 +1136,8 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
         const answerValue = getAnswerValue(question);
         const riskScore = riskScores[question.id] !== undefined ? riskScores[question.id] :
           (riskScores[question.code || ''] !== undefined ? riskScores[question.code || ''] : undefined);
+        const priorityLabel = questionPriorities[question.id] || questionPriorities[question.code || ''] || 'medium';
+        const importanceScore = priorityLabel === 'high' ? 3 : (priorityLabel === 'medium' ? 2 : 1);
 
         // Build answer object in backend format
         const answerObj: any = {
@@ -1141,7 +1164,13 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
         // Add risk score if exists
         if (riskScore !== undefined) {
           answerObj.score = riskScore;
+          // Also send normalized answerScore (0.0 - 1.0) for the ethical scoring service
+          // 4 = No Risk (1.0 safe), 0 = High Risk (0.0 safe)
+          answerObj.answerScore = riskScore / 4;
         }
+
+        // Add importance score
+        answerObj.importanceScore = importanceScore;
 
         // Only add if there's an actual answer
         if (Object.keys(answerObj.answer).length > 0) {

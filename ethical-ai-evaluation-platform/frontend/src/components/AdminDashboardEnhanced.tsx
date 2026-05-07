@@ -1084,6 +1084,7 @@ export function AdminDashboardEnhanced({
       {
         showAssignExpertsModal && selectedProjectForAssignment && (
           <AssignExpertsModal
+            project={selectedProjectForAssignment}
             useCase={useCases.find(uc => uc.id === (selectedProjectForAssignment.useCase as unknown as string)) as UseCase || { title: selectedProjectForAssignment.title } as UseCase}
             users={users}
             onClose={() => {
@@ -2663,15 +2664,18 @@ function ReportsTab({ projects, currentUser, users }: any) {
 
 // Assign Experts Modal
 interface AssignExpertsModalProps {
+  project?: Project;
   useCase: UseCase;
   users: User[];
   onClose: () => void;
   onAssign: (expertIds: string[], notes: string) => void;
 }
 
-function AssignExpertsModal({ useCase, users, onClose, onAssign }: AssignExpertsModalProps) {
-  const [selectedExperts, setSelectedExperts] = useState<string[]>(useCase.assignedExperts || []);
-  const [adminNotes, setAdminNotes] = useState(useCase.adminNotes || '');
+function AssignExpertsModal({ project, useCase, users, onClose, onAssign }: AssignExpertsModalProps) {
+  // Use project.assignedUsers as source of truth for selected experts if available
+  const initialExperts = project?.assignedUsers || useCase.assignedExperts || [];
+  const [selectedExperts, setSelectedExperts] = useState<string[]>(initialExperts);
+  const [adminNotes, setAdminNotes] = useState(project?.adminNotes || useCase.adminNotes || '');
 
   const experts = users.filter(u => u.role !== 'admin' && u.role !== 'use-case-owner');
 
