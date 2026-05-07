@@ -33,6 +33,27 @@ export function AddGeneralQuestion({ project, currentUser, onBack, onComplete }:
   const [required, setRequired] = useState(true);
   const [principle, setPrinciple] = useState<string>(QUESTION_PRINCIPLES[0]?.value || 'TRANSPARENCY');
 
+  // Load existing custom questions on mount
+  React.useEffect(() => {
+    const fetchCustomQuestions = async () => {
+      try {
+        const projectId = project.id || (project as any)._id;
+        const userId = currentUser.id || (currentUser as any)._id;
+        const res = await fetch(api(`/api/evaluations?projectId=${projectId}&userId=${userId}&stage=assess`));
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.customQuestions) {
+            setCustomQuestions(data.customQuestions);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load custom questions:', err);
+      }
+    };
+
+    fetchCustomQuestions();
+  }, [project.id, currentUser.id]);
+
   const handleAddQuestion = () => {
     setShowAddQuestion(true);
   };

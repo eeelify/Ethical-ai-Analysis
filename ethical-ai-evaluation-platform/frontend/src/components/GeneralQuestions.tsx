@@ -49,6 +49,7 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
   const [generalQuestions, setGeneralQuestions] = useState<GeneralQuestion[]>([]);
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [hasLoadedAnswers, setHasLoadedAnswers] = useState(false);
+  const [hasResumed, setHasResumed] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // Convert backend question format to frontend format
@@ -250,6 +251,8 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
     loadAnswers();
   }, [project.id, currentUser.id, generalQuestions.length]);
 
+
+
   const currentQuestion = generalQuestions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === generalQuestions.length - 1;
   const isFirstQuestion = currentQuestionIndex === 0;
@@ -433,6 +436,29 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
     );
     return hasAnswer && hasRisk;
   };
+
+  // Resume logic: Find the first unanswered question
+  useEffect(() => {
+    if (hasLoadedAnswers && generalQuestions.length > 0 && !hasResumed) {
+      console.log('🚀 Starting resume logic for GeneralQuestions...');
+      
+      let resumeIndex = 0;
+      // Find the first question that is not completed
+      const firstUnansweredIndex = generalQuestions.findIndex(q => !isQuestionCompleted(q));
+      
+      if (firstUnansweredIndex !== -1) {
+        resumeIndex = firstUnansweredIndex;
+        console.log(`📍 Found first unanswered question at index ${resumeIndex} (Q${resumeIndex + 1})`);
+      } else {
+        // All questions are answered, go to the last one
+        resumeIndex = generalQuestions.length - 1;
+        console.log(`✅ All questions completed, staying at last question (index ${resumeIndex})`);
+      }
+      
+      setCurrentQuestionIndex(resumeIndex);
+      setHasResumed(true);
+    }
+  }, [hasLoadedAnswers, generalQuestions.length, hasResumed]);
 
   // Navigate to a specific question
   const navigateToQuestion = (index: number) => {

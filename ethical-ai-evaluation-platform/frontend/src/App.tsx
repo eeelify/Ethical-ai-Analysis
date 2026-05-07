@@ -25,6 +25,7 @@ import { saveUser, loadUser, clearUser } from "./utils/auth";
 import { saveViewState, loadViewState, clearViewState } from "./utils/persistence";
 import { ForgotPassword } from "./components/ForgotPassword";
 import { ResetPassword } from "./components/ResetPassword";
+import { fetchUserProgress, fetchUserDetailedProgress } from "./utils/userProgress";
 function App() {
   // Load initial view state from storage if available
   const initialViewState = loadViewState();
@@ -331,11 +332,49 @@ function App() {
     setCurrentView("project-detail");
   };
 
-  const handleStartEvaluation = (project: Project) => {
+  const handleStartEvaluation = async (project: Project) => {
+    if (!currentUser) return;
+    
     setSelectedProject(project);
+    
     // Show general questions first for non-usecase and non-admin users
-    if (currentUser && currentUser.role !== 'use-case-owner' && currentUser.role !== 'admin') {
-      setCurrentView("general-questions");
+    if (currentUser.role !== 'use-case-owner' && currentUser.role !== 'admin') {
+      try {
+        console.log('🔍 Checking user progress for navigation...');
+        const { questionnaireStats, answeredQuestionnaireKeys } = await fetchUserDetailedProgress(project, currentUser);
+        
+        // Determine role-specific general questionnaire key
+        const roleMap: Record<string, string> = {
+          'ethical-expert': 'ethical-expert-v1',
+          'medical-expert': 'medical-expert-v1',
+          'technical-expert': 'technical-expert-v1',
+          'legal-expert': 'legal-expert-v1',
+          'education-expert': 'education-expert-v1',
+        };
+        const roleKey = roleMap[currentUser.role] || null;
+        
+        const isGeneralFinished = questionnaireStats['general-v1']?.isCompleted;
+        const isRoleGeneralFinished = roleKey ? questionnaireStats[roleKey]?.isCompleted : true;
+        
+        // If they have already started the assessment (ethical-v1 or technical-v1), jump to evaluation
+        const hasAssessmentStarted = answeredQuestionnaireKeys.some(key => 
+          key === 'ethical-v1' || key === 'technical-v1'
+        );
+        
+        if (hasAssessmentStarted) {
+          console.log('⏩ Assessment already started, jumping to evaluation view');
+          setCurrentView("evaluation");
+        } else if (isGeneralFinished && isRoleGeneralFinished) {
+          console.log('⏩ General questions finished, jumping to add-general-question view');
+          setCurrentView("add-general-question");
+        } else {
+          console.log('📂 Starting at general questions');
+          setCurrentView("general-questions");
+        }
+      } catch (error) {
+        console.error('Error fetching progress for navigation:', error);
+        setCurrentView("general-questions");
+      }
     } else {
       setCurrentView("evaluation");
     }

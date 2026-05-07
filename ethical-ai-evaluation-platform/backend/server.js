@@ -3556,6 +3556,52 @@ app.get('/api/user-progress', async (req, res) => {
       }
     }
 
+    // PER-QUESTIONNAIRE STATS (Efficient Calculation)
+    const questionnaireStats = {};
+    
+    // Get question counts per questionnaire
+    const questionCounts = await Question.aggregate([
+      { $match: { questionnaireKey: { $in: assignedQuestionnaireKeys } } },
+      { $group: { _id: '$questionnaireKey', count: { $sum: 1 } } }
+    ]);
+    
+    const countMap = {};
+    questionCounts.forEach(c => countMap[c._id] = c.count);
+    
+    assignedQuestionnaireKeys.forEach(qKey => {
+      const qTotal = countMap[qKey] || 0;
+      let qAnswered = 0;
+      
+      const resp = responses.find(r => r.questionnaireKey === qKey);
+      if (resp && Array.isArray(resp.answers)) {
+        const uniqueAnsweredInQ = new Set();
+        resp.answers.forEach(a => {
+          const idKey = a?.questionId ? String(a.questionId) : '';
+          const codeKey = a?.questionCode !== undefined && a?.questionCode !== null ? String(a.questionCode).trim() : '';
+          const key = idKey.length > 0 ? idKey : (codeKey.length > 0 ? `${qKey}:${codeKey}` : '');
+          
+          if (!key) return;
+          
+          let hasAnswer = false;
+          if (a?.answer) {
+            if (a.answer.choiceKey !== null && a.answer.choiceKey !== undefined && a.answer.choiceKey !== '') hasAnswer = true;
+            else if (a.answer.text !== null && a.answer.text !== undefined && String(a.answer.text).trim().length > 0) hasAnswer = true;
+            else if (a.answer.numeric !== null && a.answer.numeric !== undefined) hasAnswer = true;
+            else if (Array.isArray(a.answer.multiChoiceKeys) && a.answer.multiChoiceKeys.length > 0) hasAnswer = true;
+          }
+          
+          if (hasAnswer) uniqueAnsweredInQ.add(key);
+        });
+        qAnswered = uniqueAnsweredInQ.size;
+      }
+      
+      questionnaireStats[qKey] = {
+        total: qTotal,
+        answered: qAnswered,
+        isCompleted: qTotal > 0 && qAnswered >= qTotal
+      };
+    });
+
     // Total = regular questions + custom questions
     const totalWithCustom = totalQuestions + customQuestionsTotal;
     const answeredWithCustom = answeredKeys.size + customQuestionsAnswered;
@@ -3565,11 +3611,9 @@ app.get('/api/user-progress', async (req, res) => {
       progress: Math.max(0, Math.min(100, progress)),
       answered: answeredWithCustom,
       total: totalWithCustom,
-      regularAnswered: answeredKeys.size,
-      regularTotal: totalQuestions,
-      customAnswered: customQuestionsAnswered,
-      customTotal: customQuestionsTotal,
+      questionnaireStats, // NEW: Per-questionnaire details
       questionnaires: assignedQuestionnaireKeys,
+      answeredQuestionnaireKeys: Array.from(distinctResponseKeys),
       responseCount: responses.length
     });
   } catch (err) {
