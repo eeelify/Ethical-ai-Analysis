@@ -52,7 +52,15 @@ export function ProjectDetail({
 }: ProjectDetailProps) {
   const [activeTab, setActiveTab] = useState<'evaluation' | 'tensions' | 'usecase' | 'owners' | 'dashboard'>(initialTab as any);
   const [showAddTension, setShowAddTension] = useState(false);
-  const [tensions, setTensions] = useState<Tension[]>([]);
+  const [tensions, setTensions] = useState<Tension[]>(() => {
+    // Load from localStorage if present for this project
+    try {
+      const stored = localStorage.getItem(`tensions_${project.id || (project as any)._id}`);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
   // Yeni: Bağlı Use Case verisini tutacak state
   const [linkedUseCase, setLinkedUseCase] = useState<UseCase | null>(null);
   const [useCaseQuestions, setUseCaseQuestions] = useState<any[]>([]);
@@ -382,7 +390,12 @@ export function ProjectDetail({
         mitigation: data.mitigation
       };
 
-      const response = await fetch(api('/api/tensions'), {
+      // Before fetching fresh data, try to sync any locally stored tensions
+    try {
+      const stored = localStorage.getItem(`tensions_${project.id || (project as any)._id}`);
+      if (stored) setTensions(JSON.parse(stored));
+    } catch {}
+    const response = await fetch(api('/api/tensions'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
