@@ -1,0 +1,23 @@
+fastapi
+uvicorn
+neo4j
+pydantic
+python-dotenv
+chromadb
+google-generativeai
+langchain
+langchain-google-genai
+langchain-community
+PyMuPDF
+python-multipart
+python-docx
+owlready2
+
+# Testing & QA
+pytest
+pytest-asyncio
+httpx
+pytest-cov
+respx
+pytest-mock
+locust
