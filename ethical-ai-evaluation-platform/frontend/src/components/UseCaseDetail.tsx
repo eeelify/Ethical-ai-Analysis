@@ -388,14 +388,6 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
       {/* Header */}
       <div className="sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm">
         <div className="px-8 py-4">
-          <button
-            onClick={onBack}
-            className="flex items-center text-gray-600 hover:text-gray-800 mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </button>
-
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <h1 className="text-2xl text-gray-900 mb-2">{uc.title}</h1>

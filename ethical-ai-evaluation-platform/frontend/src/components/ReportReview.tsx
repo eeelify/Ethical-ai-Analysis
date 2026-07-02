@@ -204,13 +204,7 @@ export function ReportReview({
       <div className="bg-white border-b border-gray-200 sticky top-0 z-20">
         <div className="px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button
-              onClick={onBack}
-              className="flex items-center text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-sm font-medium"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </button>
+
             <div>
               <div className="text-sm text-gray-500">Report Review</div>
               <div className="text-lg font-semibold text-gray-900">{report?.title || "Report"}</div>

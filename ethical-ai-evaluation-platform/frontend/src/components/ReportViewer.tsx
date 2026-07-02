@@ -90,13 +90,6 @@ export function ReportViewer({ reportId, currentUser, onBack }: ReportViewerProp
       <div className="bg-white shadow-sm border-b sticky top-0 z-10">
         <div className="px-6 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <button
-              onClick={onBack}
-              className="flex items-center text-gray-600 hover:text-gray-800"
-            >
-              <ArrowLeft className="h-4 w-4 mr-1" />
-              Back
-            </button>
             <h1 className="text-xl font-semibold text-gray-900">Report Viewer</h1>
           </div>
           <div className="flex items-center space-x-3">

@@ -127,13 +127,7 @@ export function PreconditionApproval({
       {/* Header */}
       <div className="bg-white shadow-sm px-6 py-4">
         <div className="flex items-center">
-          <button
-            onClick={onBack}
-            className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Back
-          </button>
+
           <h1 className="text-xl text-gray-900">Ethical AI Analysis Platform</h1>
         </div>
       </div>

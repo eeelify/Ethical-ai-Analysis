@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { LoginScreen } from "./components/LoginScreen";
+import { HomePage } from "./components/HomePage";
+import { AnimatePresence } from "framer-motion";
 import { AdminDashboardEnhanced } from "./components/AdminDashboardEnhanced";
 import { UserDashboard } from "./components/UserDashboard";
 import { UseCaseOwnerDashboard } from "./components/UseCaseOwnerDashboard";
@@ -27,16 +29,76 @@ import { ForgotPassword } from "./components/ForgotPassword";
 import { ResetPassword } from "./components/ResetPassword";
 import { fetchUserProgress, fetchUserDetailedProgress } from "./utils/userProgress";
 function App() {
-  // Load initial view state from storage if available
-  const initialViewState = loadViewState();
+  // User requested to disable "resume from where left off" behavior for security and predictability
+  // const initialViewState = loadViewState();
 
   const [currentUser, setCurrentUser] = useState<User | null>(() => loadUser());
-  const [currentView, setCurrentView] = useState<string>(initialViewState?.currentView || "dashboard");
-  const [selectedProject, setSelectedProject] = useState<Project | null>(initialViewState?.selectedProject || null);
-  const [selectedTension, setSelectedTension] = useState<Tension | null>(initialViewState?.selectedTension || null);
-  const [selectedOwner, setSelectedOwner] = useState<User | null>(initialViewState?.selectedOwner || null);
-  const [selectedUseCase, setSelectedUseCase] = useState<UseCase | null>(initialViewState?.selectedUseCase || null);
-  const [selectedReportId, setSelectedReportId] = useState<string | null>(initialViewState?.selectedReportId || null);
+  const [currentView, setCurrentView] = useState<string>("dashboard");
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedTension, setSelectedTension] = useState<Tension | null>(null);
+  const [selectedOwner, setSelectedOwner] = useState<User | null>(null);
+  const [selectedUseCase, setSelectedUseCase] = useState<UseCase | null>(null);
+  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
+  
+  const isPopStateRef = React.useRef(false);
+  const isInitialMountRef = React.useRef(true);
+
+  // Global navigation sync with browser history
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      if (e.state && e.state.appNavState) {
+        isPopStateRef.current = true; // Prevent the pushState effect from running
+        const s = e.state.appNavState;
+        setCurrentView(s.currentView);
+        setSelectedProject(s.selectedProject);
+        setSelectedTension(s.selectedTension);
+        setSelectedOwner(s.selectedOwner);
+        setSelectedUseCase(s.selectedUseCase);
+        setSelectedReportId(s.selectedReportId);
+      }
+    };
+    
+    const constructUrl = () => {
+      const params = new URLSearchParams();
+      if (currentView !== 'dashboard') params.set('view', currentView);
+      if (selectedProject) params.set('projectId', (selectedProject as any).id || (selectedProject as any)._id);
+      if (selectedUseCase) params.set('useCaseId', (selectedUseCase as any).id || (selectedUseCase as any)._id);
+      if (selectedReportId) params.set('reportId', selectedReportId);
+      const query = params.toString();
+      return window.location.pathname + (query ? '?' + query : '');
+    };
+
+    // Replace initial state so we have something to pop back to
+    window.history.replaceState({
+      appNavState: { currentView, selectedProject, selectedTension, selectedOwner, selectedUseCase, selectedReportId }
+    }, '', constructUrl());
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []); // Run once on mount
+
+  useEffect(() => {
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+      return;
+    }
+    if (isPopStateRef.current) {
+      isPopStateRef.current = false;
+      return;
+    }
+    // Push new state to history when any view-related state changes
+    const params = new URLSearchParams();
+    if (currentView !== 'dashboard') params.set('view', currentView);
+    if (selectedProject) params.set('projectId', (selectedProject as any).id || (selectedProject as any)._id);
+    if (selectedUseCase) params.set('useCaseId', (selectedUseCase as any).id || (selectedUseCase as any)._id);
+    if (selectedReportId) params.set('reportId', selectedReportId);
+    const query = params.toString();
+    const newUrl = window.location.pathname + (query ? '?' + query : '');
+
+    window.history.pushState({
+      appNavState: { currentView, selectedProject, selectedTension, selectedOwner, selectedUseCase, selectedReportId }
+    }, '', newUrl);
+  }, [currentView, selectedProject, selectedTension, selectedOwner, selectedUseCase, selectedReportId]);
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [useCases, setUseCases] = useState<UseCase[]>([]);
@@ -169,6 +231,8 @@ function App() {
 
   // Persist view state whenever navigation changes
   useEffect(() => {
+    /* 
+     // Disabled to ensure users always start fresh on the dashboard
     if (currentUser) {
       saveViewState({
         currentView,
@@ -179,6 +243,7 @@ function App() {
         selectedReportId
       });
     }
+    */
   }, [currentUser, currentView, selectedProject, selectedTension, selectedOwner, selectedUseCase, selectedReportId]);
 
   // Minimal URL-based route support for report review screen: /reports/:reportId/review
@@ -652,31 +717,52 @@ function App() {
     }
   };
 
-  // Check URL manually for forgot-password and reset-password routes
+  // Client-side routing state for unauthenticated views
+  const [unauthPath, setUnauthPath] = useState(window.location.pathname || '/');
+
+  useEffect(() => {
+    const handlePopState = () => setUnauthPath(window.location.pathname || '/');
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const navigateUnauth = (path: string) => {
+    window.history.pushState({}, '', path);
+    setUnauthPath(path);
+  };
+
   if (!currentUser) {
-    const path = window.location.pathname;
-
-    if (path === '/forgot-password') {
-      return (
+    let unauthContent;
+    
+    if (unauthPath === '/forgot-password') {
+      unauthContent = (
         <ForgotPassword
-          onBackToLogin={() => {
-            window.location.href = '/';
-          }}
+          key="forgot-password"
+          onBackToLogin={() => navigateUnauth('/login')}
         />
       );
-    }
-
-    if (path === '/reset-password') {
-      return (
+    } else if (unauthPath === '/reset-password') {
+      unauthContent = (
         <ResetPassword
-          onBackToLogin={() => {
-            window.location.href = '/';
-          }}
+          key="reset-password"
+          onBackToLogin={() => navigateUnauth('/login')}
         />
       );
+    } else if (unauthPath === '/login') {
+      unauthContent = <LoginScreen key="login" onLogin={handleLogin} initialView="login" navigateTo={navigateUnauth} />;
+    } else if (unauthPath === '/register' || unauthPath === '/signup') {
+      unauthContent = <LoginScreen key="register" onLogin={handleLogin} initialView="register" navigateTo={navigateUnauth} />;
+    } else {
+      unauthContent = <HomePage key="home" navigateTo={navigateUnauth} />;
     }
 
-    return <LoginScreen onLogin={handleLogin} />;
+    return (
+      <div className="min-h-screen bg-[#050b14]">
+        <AnimatePresence mode="wait">
+          {unauthContent}
+        </AnimatePresence>
+      </div>
+    );
   }
 
   if (needsPrecondition) {

@@ -338,13 +338,7 @@ const fetchConversations = async () => {
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <button
-                  onClick={onBack}
-                  className="flex items-center text-gray-600 hover:text-gray-800"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-1" />
-                  Back
-                </button>
+
                 <div>
                   <h1 className="text-xl text-gray-900 flex items-center">
                     <Users className="h-5 w-5 mr-2" />

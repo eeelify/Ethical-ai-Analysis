@@ -1748,25 +1748,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  try {
-                    if (onBack && typeof onBack === 'function') {
-                      onBack();
-                    } else {
-                      console.warn('onBack is not a function or is undefined');
-                    }
-                  } catch (error) {
-                    console.error('Error in onBack:', error);
-                    // Error is logged, parent component should handle navigation
-                  }
-                }}
-                className="flex items-center text-gray-600 hover:text-gray-900 transition-colors bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg text-sm font-medium"
-              >
-                <ArrowLeft className="h-4 w-4 mr-1" /> Back
-              </button>
+
               <div>
                 <h1 className="text-xl text-gray-900 font-bold tracking-tight">
                   {currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1)} Evaluation

@@ -6082,6 +6082,10 @@ app.use('/api/evaluations', evaluationRoutes);
 const reportRoutes = require('./routes/reportRoutes');
 app.use('/api/reports', reportRoutes);
 
+// Ontology Service Routes
+const ontologyRoutes = require('./routes/ontologyRoutes');
+app.use('/api/ontology', ontologyRoutes);
+
 // Health check endpoint for deployment platforms
 app.get('/api/health', (req, res) => {
   res.json({

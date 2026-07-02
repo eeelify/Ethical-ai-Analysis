@@ -11,6 +11,7 @@ import { ChatPanel } from './ChatPanel';
 import { fetchUserProgress } from '../utils/userProgress';
 import { api } from '../api';
 import { Spinner } from './Spinner';
+import { OntologyReportViewer } from './OntologyReportViewer';
 
 interface ProjectDetailProps {
   project: Project;
@@ -65,7 +66,8 @@ export function ProjectDetail({
   const [linkedUseCase, setLinkedUseCase] = useState<UseCase | null>(null);
   const [useCaseQuestions, setUseCaseQuestions] = useState<any[]>([]);
   // Chat panel state
-  const [chatPanelOpen, setChatPanelOpen] = useState(false);
+  const [savingNotes, setSavingNotes] = useState(false);
+  const [ontologyReportData, setOntologyReportData] = useState<any>(null);
   const [chatOtherUser, setChatOtherUser] = useState<User | null>(null);
   const [chatProject, setChatProject] = useState<Project | null>(null);
   const [userProgress, setUserProgress] = useState<number>(project.progress || 0);
@@ -562,12 +564,12 @@ export function ProjectDetail({
     }
   };
 
-  // Generate report for a project
+  // Generate report for a project (Ontology Backend)
   const handleGenerateReport = async () => {
     try {
       setGenerating(true);
       const projectId = project.id || (project as any)._id;
-      const response = await fetch(api('/api/reports/generate'), {
+      const response = await fetch(api('/api/ontology/report'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -578,41 +580,17 @@ export function ProjectDetail({
 
       if (response.ok) {
         const result = await response.json();
-        alert('✅ Report generated successfully!');
-        // Update latest report from response or fetch it
+        alert('✅ Ontology Report generated successfully!');
         if (result.report) {
-          setLatestReport({
-            id: result.report.id || result.report._id,
-            fileUrl: result.report.fileUrl || `/api/reports/${result.report.id || result.report._id}/file`,
-            title: result.report.title || 'Analysis Report'
-          });
-        } else {
-          // Fallback: fetch latest report
-          const projectId = project.id || (project as any)._id;
-          const userId = currentUser?.id || (currentUser as any)?._id;
-          try {
-            const reportResponse = await fetch(api(`/api/projects/${projectId}/reports/latest?userId=${userId}`));
-            if (reportResponse.ok) {
-              const data = await reportResponse.json();
-              if (data.report) {
-                setLatestReport({
-                  id: data.report._id,
-                  fileUrl: data.report.fileUrl || `/api/reports/${data.report._id}/file`,
-                  title: data.report.title || 'Analysis Report'
-                });
-              }
-            }
-          } catch (err) {
-            console.warn('Could not fetch latest report after generation');
-          }
+          setOntologyReportData(result.report);
         }
       } else {
-        const error = await response.json();
-        alert('❌ Error: ' + (error.error || 'Failed to generate report'));
+        const errorData = await response.json();
+        alert(`❌ Failed to generate ontology report: ${errorData.error || 'Unknown error'}`);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error generating report:', error);
-      alert('❌ Error: ' + (error.message || 'Failed to generate report'));
+      alert('Could not connect to the server.');
     } finally {
       setGenerating(false);
     }
@@ -689,14 +667,16 @@ export function ProjectDetail({
     }
   };
 
+  // If ontology report is available, render the viewer directly instead of ProjectDetail tabs
+  if (ontologyReportData) {
+    return <OntologyReportViewer report={ontologyReportData} onBack={() => setOntologyReportData(null)} />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white shadow-sm border-b">
         <div className="px-6 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <button onClick={onBack} className="flex items-center text-gray-600 hover:text-gray-800">
-              <ArrowLeft className="h-4 w-4 mr-1" /> Back
-            </button>
             <div>
               <h1 className="text-xl text-gray-900 mr-3 flex items-center">
                 {project.title}

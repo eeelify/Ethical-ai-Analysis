@@ -52,20 +52,7 @@ export function UseCaseOwnerDetail({ owner, currentUser, onBack, onViewUseCase }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="px-6 py-4">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={onBack}
-              className="flex items-center text-gray-600 hover:text-gray-800"
-            >
-              <ArrowLeft className="h-4 w-4 mr-1" />
-              Back
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Header removed as it only contained back button */}
 
       <div className="px-6 py-6 max-w-5xl mx-auto">
         {/* Owner Profile */}
