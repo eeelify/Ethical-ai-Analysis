@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { saveAdminDashboardTab, loadAdminDashboardTab } from '../utils/persistence';
-import { Plus, Folder, MessageSquare, Users, LogOut, Search, BarChart3, UserPlus, X, Link as LinkIcon, CheckCircle2, Trash2, Bell, Clock, FileText, Download } from 'lucide-react';
+import { Plus, Folder, MessageSquare, Users, LogOut, Search, BarChart3, UserPlus, X, Link as LinkIcon, CheckCircle2, Trash2, Bell, Clock, FileText, Download, Database } from 'lucide-react';
 import { Project, User, UseCase } from '../types';
 import { fetchUserProgress } from '../utils/userProgress';
 import { ChatPanel } from './ChatPanel';
 import { ProfileModal } from './ProfileModal';
 import { ExpertQuestionManager } from './ExpertQuestionManager';
+import { OntologyViewerTab } from './OntologyViewerTab';
 import { api } from '../api';
 
 interface AdminDashboardEnhancedProps {
@@ -86,14 +87,14 @@ const ProjectCard: React.FC<{
     <div
       key={project.id}
       onClick={() => onViewProject(project)}
-      className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-all cursor-pointer group"
+      className="bg-[#050b14] rounded-xl border border-white/10 p-6 hover:border-cyan-500/30 hover:shadow-[0_0_15px_rgba(34,211,238,0.1)] transition-all cursor-pointer group"
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+          <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-cyan-400 transition-colors">
             {project.title}
           </h3>
-          <p className="text-sm text-gray-500 line-clamp-2 h-10">{project.shortDescription}</p>
+          <p className="text-sm text-slate-400 line-clamp-2 h-10">{project.shortDescription}</p>
         </div>
         <button
           onClick={(e) => {
@@ -139,21 +140,21 @@ const ProjectCard: React.FC<{
       </div>
 
       <div className="mb-4">
-        <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+        <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
           <span>Progress</span>
-          <span className="font-medium text-gray-700">{progressDisplay}%</span>
+          <span className="font-medium text-white">{progressDisplay}%</span>
         </div>
-        <div className="w-full bg-gray-100 rounded-full h-1.5">
+        <div className="w-full bg-white/10 rounded-full h-1.5">
           <div
-            className="bg-gradient-to-r from-green-500 to-green-600 h-1.5 rounded-full transition-all"
+            className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-1.5 rounded-full transition-all"
             style={{ width: `${progressDisplay}%`, minWidth: progressDisplay > 0 ? '8px' : '0' }}
           />
         </div>
       </div>
 
-      <div className="pt-4 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
+      <div className="pt-4 border-t border-white/10 flex justify-between items-center text-xs text-slate-400">
         <span>Updated: {new Date(project.createdAt).toLocaleDateString()}</span>
-        {project.isNew && <span className="text-blue-600 font-medium">New Project</span>}
+        {project.isNew && <span className="text-cyan-400 font-medium">New Project</span>}
       </div>
     </div>
   );
@@ -555,19 +556,19 @@ export function AdminDashboardEnhanced({
 
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen bg-[#0a1122] overflow-hidden text-slate-300">
       {/* Sidebar */}
-      <div className="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
+      <div className="w-64 bg-[#050b14] border-r border-white/10 flex flex-col flex-shrink-0">
         <div className="h-1 bg-gradient-to-r from-blue-600 to-blue-800" />
 
-        <div className="p-6 border-b border-gray-200">
-          <div className="text-xl font-bold text-gray-900 mb-1">Ethical AI Analysis</div>
-          <div className="text-xs text-gray-500 uppercase tracking-wider">Admin Portal</div>
+        <div className="p-6 border-b border-white/10">
+          <div className="text-xl font-bold text-white mb-1">Ethical AI Analysis</div>
+          <div className="text-xs text-slate-500 uppercase tracking-wider">Admin Portal</div>
         </div>
 
         <button
           onClick={() => setShowProfile(true)}
-          className="w-full px-6 py-6 border-b border-gray-200 hover:bg-gray-50 transition-colors text-left"
+          className="w-full px-6 py-6 border-b border-white/10 hover:bg-white/5 transition-colors text-left"
         >
           <div className="flex items-center">
             {(currentUser as any).profileImage ? (
@@ -582,8 +583,8 @@ export function AdminDashboardEnhanced({
               </div>
             )}
             <div className="text-sm overflow-hidden">
-              <div className="text-gray-900 font-medium truncate">{currentUser.name}</div>
-              <div className="text-gray-500 text-xs">Administrator</div>
+              <div className="text-white font-medium truncate">{currentUser.name}</div>
+              <div className="text-slate-500 text-xs">Administrator</div>
             </div>
           </div>
         </button>
@@ -591,7 +592,7 @@ export function AdminDashboardEnhanced({
         <nav className="flex-1 px-3 py-6 space-y-1">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'dashboard' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'dashboard' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-white/5 hover:text-white'
               }`}
           >
             <Folder className="h-5 w-5 mr-3 text-blue-600" />
@@ -599,7 +600,7 @@ export function AdminDashboardEnhanced({
           </button>
           <button
             onClick={() => setActiveTab('use-case-assignments')}
-            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'use-case-assignments' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'use-case-assignments' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-white/5 hover:text-white'
               }`}
           >
             <UserPlus className="h-5 w-5 mr-3 text-orange-600" />
@@ -607,7 +608,7 @@ export function AdminDashboardEnhanced({
           </button>
           <button
             onClick={() => setActiveTab('project-creation')}
-            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'project-creation' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'project-creation' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-white/5 hover:text-white'
               }`}
           >
             <Plus className="h-5 w-5 mr-3 text-green-600" />
@@ -615,7 +616,7 @@ export function AdminDashboardEnhanced({
           </button>
           <button
             onClick={() => setActiveTab('created-reports')}
-            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'created-reports' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'created-reports' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-white/5 hover:text-white'
               }`}
           >
             <FileText className="h-5 w-5 mr-3 text-purple-600" />
@@ -623,7 +624,7 @@ export function AdminDashboardEnhanced({
           </button>
           <button
             onClick={() => setActiveTab('expert-questions')}
-            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'expert-questions' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'expert-questions' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-white/5 hover:text-white'
               }`}
           >
             <FileText className="h-5 w-5 mr-3 text-pink-600" />
@@ -631,7 +632,7 @@ export function AdminDashboardEnhanced({
           </button>
           <button
             onClick={() => onNavigate('other-members')}
-            className="w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+            className="w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
           >
             <Users className="h-5 w-5 mr-3 text-teal-600" />
             Members
@@ -640,14 +641,22 @@ export function AdminDashboardEnhanced({
             onClick={() => {
               onNavigate('shared-area');
             }}
-            className="w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+            className="w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
           >
             <MessageSquare className="h-5 w-5 mr-3 text-indigo-600" />
             Shared Area
           </button>
+          <button
+            onClick={() => setActiveTab('ontology')}
+            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'ontology' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+              }`}
+          >
+            <Database className="h-5 w-5 mr-3 text-pink-600" />
+            Ontology
+          </button>
         </nav>
 
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-white/10">
           <button
             onClick={onLogout}
             className="w-full px-4 py-2 flex items-center text-red-600 hover:bg-red-50 rounded-lg text-sm font-medium transition-colors"
@@ -659,11 +668,11 @@ export function AdminDashboardEnhanced({
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 min-h-0 flex flex-col bg-gray-50">
+      <div className="flex-1 min-h-0 flex flex-col bg-[#0a1122]">
         {/* Top Bar with Notifications */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
+        <div className="bg-[#050b14] border-b border-white/10 px-6 py-4 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-4">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-white">
               {activeTab === 'dashboard' && 'Dashboard'}
               {activeTab === 'use-case-assignments' && 'Use Case Assignments'}
               {activeTab === 'project-creation' && 'Create Project'}
@@ -677,7 +686,7 @@ export function AdminDashboardEnhanced({
             <div className="relative" ref={messageNotificationRef}>
               <button
                 onClick={() => setShowMessageNotifications(!showMessageNotifications)}
-                className="relative p-2 text-gray-600 hover:text-gray-900"
+                className="relative p-2 text-slate-400 hover:text-white"
               >
                 <MessageSquare className="h-5 w-5" />
                 {messageUnreadCount > 0 && (
@@ -689,7 +698,7 @@ export function AdminDashboardEnhanced({
 
               {showMessageNotifications && (
                 <div
-                  className="absolute top-full mt-2 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999] overflow-hidden flex flex-col"
+                  className="absolute top-full mt-2 bg-[#050b14] rounded-lg shadow-[0_0_15px_rgba(34,211,238,0.1)] border border-white/10 z-[9999] overflow-hidden flex flex-col"
                   style={{
                     right: '0',
                     width: 'min(320px, calc(100vw - 2rem))',
@@ -697,18 +706,18 @@ export function AdminDashboardEnhanced({
                     maxWidth: 'calc(100vw - 1rem)'
                   }}
                 >
-                  <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
-                    <h3 className="font-semibold text-gray-900">Messages</h3>
+                  <div className="p-4 border-b border-white/10 flex items-center justify-between flex-shrink-0">
+                    <h3 className="font-semibold text-white">Messages</h3>
                     <button
                       onClick={() => setShowMessageNotifications(false)}
                       className="p-1 hover:bg-gray-100 rounded-full"
                     >
-                      <X className="h-4 w-4 text-gray-500" />
+                      <X className="h-4 w-4 text-slate-400" />
                     </button>
                   </div>
                   <div className="overflow-y-auto flex-1 min-h-0">
                     {messageUnreadConversations.length === 0 ? (
-                      <div className="p-6 text-center text-gray-500">
+                      <div className="p-6 text-center text-slate-400">
                         <MessageSquare className="h-8 w-8 text-gray-300 mx-auto mb-2" />
                         <p className="text-sm">No unread messages</p>
                       </div>
@@ -726,11 +735,11 @@ export function AdminDashboardEnhanced({
                                   <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-medium">
                                     {conv.fromUserName?.charAt(0) || 'U'}
                                   </div>
-                                  <div className="font-medium text-gray-900 text-sm truncate">
+                                  <div className="font-medium text-white text-sm truncate">
                                     {conv.fromUserName}
                                   </div>
                                 </div>
-                                <div className="text-xs text-gray-500 line-clamp-2">
+                                <div className="text-xs text-slate-400 line-clamp-2">
                                   {conv.lastMessage}
                                 </div>
                               </div>
@@ -753,7 +762,7 @@ export function AdminDashboardEnhanced({
             <div className="relative" ref={notificationRef}>
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="relative p-2 text-gray-600 hover:text-gray-900"
+                className="relative p-2 text-slate-400 hover:text-white"
               >
                 <Bell className="h-5 w-5" />
                 {unreadCount > 0 && (
@@ -765,7 +774,7 @@ export function AdminDashboardEnhanced({
 
               {showNotifications && (
                 <div
-                  className="absolute top-full mt-2 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999] overflow-hidden flex flex-col"
+                  className="absolute top-full mt-2 bg-[#050b14] rounded-lg shadow-[0_0_15px_rgba(34,211,238,0.1)] border border-white/10 z-[9999] overflow-hidden flex flex-col"
                   style={{
                     right: '0',
                     width: 'min(360px, calc(100vw - 2rem))',
@@ -773,20 +782,20 @@ export function AdminDashboardEnhanced({
                     maxWidth: 'calc(100vw - 1rem)'
                   }}
                 >
-                  <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
-                    <h3 className="font-semibold text-gray-900">Notifications</h3>
+                  <div className="p-4 border-b border-white/10 flex items-center justify-between flex-shrink-0">
+                    <h3 className="font-semibold text-white">Notifications</h3>
                     <button
                       onClick={() => setShowNotifications(false)}
                       className="p-1 hover:bg-gray-100 rounded-full"
                     >
-                      <X className="h-4 w-4 text-gray-500" />
+                      <X className="h-4 w-4 text-slate-400" />
                     </button>
                   </div>
                   {/* Tab Toggle */}
-                  <div className="flex border-b border-gray-200 flex-shrink-0">
+                  <div className="flex border-b border-white/10 flex-shrink-0">
                     <button
                       onClick={() => setShowNotificationHistory(false)}
-                      className={`flex-1 py-2 text-sm font-medium ${!showNotificationHistory ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                      className={`flex-1 py-2 text-sm font-medium ${!showNotificationHistory ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-400 hover:text-gray-700'}`}
                     >
                       Unread ({unreadCount})
                     </button>
@@ -795,7 +804,7 @@ export function AdminDashboardEnhanced({
                         setShowNotificationHistory(true);
                         fetchAllNotifications();
                       }}
-                      className={`flex-1 py-2 text-sm font-medium ${showNotificationHistory ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                      className={`flex-1 py-2 text-sm font-medium ${showNotificationHistory ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-400 hover:text-gray-700'}`}
                     >
                       History
                     </button>
@@ -804,7 +813,7 @@ export function AdminDashboardEnhanced({
                     {!showNotificationHistory ? (
                       /* Unread View */
                       unreadConversations.length === 0 ? (
-                        <div className="p-6 text-center text-gray-500">
+                        <div className="p-6 text-center text-slate-400">
                           <Bell className="h-8 w-8 text-gray-300 mx-auto mb-2" />
                           <p className="text-sm">No unread notifications</p>
                         </div>
@@ -822,11 +831,11 @@ export function AdminDashboardEnhanced({
                                     <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-medium">
                                       {conv.fromUserName?.charAt(0) || 'U'}
                                     </div>
-                                    <div className="font-medium text-gray-900 text-sm truncate">
+                                    <div className="font-medium text-white text-sm truncate">
                                       {conv.fromUserName}
                                     </div>
                                   </div>
-                                  <div className="text-xs text-gray-500 line-clamp-2">
+                                  <div className="text-xs text-slate-400 line-clamp-2">
                                     {String(conv.lastMessage || '').startsWith('[NOTIFICATION]')
                                       ? String(conv.lastMessage).replace(/^\[NOTIFICATION\]\s*/, '')
                                       : conv.lastMessage}
@@ -845,7 +854,7 @@ export function AdminDashboardEnhanced({
                     ) : (
                       /* History View */
                       allSystemNotifications.length === 0 ? (
-                        <div className="p-6 text-center text-gray-500">
+                        <div className="p-6 text-center text-slate-400">
                           <Bell className="h-8 w-8 text-gray-300 mx-auto mb-2" />
                           <p className="text-sm">No notification history</p>
                         </div>
@@ -854,7 +863,7 @@ export function AdminDashboardEnhanced({
                           {allSystemNotifications.map((notif, idx) => (
                             <div
                               key={notif._id || idx}
-                              className={`p-4 hover:bg-gray-50 transition-colors ${notif.isRead ? 'bg-white' : 'bg-blue-50'}`}
+                              className={`p-4 hover:bg-[#0a1122] transition-colors ${notif.isRead ? 'bg-[#050b14]' : 'bg-cyan-500/10'}`}
                             >
                               <div className="flex items-start justify-between">
                                 <div className="flex-1 min-w-0">
@@ -862,7 +871,7 @@ export function AdminDashboardEnhanced({
                                     <div className={`w-8 h-8 rounded-full ${notif.isRead ? 'bg-gray-400' : 'bg-blue-600'} text-white flex items-center justify-center text-xs font-medium`}>
                                       {notif.actorId?.name?.charAt(0) || 'S'}
                                     </div>
-                                    <div className="font-medium text-gray-900 text-sm truncate">
+                                    <div className="font-medium text-white text-sm truncate">
                                       {notif.actorId?.name || 'System'}
                                     </div>
                                     {!notif.isRead && (
@@ -870,7 +879,7 @@ export function AdminDashboardEnhanced({
                                     )}
                                   </div>
                                   <div className="text-sm font-medium text-gray-800 mb-0.5">{notif.title}</div>
-                                  <div className="text-xs text-gray-500 line-clamp-2">{notif.message}</div>
+                                  <div className="text-xs text-slate-400 line-clamp-2">{notif.message}</div>
                                   <div className="text-xs text-gray-400 mt-1">
                                     {notif.projectId?.title && <span className="mr-2">📁 {notif.projectId.title}</span>}
                                     {notif.createdAt && formatTime(notif.createdAt)}
@@ -893,13 +902,13 @@ export function AdminDashboardEnhanced({
         <div className={`flex-1 min-h-0 flex flex-col ${activeTab === 'chats' ? '' : 'hidden'}`}>
           <div className="flex-1 min-h-0 flex">
             {/* Conversations List */}
-            <div className={`${chatPanelOpen ? 'w-1/3' : 'w-full'} border-r border-gray-200 bg-white flex flex-col min-h-0`}>
+            <div className={`${chatPanelOpen ? 'w-1/3' : 'w-full'} border-r border-white/10 bg-[#050b14] flex flex-col min-h-0`}>
               <div className="p-6 flex-1 overflow-y-auto min-h-0">
                 {allConversations.length === 0 ? (
                   <div className="text-center py-12">
                     <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg text-gray-900 mb-2">No conversations yet</h3>
-                    <p className="text-gray-600">
+                    <h3 className="text-lg text-white mb-2">No conversations yet</h3>
+                    <p className="text-slate-400">
                       Start a conversation with a team member to see it here.
                     </p>
                   </div>
@@ -916,8 +925,8 @@ export function AdminDashboardEnhanced({
                       return (
                         <div
                           key={`${conv.projectId}-${conv.otherUserId}`}
-                          className={`bg-white rounded-lg border p-4 cursor-pointer hover:shadow-md transition-all relative group ${hasUnread ? 'border-blue-500 border-l-4' : 'border-gray-200'
-                            } ${isSelected ? 'bg-blue-50 border-blue-300' : ''}`}
+                          className={`bg-[#050b14] rounded-lg border p-4 cursor-pointer hover:shadow-md transition-all relative group ${hasUnread ? 'border-blue-500 border-l-4' : 'border-white/10'
+                            } ${isSelected ? 'bg-blue-900/20 border-blue-500' : ''}`}
                         >
                           <div onClick={() => handleOpenChat(conv)}>
                             <div className="flex items-start space-x-4">
@@ -937,19 +946,19 @@ export function AdminDashboardEnhanced({
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between mb-1">
                                   <div className="flex items-center space-x-2">
-                                    <h3 className={`text-base font-medium ${hasUnread ? 'text-gray-900' : 'text-gray-700'}`}>
+                                    <h3 className={`text-base font-medium ${hasUnread ? 'text-white' : 'text-gray-300'}`}>
                                       {otherUser.name}
                                     </h3>
-                                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-slate-400">
                                       {otherUser.role}
                                     </span>
                                   </div>
-                                  <div className="flex items-center text-xs text-gray-500">
+                                  <div className="flex items-center text-xs text-slate-400">
                                     <Clock className="h-3 w-3 mr-1" />
                                     {formatTime(conv.lastMessageTime)}
                                   </div>
                                 </div>
-                                <p className={`text-sm ${hasUnread ? 'text-gray-900 font-medium' : 'text-gray-600'} line-clamp-2`}>
+                                <p className={`text-sm ${hasUnread ? 'text-white font-medium' : 'text-slate-400'} line-clamp-2`}>
                                   {conv.lastMessage}
                                 </p>
                               </div>
@@ -963,7 +972,7 @@ export function AdminDashboardEnhanced({
                                 handleDeleteConversation(conv.projectId, conv.otherUserId);
                               }
                             }}
-                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 p-1.5 text-red-600 hover:bg-red-50 rounded transition-opacity"
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 p-1.5 text-red-400 hover:bg-red-900/20 rounded transition-opacity"
                             title="Delete conversation"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -978,7 +987,7 @@ export function AdminDashboardEnhanced({
 
             {/* Chat Panel - Always mounted when project/user exist, shown when chatPanelOpen */}
             {chatProject && chatOtherUser ? (
-              <div className={`flex-1 min-h-0 flex flex-col bg-white ${chatPanelOpen ? '' : 'hidden'}`}>
+              <div className={`flex-1 min-h-0 flex flex-col bg-[#0a1122] ${chatPanelOpen ? '' : 'hidden'}`}>
                 <ChatPanel
                   project={chatProject}
                   currentUser={currentUser}
@@ -1077,6 +1086,10 @@ export function AdminDashboardEnhanced({
               currentUser={currentUser}
             />
           )}
+
+          {activeTab === 'ontology' && (
+            <OntologyViewerTab />
+          )}
         </div>
       </div>
 
@@ -1143,7 +1156,7 @@ export function AdminDashboardEnhanced({
       {
         chatProject && chatOtherUser ? (
           <div className={chatPanelOpen && activeTab !== 'chats' ? 'fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4' : 'hidden'}>
-            <div className="w-full max-w-4xl h-full max-h-[90vh] bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col">
+            <div className="w-full max-w-4xl h-full max-h-[90vh] bg-[#050b14] border border-white/10 rounded-xl shadow-[0_0_15px_rgba(34,211,238,0.1)] overflow-hidden flex flex-col">
               <ChatPanel
                 project={chatProject}
                 currentUser={currentUser}
@@ -1280,14 +1293,14 @@ function ProjectProgressCard({ project, users, onViewProject, onDeleteProject }:
     <div
       key={project.id}
       onClick={() => onViewProject(project)}
-      className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-all cursor-pointer group"
+      className="bg-[#050b14]/50 rounded-xl border border-white/10 p-6 hover:shadow-[0_0_15px_rgba(34,211,238,0.1)] hover:border-cyan-500/30 transition-all cursor-pointer group"
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+          <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-blue-500 transition-colors">
             {project.title}
           </h3>
-          <p className="text-sm text-gray-500 line-clamp-2 h-10">{project.shortDescription}</p>
+          <p className="text-sm text-slate-400 line-clamp-2 h-10">{project.shortDescription}</p>
         </div>
         <button
           onClick={(e) => {
@@ -1297,7 +1310,7 @@ function ProjectProgressCard({ project, users, onViewProject, onDeleteProject }:
               onDeleteProject(project.id);
             }
           }}
-          className="ml-3 inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+          className="ml-3 inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-400 border border-red-900/50 rounded-lg hover:bg-red-900/20 transition-colors"
         >
           <Trash2 className="w-4 h-4 mr-2" />
           Delete
@@ -1307,7 +1320,7 @@ function ProjectProgressCard({ project, users, onViewProject, onDeleteProject }:
       <div className="flex items-center space-x-2 mb-4">
         {/* Only show generic status if it's NOT 'ongoing' OR if derivedStatus is 'setup' */}
         {((project.status || '').toLowerCase() !== 'ongoing' || (!project.derivedStatus || project.derivedStatus === 'setup')) && (
-          <span className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${statusColors[project.status]?.bg || 'bg-gray-100'} ${statusColors[project.status]?.text || 'text-gray-800'}`}>
+          <span className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${statusColors[project.status]?.bg || 'bg-gray-800'} ${statusColors[project.status]?.text || 'text-gray-300'}`}>
             {(project.status || 'Unknown').toUpperCase()}
           </span>
         )}
@@ -1315,19 +1328,19 @@ function ProjectProgressCard({ project, users, onViewProject, onDeleteProject }:
           const derivedStatus = project.derivedStatus || 'setup';
           if (derivedStatus === 'resolve') {
             return (
-              <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-800 border border-green-200">
+              <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-green-900/30 text-green-400 border border-green-800">
                 RESOLVE
               </span>
             );
           } else if (derivedStatus === 'assess') {
             return (
-              <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
+              <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-yellow-900/30 text-yellow-400 border border-yellow-800">
                 ASSESS
               </span>
             );
           } else {
             return (
-              <span className="px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-full border border-gray-200">
+              <span className="px-2.5 py-0.5 text-xs font-medium bg-gray-800 text-slate-400 rounded-full border border-white/10">
                 SETUP
               </span>
             );
@@ -1336,13 +1349,13 @@ function ProjectProgressCard({ project, users, onViewProject, onDeleteProject }:
       </div>
 
       <div className="mb-4">
-        <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+        <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
           <span>Progress</span>
-          <span className="font-medium text-gray-700">
+          <span className="font-medium text-gray-300">
             {loading ? '...' : `${progressDisplay}%`}
           </span>
         </div>
-        <div className="w-full bg-gray-100 rounded-full h-1.5">
+        <div className="w-full bg-gray-800 rounded-full h-1.5">
           <div
             className="bg-gradient-to-r from-green-500 to-green-600 h-1.5 rounded-full transition-all"
             style={{ width: `${progressDisplay}%`, minWidth: progressDisplay > 0 ? '8px' : '0' }}
@@ -1350,9 +1363,9 @@ function ProjectProgressCard({ project, users, onViewProject, onDeleteProject }:
         </div>
       </div>
 
-      <div className="pt-4 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
+      <div className="pt-4 border-t border-white/10 flex justify-between items-center text-xs text-slate-400">
         <span>Updated: {new Date(project.createdAt).toLocaleDateString()}</span>
-        {project.isNew && <span className="text-blue-600 font-medium">New Project</span>}
+        {project.isNew && <span className="text-blue-400 font-medium">New Project</span>}
       </div>
     </div >
   );
@@ -1361,11 +1374,11 @@ function ProjectProgressCard({ project, users, onViewProject, onDeleteProject }:
 function DashboardTab({ projects, users, searchQuery, setSearchQuery, onViewProject, onCreateNew, onDeleteProject }: any) {
   return (
     <>
-      <div className="bg-white border-b border-gray-200 px-8 py-6 flex-shrink-0">
+      <div className="bg-[#050b14] border-b border-white/10 px-8 py-6 flex-shrink-0">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">Overview</h1>
-            <p className="text-gray-600">Monitor all evaluation projects and risk assessments</p>
+            <h1 className="text-2xl font-bold text-white mb-1">Overview</h1>
+            <p className="text-slate-400">Monitor all evaluation projects and risk assessments</p>
           </div>
           <button
             onClick={onCreateNew}
@@ -1376,13 +1389,13 @@ function DashboardTab({ projects, users, searchQuery, setSearchQuery, onViewProj
         </div>
 
         <div className="relative max-w-md">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search projects..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 bg-[#0a1122] border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-500"
           />
         </div>
       </div>
@@ -1419,38 +1432,38 @@ function UseCaseAssignmentsTab({ useCases, projects, users, onAssignExperts, onD
 
   return (
     <>
-      <div className="bg-white border-b border-gray-200 px-8 py-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Use Case Assignments</h1>
-        <p className="text-gray-600">Manage expert assignments for specific use cases</p>
+      <div className="bg-[#050b14] border-b border-white/10 px-8 py-6">
+        <h1 className="text-2xl font-bold text-white mb-1">Use Case Assignments</h1>
+        <p className="text-slate-400">Manage expert assignments for specific use cases</p>
       </div>
 
       <div className="px-8 py-6">
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+        <div className="bg-[#050b14]/50 rounded-lg border border-white/10 overflow-hidden shadow-sm">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-[#0a1122] border-b border-white/10">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Use Case</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Owner</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Assigned Experts</th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Use Case</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Owner</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Assigned Experts</th>
+                <th className="px-6 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-white/10">
               {loading ? (
                 // Loading skeleton
                 [1, 2, 3].map(i => (
                   <tr key={i} className="animate-pulse">
-                    <td className="px-6 py-4"><div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-3 bg-gray-100 rounded w-1/2"></div></td>
-                    <td className="px-6 py-4"><div className="h-4 bg-gray-200 rounded w-24"></div></td>
-                    <td className="px-6 py-4"><div className="h-5 bg-gray-200 rounded-full w-20"></div></td>
-                    <td className="px-6 py-4"><div className="h-4 bg-gray-200 rounded w-32"></div></td>
-                    <td className="px-6 py-4"><div className="h-8 bg-gray-200 rounded w-24 ml-auto"></div></td>
+                    <td className="px-6 py-4"><div className="h-4 bg-gray-800 rounded w-3/4 mb-2"></div><div className="h-3 bg-gray-900 rounded w-1/2"></div></td>
+                    <td className="px-6 py-4"><div className="h-4 bg-gray-800 rounded w-24"></div></td>
+                    <td className="px-6 py-4"><div className="h-5 bg-gray-800 rounded-full w-20"></div></td>
+                    <td className="px-6 py-4"><div className="h-4 bg-gray-800 rounded w-32"></div></td>
+                    <td className="px-6 py-4"><div className="h-8 bg-gray-800 rounded w-24 ml-auto"></div></td>
                   </tr>
                 ))
               ) : filteredProjects.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={5} className="px-6 py-8 text-center text-slate-400">
                     No projects found for assignment. Please create a project first.
                   </td>
                 </tr>
@@ -1469,26 +1482,26 @@ function UseCaseAssignmentsTab({ useCases, projects, users, onAssignExperts, onD
                   );
 
                   return (
-                    <tr key={project.id} className="hover:bg-gray-50">
+                    <tr key={project.id} className="hover:bg-[#0a1122]">
                       <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-gray-900">{project.title}</div>
-                        <div className="text-xs text-gray-500">{linkedUseCase?.title || 'No linked Use Case'}</div>
+                        <div className="text-sm font-medium text-white">{project.title}</div>
+                        <div className="text-xs text-slate-400">{linkedUseCase?.title || 'No linked Use Case'}</div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{owner?.name || 'Admin'}</td>
+                      <td className="px-6 py-4 text-sm text-slate-400">{owner?.name || 'Admin'}</td>
                       <td className="px-6 py-4">
-                        <span className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${project.status === 'ongoing' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                        <span className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${project.status === 'ongoing' ? 'bg-green-900/30 text-green-400' : 'bg-gray-800 text-slate-200'}`}>
                           {project.status ? project.status.toUpperCase() : 'ONGOING'}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex -space-x-2">
                           {assignedExperts.length === 0 ? (
-                            <span className="text-xs text-gray-400 italic">None</span>
+                            <span className="text-xs text-gray-500 italic">None</span>
                           ) : (
                             assignedExperts.map((expert: User) => (
                               <div
                                 key={expert.id}
-                                className="w-8 h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-blue-700 text-xs font-medium"
+                                className="w-8 h-8 rounded-full bg-cyan-500/20 border-2 border-[#050b14] flex items-center justify-center text-cyan-400 text-xs font-medium"
                                 title={`${expert.name} (${expert.role})`}
                               >
                                 {expert.name.charAt(0)}
@@ -1501,13 +1514,13 @@ function UseCaseAssignmentsTab({ useCases, projects, users, onAssignExperts, onD
                         <div className="flex items-center justify-end space-x-2">
                           <button
                             onClick={() => onAssignExperts(project)}
-                            className="px-3 py-1.5 text-xs font-medium bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                            className="px-3 py-1.5 text-xs font-medium bg-white/5 border border-white/10 text-slate-300 rounded-lg hover:bg-white/10 hover:text-white transition-colors"
                           >
                             Manage Team
                           </button>
                           <button
                             onClick={() => handleDelete(project)}
-                            className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-900/20 rounded-lg transition-colors"
                             title="Delete Project"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -1607,14 +1620,14 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
 
   return (
     <>
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+      <div className="bg-[#050b14] border-b border-white/10 px-6 py-4 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Create New Project</h1>
-          <p className="text-gray-600">Initialize a new evaluation project linked to a Use Case</p>
+          <h1 className="text-2xl font-bold text-white mb-1">Create New Project</h1>
+          <p className="text-slate-400">Initialize a new evaluation project linked to a Use Case</p>
         </div>
         <button
           onClick={onClose}
-          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-2 text-gray-500 hover:text-slate-300 hover:bg-gray-800 rounded-lg transition-colors"
           aria-label="Close"
         >
           <X className="h-5 w-5" />
@@ -1626,10 +1639,10 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
           <form onSubmit={handleSubmit} className="space-y-6">
 
             {/* 1. Project Info Section */}
-            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-6">
+            <div className="bg-[#050b14]/50 p-6 rounded-xl border border-white/10 shadow-sm space-y-6">
 
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                <label className="block text-sm font-medium mb-2 text-blue-900 flex items-center">
+              <div className="bg-[#050b14]/50 border-white/10 text-cyan-400">
+                <label className="block text-sm font-medium mb-2 text-cyan-400 flex items-center">
                   <LinkIcon className="h-4 w-4 mr-2" />
                   Link to a Use Case (Optional)
                 </label>
@@ -1650,7 +1663,7 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
                       setAutoUseCaseOwnerId('');
                     }
                   }}
-                  className="w-full px-4 py-2.5 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-blue-900"
+                  className="w-full px-4 py-2.5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-[#0a1122] text-white placeholder-gray-500"
                 >
                   <option value="">Select a submitted Use Case...</option>
                   {useCases.map((uc: UseCase) => (
@@ -1660,7 +1673,7 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
                   ))}
                 </select>
                 {autoUseCaseOwnerId && (
-                  <div className="mt-2 text-xs text-blue-800">
+                  <div className="mt-2 text-xs text-cyan-400">
                     Use Case owner will be assigned automatically:{" "}
                     <span className="font-medium">
                       {users.find((u: User) => u.id === autoUseCaseOwnerId)?.name || 'Unknown'}
@@ -1670,24 +1683,24 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700">Project Title *</label>
+                <label className="block text-sm font-medium mb-2 text-slate-300">Project Title *</label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   placeholder="e.g., Cardiac AI Diagnosis System"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700">Description *</label>
+                <label className="block text-sm font-medium mb-2 text-slate-300">Description *</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={4}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   placeholder="Describe the AI system and evaluation goals..."
                   required
                 />
@@ -1695,22 +1708,22 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
 
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">Target Date *</label>
+                  <label className="block text-sm font-medium mb-2 text-slate-300">Target Date *</label>
                   <input
                     type="date"
                     value={targetDate}
                     onChange={(e) => setTargetDate(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">Category Tags</label>
+                  <label className="block text-sm font-medium mb-2 text-slate-300">Category Tags</label>
                   <input
                     type="text"
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                     placeholder="medical, finance..."
                   />
                 </div>
@@ -1719,52 +1732,52 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
             </div>
 
             {/* 2. Project Context and Scope Questions (7 Soru) */}
-            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-6">
-              <h2 className="text-lg font-bold text-gray-900 border-b pb-3 mb-4">Project Context and Scope</h2>
+            <div className="bg-[#050b14]/50 p-6 rounded-xl border border-white/10 shadow-sm space-y-6">
+              <h2 className="text-lg font-bold text-white border-b border-white/10 pb-3 mb-4">Project Context and Scope</h2>
 
               {/* Soru 1: Who requested the inspection? */}
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700">1. Who requested the inspection?</label>
+                <label className="block text-sm font-medium mb-2 text-slate-300">1. Who requested the inspection?</label>
                 <input
                   type="text"
                   value={requester}
                   onChange={(e) => setRequester(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   placeholder="e.g., Legal Department, Product Owner, Regulatory Body"
                 />
               </div>
 
               {/* Soru 2: Why carry out an inspection? */}
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700">2. Why carry out an inspection?</label>
+                <label className="block text-sm font-medium mb-2 text-slate-300">2. Why carry out an inspection?</label>
                 <input
                   type="text"
                   value={inspectionReason}
                   onChange={(e) => setInspectionReason(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   placeholder="e.g., Compliance check, Risk mitigation, Public trust building"
                 />
               </div>
 
               {/* Soru 3: For whom is the inspection relevant? */}
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700">3. For whom is the inspection relevant?</label>
+                <label className="block text-sm font-medium mb-2 text-slate-300">3. For whom is the inspection relevant?</label>
                 <input
                   type="text"
                   value={relevantFor}
                   onChange={(e) => setRelevantFor(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   placeholder="e.g., Internal auditors, Customers, Regulators"
                 />
               </div>
 
               {/* Soru 4: Is it recommended or required (mandatory inspection)? */}
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700">4. Is it recommended or required (mandatory inspection)?</label>
+                <label className="block text-sm font-medium mb-2 text-slate-300">4. Is it recommended or required (mandatory inspection)?</label>
                 <select
                   value={isMandatory}
                   onChange={(e) => setIsMandatory(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  className="w-full px-4 py-2.5 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 >
                   <option value="">Select one...</option>
                   <option value="recommended">Recommended</option>
@@ -1774,36 +1787,36 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
 
               {/* Soru 5: What are the sufficient vs. necessary conditions that need to be analyzed? */}
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700">5. What are the sufficient vs. necessary conditions that need to be analyzed?</label>
+                <label className="block text-sm font-medium mb-2 text-slate-300">5. What are the sufficient vs. necessary conditions that need to be analyzed?</label>
                 <textarea
                   value={conditionsToAnalyze}
                   onChange={(e) => setConditionsToAnalyze(e.target.value)}
                   rows={2}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   placeholder="e.g., Minimum legal requirements (necessary), Best practice standards (sufficient)"
                 />
               </div>
 
               {/* Soru 6: How are the inspection results to be used? */}
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700">6. How are the inspection results to be used? (e.g. verification, certification, sanctions)</label>
+                <label className="block text-sm font-medium mb-2 text-slate-300">6. How are the inspection results to be used? (e.g. verification, certification, sanctions)</label>
                 <input
                   type="text"
                   value={resultsUsage}
                   onChange={(e) => setResultsUsage(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   placeholder="e.g., Internal risk report, External certification for compliance"
                 />
               </div>
 
               {/* Soru 7: Will the results be shared (public) or kept private? */}
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700">7. Will the results be shared (public) or kept private? (If private, why?)</label>
+                <label className="block text-sm font-medium mb-2 text-slate-300">7. Will the results be shared (public) or kept private? (If private, why?)</label>
                 <textarea
                   value={resultsSharing}
                   onChange={(e) => setResultsSharing(e.target.value)}
                   rows={2}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   placeholder="e.g., Public (for transparency), Private (due to sensitive trade secrets)"
                 />
               </div>
@@ -1812,20 +1825,20 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
 
 
             {/* 3. Assignment Section (Ekip Atama) - Düzeltilmiş Görünüm */}
-            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-6">
+            <div className="bg-[#050b14]/50 p-6 rounded-xl border border-white/10 shadow-sm space-y-6">
               <div>
-                <label className="block text-sm font-medium mb-3 text-gray-700">
+                <label className="block text-sm font-medium mb-3 text-slate-300">
                   Assign Evaluation Team (Experts & Owners) *
                 </label>
-                <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
+                <div className="space-y-2 max-h-48 overflow-y-auto border border-white/10 rounded-lg p-3 bg-[#0a1122]">
 
                   {experts.length === 0 ? (
-                    <div className="text-sm text-gray-500 text-center py-4">No users available for assignment.</div>
+                    <div className="text-sm text-slate-500 text-center py-4">No users available for assignment.</div>
                   ) : (
                     experts.map((user: User) => (
                       <label
                         key={user.id}
-                        className={`flex items-center p-2 rounded cursor-pointer transition-colors ${selectedTeam.includes(user.id) ? 'bg-blue-100 border border-blue-200' : 'hover:bg-gray-100'
+                        className={`flex items-center p-2 rounded cursor-pointer transition-colors ${selectedTeam.includes(user.id) ? 'bg-cyan-500/10 border border-blue-500/30' : 'hover:bg-white/5'
                           }`}
                       >
                         <input
@@ -1835,11 +1848,11 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
                           className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 mr-3"
                         />
                         <div className="flex items-center flex-1">
-                          <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm text-gray-600 mr-3 font-medium border-2 border-white shadow-sm">
+                          <div className="w-8 h-8 rounded-full bg-[#1a2333] flex items-center justify-center text-sm text-slate-400 mr-3 font-medium border border-white/10 shadow-sm">
                             {user.name.charAt(0)}
                           </div>
-                          <span className="text-sm text-gray-900 font-medium">{user.name}</span>
-                          <span className={`text-xs ml-auto px-2 py-0.5 rounded-full capitalize ${user.role !== 'use-case-owner' && user.role !== 'admin' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
+                          <span className="text-sm text-white font-medium">{user.name}</span>
+                          <span className={`text-xs ml-auto px-2 py-0.5 rounded-full capitalize ${user.role !== 'use-case-owner' && user.role !== 'admin' ? 'bg-green-900/30 text-green-400' : 'bg-orange-900/30 text-orange-400'
                             }`}>
                             {user.role.replace('-', ' ')}
                           </span>
@@ -2003,16 +2016,16 @@ function CreatedReportsTab({ projects, currentUser }: any) {
 
   return (
     <>
-      <div className="bg-white border-b border-gray-200 px-8 py-6">
+      <div className="bg-[#050b14] border-b border-white/10 px-8 py-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">Created Reports</h1>
-            <p className="text-gray-600">View created reports</p>
+            <h1 className="text-2xl font-bold text-white mb-1">Created Reports</h1>
+            <p className="text-slate-400">View created reports</p>
           </div>
           <select
             value={filterProjectId}
             onChange={(e) => setFilterProjectId(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 bg-[#0a1122] border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All Projects</option>
             {projects.map((p: any) => (
@@ -2027,13 +2040,13 @@ function CreatedReportsTab({ projects, currentUser }: any) {
       <div className="px-8 py-6">
         {/* Reports List */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Created Reports</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">Created Reports</h2>
           {loading ? (
-            <div className="text-center py-8 text-gray-500">Loading...</div>
+            <div className="text-center py-8 text-slate-400">Loading...</div>
           ) : reports.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-lg">
-              <p className="text-gray-500 mb-2">No reports created yet</p>
-              <p className="text-sm text-gray-400">You can create reports from the project detail page</p>
+            <div className="text-center py-12 bg-gray-900/30 rounded-lg">
+              <p className="text-slate-400 mb-2">No reports created yet</p>
+              <p className="text-sm text-gray-500">You can create reports from the project detail page</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -2046,16 +2059,16 @@ function CreatedReportsTab({ projects, currentUser }: any) {
                 return (
                   <div
                     key={reportId}
-                    className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                    className="bg-[#050b14]/50 border border-white/10 rounded-lg p-4 hover:shadow-[0_0_15px_rgba(34,211,238,0.1)] hover:border-cyan-500/30 transition-shadow"
                   >
                     <div className="flex items-start justify-between">
                       <div
                         className="flex-1 cursor-pointer"
                         onClick={() => handleViewReport(reportId)}
                       >
-                        <h3 className="font-medium text-gray-900 mb-1">{report.title}</h3>
-                        <p className="text-sm text-gray-600 mb-2">{projectTitle}</p>
-                        <div className="flex items-center gap-4 text-xs text-gray-500">
+                        <h3 className="font-medium text-white mb-1">{report.title}</h3>
+                        <p className="text-sm text-slate-400 mb-2">{projectTitle}</p>
+                        <div className="flex items-center gap-4 text-xs text-slate-400">
                           <span>Created by: {generatedBy}</span>
                           <span>•</span>
                           <span>{generatedAt}</span>
@@ -2070,7 +2083,7 @@ function CreatedReportsTab({ projects, currentUser }: any) {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={(e) => handleDownloadPDF(reportId, report.title, e)}
-                          className="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-2"
+                          className="px-3 py-1.5 text-sm text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors flex items-center gap-2"
                           title="Download PDF"
                         >
                           <Download className="h-4 w-4" />
@@ -2079,15 +2092,15 @@ function CreatedReportsTab({ projects, currentUser }: any) {
 
                         <button
                           onClick={(e) => handleDeleteReport(reportId, report.title, e)}
-                          className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-2"
+                          className="px-3 py-1.5 text-sm text-red-400 hover:bg-red-900/20 rounded-lg transition-colors flex items-center gap-2"
                           title="Delete Report"
                         >
                           <Trash2 className="h-4 w-4" />
                           Delete
                         </button>
                         {report.status === 'final' || report.status === 'archived' ? (
-                          <span className={`px-2 py-1 text-xs font-medium rounded ${report.status === 'final' ? 'bg-green-100 text-green-800' :
-                            'bg-gray-100 text-gray-800'
+                          <span className={`px-2 py-1 text-xs font-medium rounded ${report.status === 'final' ? 'bg-green-900/30 text-green-400' :
+                            'bg-gray-800 text-gray-300'
                             }`}>
                             {report.status === 'final' ? 'Final' : 'Archived'}
                           </span>
@@ -2104,24 +2117,24 @@ function CreatedReportsTab({ projects, currentUser }: any) {
 
       {/* Report View Modal */}
       {selectedReport && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-[#050b14] border border-white/10 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">{selectedReport.title}</h2>
-                <p className="text-sm text-gray-500 mt-1">
+                <h2 className="text-xl font-bold text-white">{selectedReport.title}</h2>
+                <p className="text-sm text-slate-400 mt-1">
                   {selectedReport.projectId?.title} • {new Date(selectedReport.generatedAt || selectedReport.createdAt).toLocaleString('tr-TR')}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedReport(null)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-500 hover:text-slate-300"
               >
                 <X className="h-6 w-6" />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-6">
-              <div className="prose max-w-none whitespace-pre-wrap text-gray-700">
+              <div className="prose max-w-none prose-invert whitespace-pre-wrap text-slate-300">
                 {(() => {
                   const sections = (selectedReport as any).sections;
                   if (Array.isArray(sections) && sections.length > 0) {
@@ -2133,7 +2146,7 @@ function CreatedReportsTab({ projects, currentUser }: any) {
                 })()}
               </div>
             </div>
-            <div className="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
+            <div className="px-6 py-4 border-t border-white/10 flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <button
                   onClick={(e) => {
@@ -2163,7 +2176,7 @@ function CreatedReportsTab({ projects, currentUser }: any) {
               </div>
               <button
                 onClick={() => setSelectedReport(null)}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                className="px-4 py-2 bg-gray-800 text-slate-300 rounded-lg hover:bg-gray-700"
               >
                 Kapat
               </button>
@@ -2419,29 +2432,29 @@ function ReportsTab({ projects, currentUser, users }: any) {
     <>
       {/* Generating Message Overlay */}
       {showGeneratingMessage && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm">
+          <div className="bg-[#050b14] border border-white/10 rounded-lg p-6 max-w-md mx-4 shadow-[0_0_15px_rgba(34,211,238,0.1)]">
             <div className="flex items-center space-x-4">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Generating Report</h3>
-                <p className="text-sm text-gray-600 mt-1">Your report is being generated. Please wait...</p>
+                <h3 className="text-lg font-semibold text-white">Generating Report</h3>
+                <p className="text-sm text-slate-400 mt-1">Your report is being generated. Please wait...</p>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      <div className="bg-white border-b border-gray-200 px-8 py-6">
+      <div className="bg-[#050b14] border-b border-white/10 px-8 py-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">AI Generated Reports</h1>
-            <p className="text-gray-600">AI-generated analysis reports</p>
+            <h1 className="text-2xl font-bold text-white mb-1">AI Generated Reports</h1>
+            <p className="text-slate-400">AI-generated analysis reports</p>
           </div>
           <select
             value={filterProjectId}
             onChange={(e) => setFilterProjectId(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 bg-[#0a1122] border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All Projects</option>
             {projects.map((p: any) => (
@@ -2456,7 +2469,7 @@ function ReportsTab({ projects, currentUser, users }: any) {
       <div className="px-8 py-6">
         {/* Projects List - Generate Reports */}
         <div className="mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Generate Reports for Projects</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">Generate Reports for Projects</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {projects.map((project: any) => {
               const projectId = project.id || project._id;
@@ -2471,34 +2484,34 @@ function ReportsTab({ projects, currentUser, users }: any) {
               return (
                 <div
                   key={projectId}
-                  className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                  className="bg-[#050b14]/50 border border-white/10 rounded-lg p-4 hover:shadow-[0_0_15px_rgba(34,211,238,0.1)] hover:border-cyan-500/30 transition-shadow"
                 >
-                  <h3 className="font-medium text-gray-900 mb-2 truncate">{project.title}</h3>
-                  <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+                  <h3 className="font-medium text-white mb-2 truncate">{project.title}</h3>
+                  <p className="text-sm text-slate-400 mb-3 line-clamp-2">
                     {project.shortDescription || project.fullDescription || 'No description'}
                   </p>
                   <div className="mb-3">
-                    <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                    <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
                       <span>Progress</span>
-                      <span className="font-medium">{projectProgress}%</span>
+                      <span className="font-medium text-gray-300">{projectProgress}%</span>
                     </div>
-                    <div className="w-full bg-gray-100 rounded-full h-1.5">
+                    <div className="w-full bg-gray-800 rounded-full h-1.5">
                       <div
-                        className={`h-1.5 rounded-full transition-all ${isComplete ? 'bg-green-500' : 'bg-gray-300'
+                        className={`h-1.5 rounded-full transition-all ${isComplete ? 'bg-green-500' : 'bg-gray-600'
                           }`}
                         style={{ width: `${Math.min(100, projectProgress)}%`, minWidth: projectProgress > 0 ? '8px' : '0' }}
                       />
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-slate-400">
                       {projectReports.length} rapor
                     </span>
                     <button
                       onClick={() => handleGenerateReport(projectId)}
                       disabled={!canGenerate}
                       className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${!canGenerate
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        ? 'bg-gray-800 text-slate-500 cursor-not-allowed'
                         : 'bg-green-600 text-white hover:bg-green-700'
                         }`}
                       title={!isComplete ? 'Project must be 100% complete to generate report' : ''}
@@ -2514,13 +2527,13 @@ function ReportsTab({ projects, currentUser, users }: any) {
 
         {/* Reports List */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Created Reports</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">Created Reports</h2>
           {loading ? (
-            <div className="text-center py-8 text-gray-500">Loading...</div>
+            <div className="text-center py-8 text-slate-400">Loading...</div>
           ) : reports.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-lg">
-              <p className="text-gray-500 mb-2">No reports created yet</p>
-              <p className="text-sm text-gray-400">You can create reports for the projects above</p>
+            <div className="text-center py-12 bg-gray-900/30 rounded-lg">
+              <p className="text-slate-400 mb-2">No reports created yet</p>
+              <p className="text-sm text-gray-500">You can create reports for the projects above</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -2533,16 +2546,16 @@ function ReportsTab({ projects, currentUser, users }: any) {
                 return (
                   <div
                     key={reportId}
-                    className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                    className="bg-[#050b14]/50 border border-white/10 rounded-lg p-4 hover:shadow-[0_0_15px_rgba(34,211,238,0.1)] hover:border-cyan-500/30 transition-shadow"
                   >
                     <div className="flex items-start justify-between">
                       <div
                         className="flex-1 cursor-pointer"
                         onClick={() => handleViewReport(reportId)}
                       >
-                        <h3 className="font-medium text-gray-900 mb-1">{report.title}</h3>
-                        <p className="text-sm text-gray-600 mb-2">{projectTitle}</p>
-                        <div className="flex items-center gap-4 text-xs text-gray-500">
+                        <h3 className="font-medium text-white mb-1">{report.title}</h3>
+                        <p className="text-sm text-slate-400 mb-2">{projectTitle}</p>
+                        <div className="flex items-center gap-4 text-xs text-slate-400">
                           <span>Created by: {generatedBy}</span>
                           <span>•</span>
                           <span>{generatedAt}</span>
@@ -2557,7 +2570,7 @@ function ReportsTab({ projects, currentUser, users }: any) {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={(e) => handleDownloadPDF(reportId, report.title, e)}
-                          className="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-2"
+                          className="px-3 py-1.5 text-sm text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors flex items-center gap-2"
                           title="Download PDF"
                         >
                           <Download className="h-4 w-4" />
@@ -2566,15 +2579,15 @@ function ReportsTab({ projects, currentUser, users }: any) {
 
                         <button
                           onClick={(e) => handleDeleteReport(reportId, report.title, e)}
-                          className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-2"
+                          className="px-3 py-1.5 text-sm text-red-400 hover:bg-red-900/20 rounded-lg transition-colors flex items-center gap-2"
                           title="Delete Report"
                         >
                           <Trash2 className="h-4 w-4" />
                           Delete
                         </button>
                         {report.status === 'final' || report.status === 'archived' ? (
-                          <span className={`px-2 py-1 text-xs font-medium rounded ${report.status === 'final' ? 'bg-green-100 text-green-800' :
-                            'bg-gray-100 text-gray-800'
+                          <span className={`px-2 py-1 text-xs font-medium rounded ${report.status === 'final' ? 'bg-green-900/30 text-green-400' :
+                            'bg-gray-800 text-gray-300'
                             }`}>
                             {report.status === 'final' ? 'Final' : 'Archived'}
                           </span>
@@ -2591,24 +2604,24 @@ function ReportsTab({ projects, currentUser, users }: any) {
 
       {/* Report View Modal */}
       {selectedReport && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-[#050b14] border border-white/10 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">{selectedReport.title}</h2>
-                <p className="text-sm text-gray-500 mt-1">
+                <h2 className="text-xl font-bold text-white">{selectedReport.title}</h2>
+                <p className="text-sm text-slate-400 mt-1">
                   {selectedReport.projectId?.title} • {new Date(selectedReport.generatedAt || selectedReport.createdAt).toLocaleString('tr-TR')}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedReport(null)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-500 hover:text-slate-300"
               >
                 <X className="h-6 w-6" />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-6">
-              <div className="prose max-w-none whitespace-pre-wrap text-gray-700">
+              <div className="prose max-w-none prose-invert whitespace-pre-wrap text-slate-300">
                 {(() => {
                   const sections = (selectedReport as any).sections;
                   if (Array.isArray(sections) && sections.length > 0) {
@@ -2620,7 +2633,7 @@ function ReportsTab({ projects, currentUser, users }: any) {
                 })()}
               </div>
             </div>
-            <div className="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
+            <div className="px-6 py-4 border-t border-white/10 flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <button
                   onClick={(e) => {
@@ -2650,7 +2663,7 @@ function ReportsTab({ projects, currentUser, users }: any) {
               </div>
               <button
                 onClick={() => setSelectedReport(null)}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                className="px-4 py-2 bg-gray-800 text-slate-300 rounded-lg hover:bg-gray-700"
               >
                 Kapat
               </button>
@@ -2693,33 +2706,33 @@ function AssignExpertsModal({ project, useCase, users, onClose, onAssign }: Assi
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50 flex-shrink-0">
-          <h2 className="text-lg font-bold text-gray-900">Assign Evaluation Team</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+      <div className="bg-[#050b14] rounded-xl shadow-[0_0_15px_rgba(34,211,238,0.1)] border border-white/10 max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#0a1122] flex-shrink-0">
+          <h2 className="text-lg font-bold text-white">Assign Evaluation Team</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-slate-300 transition-colors">
             <X className="h-5 w-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-y-auto flex-1 min-h-0">
           <div>
-            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Target Use Case</div>
-            <div className="text-base font-medium text-gray-900">{useCase.title}</div>
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Target Use Case</div>
+            <div className="text-base font-medium text-white">{useCase.title}</div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-3 text-gray-700">Select Experts</label>
-            <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-100 rounded-lg p-2 bg-gray-50">
+            <label className="block text-sm font-medium mb-3 text-slate-300">Select Experts</label>
+            <div className="space-y-2 max-h-48 overflow-y-auto border border-white/10 rounded-lg p-2 bg-[#0a1122]">
               {experts.length === 0 ? (
-                <div className="text-sm text-gray-500 text-center py-2">No experts available to assign.</div>
+                <div className="text-sm text-slate-500 text-center py-2">No experts available to assign.</div>
               ) : (
                 experts.map(expert => (
                   <label
                     key={expert.id}
                     className={`flex items-center p-3 rounded-lg cursor-pointer transition-all ${selectedExperts.includes(expert.id)
-                      ? 'bg-blue-50 border border-blue-200'
-                      : 'hover:bg-white border border-transparent'
+                      ? 'bg-cyan-500/10 border border-blue-500/30'
+                      : 'hover:bg-[#050b14] border border-transparent'
                       }`}
                   >
                     <input
@@ -2729,8 +2742,8 @@ function AssignExpertsModal({ project, useCase, users, onClose, onAssign }: Assi
                       className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 mr-3 border-gray-300"
                     />
                     <div className="flex-1">
-                      <div className="text-sm font-medium text-gray-900">{expert.name}</div>
-                      <div className="text-xs text-gray-500 capitalize">{expert.role.replace('-', ' ')}</div>
+                      <div className="text-sm font-medium text-white">{expert.name}</div>
+                      <div className="text-xs text-slate-400 capitalize">{expert.role.replace('-', ' ')}</div>
                     </div>
                   </label>
                 ))
@@ -2739,12 +2752,12 @@ function AssignExpertsModal({ project, useCase, users, onClose, onAssign }: Assi
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2 text-gray-700">Instructions / Notes</label>
+            <label className="block text-sm font-medium mb-2 text-slate-300">Instructions / Notes</label>
             <textarea
               value={adminNotes}
               onChange={(e) => setAdminNotes(e.target.value)}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="w-full px-4 py-2 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="Specific instructions for the evaluation team..."
             />
           </div>
@@ -2753,7 +2766,7 @@ function AssignExpertsModal({ project, useCase, users, onClose, onAssign }: Assi
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800 text-sm font-medium"
+              className="px-4 py-2 text-slate-400 hover:text-gray-800 text-sm font-medium"
             >
               Cancel
             </button>

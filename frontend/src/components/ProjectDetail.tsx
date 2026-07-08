@@ -673,16 +673,16 @@ export function ProjectDetail({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-[#0a1122]">
+      <div className="bg-[#050b14] shadow-sm border-b">
         <div className="px-6 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <div>
-              <h1 className="text-xl text-gray-900 mr-3 flex items-center">
+              <h1 className="text-xl text-white mr-3 flex items-center">
                 {project.title}
-                {project.isNew && <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">NEW</span>}
+                {project.isNew && <span className="ml-2 px-2 py-1 bg-cyan-500/20 text-cyan-400 text-xs rounded-full">NEW</span>}
               </h1>
-              <p className="text-gray-600">{project.shortDescription}</p>
+              <p className="text-slate-400">{project.shortDescription}</p>
             </div>
           </div>
           <div className="flex items-center space-x-3">
@@ -702,7 +702,7 @@ export function ProjectDetail({
                   onClick={handleGenerateReport}
                   disabled={!canGenerate}
                   className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${!canGenerate
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      ? 'bg-gray-300 text-slate-400 cursor-not-allowed'
                       : 'bg-green-600 text-white hover:bg-green-700'
                     }`}
                   title={!isComplete ? 'Project must be 100% complete to generate report' : ''}
@@ -792,7 +792,7 @@ export function ProjectDetail({
               disabled={!latestReport}
               className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ml-2 ${latestReport
                   ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-gray-300 text-slate-400 cursor-not-allowed'
                 }`}
               title={latestReport ? `View latest report: ${latestReport.title || 'Analysis Report'}` : 'No report available yet'}
             >
@@ -838,40 +838,40 @@ export function ProjectDetail({
           return (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               {/* Target Date Card */}
-              <div className="bg-white p-4 rounded-lg shadow-sm border flex items-center">
+              <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border flex items-center">
                 <TargetDateIcon className={`h-5 w-5 ${cardThemes.targetDate.color} mr-3`} />
                 <div>
                   <div className={`text-sm font-semibold ${cardThemes.targetDate.color}`}>Target Date</div>
-                  <div className="text-sm font-medium text-gray-900">{new Date(project.targetDate).toLocaleDateString()}</div>
+                  <div className="text-sm font-medium text-white">{new Date(project.targetDate).toLocaleDateString()}</div>
                 </div>
               </div>
 
               {/* Team Card */}
-              <div className="bg-white p-4 rounded-lg shadow-sm border flex items-center">
+              <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border flex items-center">
                 <TeamIcon className={`h-5 w-5 ${cardThemes.team.color} mr-3`} />
                 <div>
                   <div className={`text-sm font-semibold ${cardThemes.team.color}`}>Team</div>
-                  <div className="text-sm font-medium text-gray-900">{assignedUserDetails.length} members</div>
+                  <div className="text-sm font-medium text-white">{assignedUserDetails.length} members</div>
                 </div>
               </div>
 
               {/* Progress Card */}
-              <div className="bg-white p-4 rounded-lg shadow-sm border flex items-center">
+              <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border flex items-center">
                 <ProgressIcon className={`h-5 w-5 ${cardThemes.progress.color} mr-3`} />
                 <div>
                   <div className={`text-sm font-semibold ${cardThemes.progress.color}`}>Progress</div>
-                  <div className={`text-sm font-medium ${isProgressComplete ? 'text-emerald-600' : 'text-gray-900'}`}>
+                  <div className={`text-sm font-medium ${isProgressComplete ? 'text-emerald-600' : 'text-white'}`}>
                     {progressValue}%
                   </div>
                 </div>
               </div>
 
               {/* Tensions Card */}
-              <div className="bg-white p-4 rounded-lg shadow-sm border flex items-center">
+              <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border flex items-center">
                 <TensionsIcon className={`h-5 w-5 ${cardThemes.tensions.color} mr-3`} />
                 <div>
                   <div className={`text-sm font-semibold ${cardThemes.tensions.color}`}>Tensions</div>
-                  <div className="text-sm font-medium text-gray-900">{tensions.length} total</div>
+                  <div className="text-sm font-medium text-white">{tensions.length} total</div>
                 </div>
               </div>
             </div>
@@ -879,8 +879,8 @@ export function ProjectDetail({
         })()}
 
         {/* Assigned Members with Contact button */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border mb-6">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">Assigned Members</h4>
+        <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border mb-6">
+          <h4 className="text-sm font-medium text-slate-300 mb-3">Assigned Members</h4>
           <div className="space-y-2">
             {assignedUserDetails.length > 0 ? (
               assignedUserDetails.map((u) => {
@@ -893,7 +893,7 @@ export function ProjectDetail({
                 const memberProgressDisplay = Math.max(0, Math.min(100, memberProgress));
 
                 return (
-                  <div key={u.id} className="flex items-center justify-between p-3 rounded hover:bg-gray-50 border-b border-gray-100 last:border-b-0">
+                  <div key={u.id} className="flex items-center justify-between p-3 rounded hover:bg-[#0a1122] border-b border-white/5 last:border-b-0">
                     <div className="flex items-center flex-1">
                       <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center mr-3 text-sm font-medium">
                         {u.name?.charAt(0) || 'U'}
@@ -901,11 +901,11 @@ export function ProjectDetail({
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{u.name}</div>
-                            <div className="text-xs text-gray-500">{u.role}</div>
+                            <div className="text-sm font-medium text-white">{u.name}</div>
+                            <div className="text-xs text-slate-400">{u.role}</div>
                           </div>
                           <div className="text-right ml-4">
-                            <div className="text-xs font-medium text-gray-700">{memberProgressDisplay}%</div>
+                            <div className="text-xs font-medium text-slate-300">{memberProgressDisplay}%</div>
                           </div>
                         </div>
                         <div className="w-full bg-gray-200 h-1.5 rounded-full mt-2">
@@ -937,20 +937,20 @@ export function ProjectDetail({
                 );
               })
             ) : (
-              <div className="text-sm text-gray-500">No members assigned.</div>
+              <div className="text-sm text-slate-400">No members assigned.</div>
             )}
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border">
-          <div className="border-b border-gray-200 flex">
+        <div className="bg-[#050b14] rounded-lg shadow-sm border">
+          <div className="border-b border-white/10 flex">
             {['evaluation', 'tensions', 'usecase', 'owners'].map((tab) => {
               if (tab === 'owners' && !canViewOwners) return null;
               return (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab as any)}
-                  className={`px-6 py-3 text-sm capitalize flex items-center ${activeTab === tab ? 'border-b-2 border-blue-500 text-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700'}`}
+                  className={`px-6 py-3 text-sm capitalize flex items-center ${activeTab === tab ? 'border-b-2 border-blue-500 text-blue-600 bg-blue-50' : 'text-slate-400 hover:text-slate-300'}`}
                 >
                   {tab === 'tensions' ? `Tensions (${tensions.length})` : tab === 'dashboard' ? 'Analytics' : tab}
                 </button>
@@ -972,17 +972,17 @@ export function ProjectDetail({
               const averageProgressDisplay = Math.max(0, Math.min(100, averageProgress));
 
               return (
-                <div className="text-center py-8 bg-gray-50 rounded-lg">
+                <div className="text-center py-8 bg-[#0a1122] rounded-lg">
                   {userProgress === 0 && currentUser.role === 'admin' ? (
                     <div>
-                      <div className="text-gray-700 mb-2 font-medium">
+                      <div className="text-slate-300 mb-2 font-medium">
                         Team Average Progress
                       </div>
-                      <div className="text-sm text-gray-500 mb-4">
+                      <div className="text-sm text-slate-400 mb-4">
                         {Math.round(averageProgressDisplay)}%
                       </div>
                       <div className="max-w-md mx-auto">
-                        <div className="w-full bg-gray-100 rounded-full h-1.5">
+                        <div className="w-full bg-white/5 rounded-full h-1.5">
                           <div
                             className={
                               averageProgressDisplay === 0
@@ -998,15 +998,15 @@ export function ProjectDetail({
                       </div>
                     </div>
                   ) : userProgress === 0 ? (
-                    <div className="text-gray-500">
+                    <div className="text-slate-400">
                       Select 'Start Evaluation' to begin.
                     </div>
                   ) : userProgress < 100 ? (
                     <div>
-                      <div className="text-gray-700 mb-2 font-medium">
+                      <div className="text-slate-300 mb-2 font-medium">
                         Continue your evaluation
                       </div>
-                      <div className="text-sm text-gray-500 mb-4">
+                      <div className="text-sm text-slate-400 mb-4">
                         Progress: {Math.round(userProgress)}%
                       </div>
                       <button
@@ -1019,7 +1019,7 @@ export function ProjectDetail({
                   ) : (
                     <div className="text-green-600">
                       <div className="font-medium mb-2">✓ Evaluation Completed</div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-slate-400">
                         All questions have been answered. Admin has been notified.
                       </div>
                     </div>
@@ -1031,7 +1031,7 @@ export function ProjectDetail({
             {activeTab === 'tensions' && (
               <div>
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-medium text-gray-900">Tensions Management</h3>
+                  <h3 className="text-lg font-medium text-white">Tensions Management</h3>
                   {canManageTensions && (
                     <button
                       onClick={() => setShowAddTension(true)}
@@ -1058,9 +1058,9 @@ export function ProjectDetail({
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed">
+                  <div className="text-center py-12 bg-[#0a1122] rounded-lg border border-dashed">
                     <GitBranch className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-500 font-medium">No tensions identified yet.</p>
+                    <p className="text-slate-400 font-medium">No tensions identified yet.</p>
                   </div>
                 )}
               </div>
@@ -1068,25 +1068,25 @@ export function ProjectDetail({
 
             {/* USE CASE SEKMESİ (GÜNCELLENDİ) */}
             {activeTab === 'usecase' && (
-              <div className="bg-white rounded-lg">
+              <div className="bg-[#050b14] rounded-lg">
                 {linkedUseCase ? (
                   <div className="space-y-6">
                     <div className="flex justify-between items-start border-b pb-4">
                       <div>
-                        <h2 className="text-2xl font-bold text-gray-900">{linkedUseCase.title}</h2>
-                        <span className="inline-block mt-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                        <h2 className="text-2xl font-bold text-white">{linkedUseCase.title}</h2>
+                        <span className="inline-block mt-2 px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-xs font-medium">
                           {linkedUseCase.aiSystemCategory || 'General AI'}
                         </span>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm text-gray-500">Status</div>
-                        <div className="font-medium text-gray-900 capitalize">{linkedUseCase.status.replace('-', ' ')}</div>
+                        <div className="text-sm text-slate-400">Status</div>
+                        <div className="font-medium text-white capitalize">{linkedUseCase.status.replace('-', ' ')}</div>
                       </div>
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Description</h3>
-                      <p className="text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-lg border">
+                      <h3 className="text-lg font-semibold text-white mb-2">Description</h3>
+                      <p className="text-slate-300 leading-relaxed bg-[#0a1122] p-4 rounded-lg border">
                         {linkedUseCase.description}
                       </p>
                     </div>
@@ -1095,7 +1095,7 @@ export function ProjectDetail({
                     {useCaseQuestions && useCaseQuestions.length > 0 && (
                       <div>
                         <div className="flex items-center justify-between mb-3">
-                          <h3 className="text-lg font-semibold text-gray-900">Questions & Answers</h3>
+                          <h3 className="text-lg font-semibold text-white">Questions & Answers</h3>
                           <button
                             onClick={() => {
                               // Create a text file with Q&A
@@ -1121,19 +1121,19 @@ export function ProjectDetail({
                               document.body.removeChild(link);
                               URL.revokeObjectURL(url);
                             }}
-                            className="text-sm text-blue-600 hover:text-blue-800 inline-flex items-center px-3 py-1.5 border border-blue-200 rounded-lg hover:bg-blue-50"
+                            className="text-sm text-blue-400 hover:text-cyan-400 inline-flex items-center px-3 py-1.5 bg-[#0a1122] border border-white/10 rounded-lg hover:bg-white/5"
                           >
                             <Download className="w-4 h-4 mr-1" />
                             Download Q&A as File
                           </button>
                         </div>
-                        <div className="space-y-4 max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
+                        <div className="space-y-4 max-h-96 overflow-y-auto border border-white/10 rounded-lg p-4 bg-[#0a1122]">
                           {useCaseQuestions.map((q, idx) => (
-                            <div key={q.id || idx} className="bg-white p-4 rounded-lg border border-gray-200">
-                              <div className="text-sm font-medium text-gray-900 mb-2">
+                            <div key={q.id || idx} className="bg-[#050b14] p-4 rounded-lg border border-white/10">
+                              <div className="text-sm font-medium text-white mb-2">
                                 {idx + 1}. {q.questionEn}
                               </div>
-                              <div className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg mt-2">
+                              <div className="text-sm text-slate-300 bg-[#0a1122] p-3 rounded-lg mt-2">
                                 {q.answer || <span className="text-gray-400 italic">No answer provided</span>}
                               </div>
                             </div>
@@ -1144,17 +1144,17 @@ export function ProjectDetail({
 
                     {linkedUseCase.supportingFiles && linkedUseCase.supportingFiles.length > 0 && (
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Supporting Files</h3>
+                        <h3 className="text-lg font-semibold text-white mb-3">Supporting Files</h3>
                         <div className="space-y-2">
                           {linkedUseCase.supportingFiles.map((file, idx) => (
-                            <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
+                            <div key={idx} className="flex items-center justify-between p-3 bg-[#0a1122] rounded-lg border">
                               <div className="flex items-center">
                                 <FileText className="h-5 w-5 text-gray-400 mr-3" />
-                                <span className="text-sm text-gray-900">{file.name}</span>
+                                <span className="text-sm text-white">{file.name}</span>
                               </div>
                               <button
                                 onClick={() => handleDownload(file as any)}
-                                className="text-sm text-blue-600 hover:text-blue-800 inline-flex items-center"
+                                className="text-sm text-blue-600 hover:text-cyan-400 inline-flex items-center"
                               >
                                 <Download className="w-4 h-4 mr-1" />
                                 Download
@@ -1166,23 +1166,23 @@ export function ProjectDetail({
                     )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="bg-gray-50 p-4 rounded-lg border">
-                        <h4 className="text-sm font-bold text-gray-500 uppercase mb-2">Owner</h4>
+                      <div className="bg-[#0a1122] p-4 rounded-lg border">
+                        <h4 className="text-sm font-bold text-slate-400 uppercase mb-2">Owner</h4>
                         <div className="flex items-center">
                           <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center mr-3">
                             {useCaseOwnerName?.charAt(0) || 'U'}
                           </div>
-                          <span className="text-gray-900 font-medium">{useCaseOwnerName || 'Unknown Owner'}</span>
+                          <span className="text-white font-medium">{useCaseOwnerName || 'Unknown Owner'}</span>
                         </div>
                       </div>
-                      <div className="bg-gray-50 p-4 rounded-lg border">
-                        <h4 className="text-sm font-bold text-gray-500 uppercase mb-2">Internal ID</h4>
+                      <div className="bg-[#0a1122] p-4 rounded-lg border">
+                        <h4 className="text-sm font-bold text-slate-400 uppercase mb-2">Internal ID</h4>
                         <code className="text-sm bg-gray-200 px-2 py-1 rounded">{linkedUseCase.id || (linkedUseCase as any)._id}</code>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-12 text-gray-500 border rounded-lg">
+                  <div className="text-center py-12 text-slate-400 border rounded-lg">
                     <FileText className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                     <p>No linked Use Case found.</p>
                     <p className="text-xs text-gray-400">
@@ -1219,12 +1219,12 @@ export function ProjectDetail({
       {/* Generating Report Overlay */}
       {generating && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl">
+          <div className="bg-[#050b14] rounded-lg p-6 max-w-md mx-4 shadow-xl">
             <div className="flex items-center gap-2.5" role="status" aria-live="polite">
               <Spinner size={20} strokeWidth={2.5} className="flex-shrink-0" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Generating Report</h3>
-                <p className="text-sm text-gray-600 mt-1">Your report is being generated. Please wait...</p>
+                <h3 className="text-lg font-semibold text-white">Generating Report</h3>
+                <p className="text-sm text-slate-400 mt-1">Your report is being generated. Please wait...</p>
               </div>
             </div>
           </div>
@@ -1247,7 +1247,7 @@ export function ProjectDetail({
           {/* Center modal */}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div
-              className="w-full max-w-2xl bg-white shadow-2xl border border-gray-200 rounded-xl overflow-hidden flex flex-col min-h-0"
+              className="w-full max-w-2xl bg-[#050b14] shadow-2xl border border-white/10 rounded-xl overflow-hidden flex flex-col min-h-0"
               style={{ height: '70vh', maxHeight: 650 }}
               onClick={(e) => e.stopPropagation()}
               role="dialog"

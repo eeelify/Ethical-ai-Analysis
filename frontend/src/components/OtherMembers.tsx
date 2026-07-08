@@ -330,26 +330,26 @@ const fetchConversations = async () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-[#0a1122]">
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-h-0">
         {/* Header */}
-        <div className="bg-white shadow-sm border-b flex-shrink-0">
+        <div className="bg-[#050b14] shadow-sm border-b flex-shrink-0">
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
 
                 <div>
-                  <h1 className="text-xl text-gray-900 flex items-center">
+                  <h1 className="text-xl text-white flex items-center">
                     <Users className="h-5 w-5 mr-2" />
                     Team Members
                   </h1>
-                  <p className="text-gray-600">
+                  <p className="text-slate-400">
                     Connect with other experts on the platform
                   </p>
                 </div>
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-slate-400">
                 {activeTab === 'members' 
                   ? `${filteredUsers.length} of ${otherUsers.length} members`
                   : `${conversations.length} conversations`}
@@ -358,7 +358,7 @@ const fetchConversations = async () => {
           </div>
           
           {/* Tabs */}
-          <div className="px-6 border-t border-gray-200">
+          <div className="px-6 border-t border-white/10">
             <div className="flex space-x-1">
               <button
                 onClick={() => {
@@ -368,7 +368,7 @@ const fetchConversations = async () => {
                 className={`px-4 py-2 text-sm font-medium transition-colors ${
                   activeTab === 'members'
                     ? 'text-blue-600 border-b-2 border-blue-600'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 <Users className="h-4 w-4 inline mr-2" />
@@ -379,7 +379,7 @@ const fetchConversations = async () => {
                 className={`px-4 py-2 text-sm font-medium transition-colors ${
                   activeTab === 'chats'
                     ? 'text-blue-600 border-b-2 border-blue-600'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 <MessageSquare className="h-4 w-4 inline mr-2" />
@@ -404,7 +404,7 @@ const fetchConversations = async () => {
             return (
               <div
                 key={user.id}
-                className="bg-white rounded-lg shadow-sm border p-6"
+                className="bg-[#050b14] rounded-lg shadow-sm border p-6"
               >
                 <div className="flex items-center space-x-4 mb-4">
                   <div className="relative">
@@ -417,10 +417,10 @@ const fetchConversations = async () => {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg text-gray-900 truncate">
+                    <h3 className="text-lg text-white truncate">
                       {user.name}
                     </h3>
-                    <p className="text-sm text-gray-500 truncate">
+                    <p className="text-sm text-slate-400 truncate">
                       {user.email}
                     </p>
 
@@ -440,7 +440,7 @@ const fetchConversations = async () => {
                 </div>
 
                 <div className="mb-4">
-                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
                     Active Projects ({userProjects.length})
                   </div>
                   <div className="space-y-1">
@@ -449,7 +449,7 @@ const fetchConversations = async () => {
                         {userProjects.map((project) => (
                           <div
                             key={project.id || (project as any)._id}
-                            className="text-xs text-gray-700 bg-gray-50 px-2 py-1.5 rounded border border-gray-100 truncate"
+                            className="text-xs text-slate-300 bg-[#0a1122] px-2 py-1.5 rounded border border-white/5 truncate"
                             title={project.title}
                           >
                             {project.title}
@@ -457,7 +457,7 @@ const fetchConversations = async () => {
                         ))}
                       </div>
                     ) : (
-                      <div className="text-xs text-gray-400 italic">
+                      <div className="text-xs text-slate-400 italic">
                         No active projects assigned
                       </div>
                     )}
@@ -482,8 +482,8 @@ const fetchConversations = async () => {
             {filteredUsers.length === 0 && (
               <div className="text-center py-12 col-span-full">
                 <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg text-gray-900 mb-2">No members found</h3>
-                <p className="text-gray-600">
+                <h3 className="text-lg text-white mb-2">No members found</h3>
+                <p className="text-slate-400">
                   {searchTerm
                     ? 'No members match your search criteria.'
                     : 'There are no other members on the platform yet.'}
@@ -495,15 +495,15 @@ const fetchConversations = async () => {
       ) : (
         /* Chats - WhatsApp style layout */
         <div className="flex-1 min-h-0 flex flex-col" style={{ height: 'calc(100vh - 140px)' }}>
-          <div className="flex flex-1 min-h-0 border-t border-gray-200" style={{ maxHeight: 'calc(100vh - 140px)' }}>
+          <div className="flex flex-1 min-h-0 border-t border-white/10" style={{ maxHeight: 'calc(100vh - 140px)' }}>
             {/* Conversation list */}
-            <div className="w-64 border-r border-gray-200 bg-white flex flex-col overflow-hidden" style={{ height: '100%', maxHeight: 'calc(100vh - 140px)' }}>
+            <div className="w-64 border-r border-white/10 bg-[#050b14] flex flex-col overflow-hidden" style={{ height: '100%', maxHeight: 'calc(100vh - 140px)' }}>
               <div className="flex-1 overflow-y-auto overscroll-contain" style={{ height: '100%' }}>
               {conversationList.length === 0 ? (
                 <div className="text-center py-12">
                   <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg text-gray-900 mb-2">No conversations yet</h3>
-                  <p className="text-gray-600">Start a conversation to see it here.</p>
+                  <h3 className="text-lg text-white mb-2">No conversations yet</h3>
+                  <p className="text-slate-400">Start a conversation to see it here.</p>
                 </div>
               ) : (
                 <div className="space-y-2 p-3">
@@ -529,7 +529,7 @@ const fetchConversations = async () => {
                         key={`${conv.projectId?.id || conv.projectId?._id || conv.projectId}-${conv.otherUserId?.id || conv.otherUserId?._id || conv.otherUserId}`}
                         onClick={() => handleOpenChat(conv)}
                         className={`rounded-lg border p-3 cursor-pointer transition-all ${
-                          isSelected ? 'border-blue-500 bg-blue-50' : hasUnread ? 'border-blue-500 border-l-4 bg-white' : 'border-gray-200 bg-white hover:shadow-sm'
+                          isSelected ? 'border-blue-500 bg-blue-50' : hasUnread ? 'border-blue-500 border-l-4 bg-[#050b14]' : 'border-white/10 bg-[#050b14] hover:shadow-sm'
                         }`}
                       >
                         <div className="flex items-start space-x-3">
@@ -549,16 +549,16 @@ const fetchConversations = async () => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-2">
-                                <h3 className={`text-sm font-semibold ${hasUnread ? 'text-gray-900' : 'text-gray-700'}`}>
+                                <h3 className={`text-sm font-semibold ${hasUnread ? 'text-white' : 'text-slate-300'}`}>
                                   {otherUser.name}
                                 </h3>
                               </div>
-                              <div className="text-xs text-gray-500 flex items-center">
+                              <div className="text-xs text-slate-400 flex items-center">
                                 <Clock className="h-3 w-3 mr-1" />
                                 {formatTime(conv.lastMessageTime)}
                               </div>
                             </div>
-                            <p className={`text-sm truncate ${hasUnread ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
+                            <p className={`text-sm truncate ${hasUnread ? 'text-white font-medium' : 'text-slate-400'}`}>
                               {conv.lastMessage || 'No messages yet'}
                             </p>
                           </div>
@@ -572,10 +572,10 @@ const fetchConversations = async () => {
             </div>
 
             {/* Chat area */}
-            <div className="flex-1 bg-white flex flex-col overflow-hidden" style={{ height: '100%', maxHeight: 'calc(100vh - 140px)' }}>
+            <div className="flex-1 bg-[#050b14] flex flex-col overflow-hidden" style={{ height: '100%', maxHeight: 'calc(100vh - 140px)' }}>
               {/* Empty state - shown when no chat selected */}
               {!chatPanelOpen || !chatOtherUser || !chatProject ? (
-                <div className="flex-1 flex items-center justify-center text-gray-500" style={{ height: '100%' }}>
+                <div className="flex-1 flex items-center justify-center text-slate-400" style={{ height: '100%' }}>
                   Select a conversation to start chatting.
                 </div>
               ) : null}
@@ -615,20 +615,20 @@ const fetchConversations = async () => {
 
       {/* Chat Panel - Fullscreen overlay - Same instance, shown when activeTab !== 'chats' */}
       {chatProject && chatOtherUser ? (
-        <div className={`fixed inset-0 z-50 bg-white flex flex-col ${chatPanelOpen && activeTab !== 'chats' ? '' : 'hidden'}`}>
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 bg-white shrink-0">
+        <div className={`fixed inset-0 z-50 bg-[#050b14] flex flex-col ${chatPanelOpen && activeTab !== 'chats' ? '' : 'hidden'}`}>
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10 bg-[#050b14] shrink-0">
             <button
               onClick={() => {
                 setChatPanelOpen(false);
                 // Keep project/user so ChatPanel stays mounted
                 fetchConversations();
               }}
-              className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+              className="flex items-center gap-2 text-sm font-medium text-slate-300 hover:text-white"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
             </button>
-            <div className="text-sm text-gray-500">Chat</div>
+            <div className="text-sm text-slate-400">Chat</div>
           </div>
           <div className="flex-1 min-h-0">
             <ChatPanel

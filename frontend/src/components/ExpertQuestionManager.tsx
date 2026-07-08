@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { api } from '../api';
 import { Plus, Edit2, Trash2, X, RefreshCw, Save } from 'lucide-react';
 
@@ -220,15 +220,15 @@ export function ExpertQuestionManager() {
     };
 
     return (
-        <div className="p-6 h-full flex flex-col bg-gray-50">
+        <div className="p-6 h-full flex flex-col bg-[#0a1122]">
             <div className="flex justify-between items-center mb-6 shrink-0">
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-900">Expert Questions</h2>
-                    <p className="text-gray-500 text-sm mt-1">Manage standard evaluation questions</p>
+                    <h2 className="text-2xl font-bold text-white">Expert Questions</h2>
+                    <p className="text-slate-400 text-sm mt-1">Manage standard evaluation questions</p>
                 </div>
                 <div className="flex space-x-3 items-center">
-                    <div className="flex items-center space-x-2 bg-white px-3 py-1.5 border border-gray-200 rounded-lg shadow-sm">
-                        <span className="text-sm font-medium text-gray-700">Questionnaire Key:</span>
+                    <div className="flex items-center space-x-2 bg-[#050b14] px-3 py-1.5 border border-white/10 rounded-lg shadow-sm">
+                        <span className="text-sm font-medium text-slate-300">Questionnaire Key:</span>
                         <select
                             value={questionnaireKey}
                             onChange={(e) => setQuestionnaireKey(e.target.value)}
@@ -244,7 +244,7 @@ export function ExpertQuestionManager() {
                     </div>
                     <button
                         onClick={fetchQuestions}
-                        className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 bg-white border border-gray-200 rounded-lg transition-colors shadow-sm"
+                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 bg-[#050b14] border border-white/10 rounded-lg transition-colors shadow-sm"
                         title="Refresh Questions"
                     >
                         <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin text-blue-600' : ''}`} />
@@ -259,31 +259,31 @@ export function ExpertQuestionManager() {
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 flex-1 overflow-hidden flex flex-col">
+            <div className="bg-[#050b14] rounded-xl shadow-sm border border-white/10 flex-1 overflow-hidden flex flex-col">
                 <div className="overflow-x-auto flex-1">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50 sticky top-0 z-[5]">
+                        <thead className="bg-[#0a1122] sticky top-0 z-[5]">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order / Code</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Principle</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Question Text</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Order / Code</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Principle</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Question Text</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Type</th>
+                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-[#050b14] divide-y divide-gray-200">
                             {questions.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                                    <td colSpan={5} className="px-6 py-12 text-center text-slate-400">
                                         No questions found for questionnaire key "{questionnaireKey}".
                                     </td>
                                 </tr>
                             ) : (
                                 questions.map((q) => (
-                                    <tr key={q._id} className="hover:bg-gray-50 transition-colors">
+                                    <tr key={q._id} className="hover:bg-[#0a1122] transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm font-medium text-gray-900">Ord: {q.order}</div>
-                                            <div className="text-xs text-gray-500">{q.code}</div>
+                                            <div className="text-sm font-medium text-white">Ord: {q.order}</div>
+                                            <div className="text-xs text-slate-400">{q.code}</div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className="px-2.5 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
@@ -291,10 +291,10 @@ export function ExpertQuestionManager() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="text-sm text-gray-900 line-clamp-2" title={q.text?.en}>{q.text?.en}</div>
+                                            <div className="text-sm text-white line-clamp-2" title={q.text?.en}>{q.text?.en}</div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-900">{q.answerType}</div>
+                                            <div className="text-sm text-white">{q.answerType}</div>
                                             <div className="text-xs text-gray-400">{q.options?.length || 0} options</div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -317,12 +317,12 @@ export function ExpertQuestionManager() {
 
             {isModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl flex flex-col" style={{ maxHeight: '90vh' }}>
-                        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50 rounded-t-xl shrink-0">
-                            <h3 className="text-lg font-bold text-gray-900">
+                    <div className="bg-[#050b14] rounded-xl shadow-2xl w-full max-w-3xl flex flex-col" style={{ maxHeight: '90vh' }}>
+                        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#0a1122] rounded-t-xl shrink-0">
+                            <h3 className="text-lg font-bold text-white">
                                 {editingQuestion ? 'Edit Question' : 'Add New Question'}
                             </h3>
-                            <button onClick={handleCloseModal} className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-200 transition-colors">
+                            <button onClick={handleCloseModal} className="text-gray-400 hover:text-slate-400 p-1 rounded-full hover:bg-gray-200 transition-colors">
                                 <X className="h-5 w-5" />
                             </button>
                         </div>
@@ -330,7 +330,7 @@ export function ExpertQuestionManager() {
                         <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar">
                             <div className="grid grid-cols-2 gap-4 mb-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Code *</label>
+                                    <label className="block text-sm font-medium text-slate-300 mb-1">Code *</label>
                                     <input
                                         type="text"
                                         required
@@ -341,7 +341,7 @@ export function ExpertQuestionManager() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Order</label>
+                                    <label className="block text-sm font-medium text-slate-300 mb-1">Order</label>
                                     <input
                                         type="number"
                                         value={formData.order || ''}
@@ -354,7 +354,7 @@ export function ExpertQuestionManager() {
 
                             <div className="grid grid-cols-1 gap-4 mb-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Principle Label *</label>
+                                    <label className="block text-sm font-medium text-slate-300 mb-1">Principle Label *</label>
                                     <select
                                         required
                                         value={formData.principleLabel?.en || ''}
@@ -378,7 +378,7 @@ export function ExpertQuestionManager() {
                             </div>
 
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Question Text *</label>
+                                <label className="block text-sm font-medium text-slate-300 mb-1">Question Text *</label>
                                 <textarea
                                     required
                                     rows={2}
@@ -393,7 +393,7 @@ export function ExpertQuestionManager() {
 
                             <div className="grid grid-cols-2 gap-4 mb-4 items-center">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Answer Type *</label>
+                                    <label className="block text-sm font-medium text-slate-300 mb-1">Answer Type *</label>
                                     <select
                                         value={formData.answerType || 'single_choice'}
                                         onChange={(e) => setFormData({ ...formData, answerType: e.target.value })}
@@ -412,7 +412,7 @@ export function ExpertQuestionManager() {
                                         onChange={(e) => setFormData({ ...formData, required: e.target.checked })}
                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                                     />
-                                    <label htmlFor="required_checkbox" className="ml-2 block text-sm text-gray-900">
+                                    <label htmlFor="required_checkbox" className="ml-2 block text-sm text-white">
                                         Required Question
                                     </label>
                                 </div>
@@ -420,11 +420,11 @@ export function ExpertQuestionManager() {
 
                             {/* Options Section */}
                             {(formData.answerType === 'single_choice') && (
-                                <div className="mt-6 border-t border-gray-200 pt-4">
+                                <div className="mt-6 border-t border-white/10 pt-4">
                                     <div className="flex flex-col xl:flex-row xl:items-center justify-between mb-3 gap-2">
-                                        <h4 className="text-sm font-bold text-gray-900">Answer Options</h4>
+                                        <h4 className="text-sm font-bold text-white">Answer Options</h4>
                                         <div className="flex flex-wrap items-center">
-                                            <span className="text-xs text-gray-500 font-medium mr-2">Quick Fill:</span>
+                                            <span className="text-xs text-slate-400 font-medium mr-2">Quick Fill:</span>
                                             <button type="button" onClick={() => applyTemplate('2')} className="text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1.5 rounded transition-colors shadow-sm mr-2">2 Options</button>
                                             <button type="button" onClick={() => applyTemplate('3')} className="text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1.5 rounded transition-colors shadow-sm mr-2">3 Options</button>
                                             <button type="button" onClick={() => applyTemplate('4')} className="text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1.5 rounded transition-colors shadow-sm mr-2">4 Options</button>
@@ -440,16 +440,16 @@ export function ExpertQuestionManager() {
                                     </div>
 
                                     {editingOptions.length === 0 ? (
-                                        <div className="text-sm text-gray-500 italic bg-gray-50 p-3 rounded-lg border border-gray-200 text-center">
+                                        <div className="text-sm text-slate-400 italic bg-[#0a1122] p-3 rounded-lg border border-white/10 text-center">
                                             No options added yet.
                                         </div>
                                     ) : (
                                         <div className="space-y-3">
                                             {editingOptions.map((opt, idx) => (
-                                                <div key={idx} className="flex items-end gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg group">
+                                                <div key={idx} className="flex items-end gap-3 p-3 bg-[#0a1122] border border-white/10 rounded-lg group">
                                                     <div className="grid grid-cols-12 gap-3 flex-1">
                                                         <div className="col-span-3">
-                                                            <label className="block text-xs text-gray-500 mb-1">Option Key</label>
+                                                            <label className="block text-xs text-slate-400 mb-1">Option Key</label>
                                                             <input
                                                                 type="text"
                                                                 value={opt.key}
@@ -461,7 +461,7 @@ export function ExpertQuestionManager() {
                                                         <div className="col-span-7">
                                                             <div className="flex space-x-2">
                                                                 <div className="flex-1">
-                                                                    <label className="block text-xs text-gray-500 mb-1">Label</label>
+                                                                    <label className="block text-xs text-slate-400 mb-1">Label</label>
                                                                     <input
                                                                         type="text"
                                                                         value={opt.label.en}
@@ -472,7 +472,7 @@ export function ExpertQuestionManager() {
                                                             </div>
                                                         </div>
                                                         <div className="col-span-2">
-                                                            <label className="block text-xs text-gray-500 mb-1" title="0.0 (Risky) to 1.0 (Safe)">Score (0-1)</label>
+                                                            <label className="block text-xs text-slate-400 mb-1" title="0.0 (Risky) to 1.0 (Safe)">Score (0-1)</label>
                                                             <input
                                                                 type="number"
                                                                 step="0.1"
@@ -500,10 +500,10 @@ export function ExpertQuestionManager() {
                             )}
                         </div>
 
-                        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end space-x-3 rounded-b-xl shrink-0">
+                        <div className="px-6 py-4 border-t border-white/10 bg-[#0a1122] flex justify-end space-x-3 rounded-b-xl shrink-0">
                             <button
                                 onClick={handleCloseModal}
-                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                                className="px-4 py-2 text-sm font-medium text-slate-300 bg-[#050b14] border border-gray-300 rounded-lg hover:bg-[#0a1122]"
                             >
                                 Cancel
                             </button>

@@ -17,6 +17,7 @@ import {
   Trash2,
   RefreshCw,
   CheckCircle,
+  Database,
 } from "lucide-react";
 import { Project, User, UseCase } from "../types";
 import { ChatPanel } from "./ChatPanel";
@@ -24,6 +25,7 @@ import { NotificationDetailPanel } from "./NotificationDetailPanel";
 import { NotificationBell } from "./NotificationBell";
 import { formatRoleName } from "../utils/helpers";
 import { ProfileModal } from "./ProfileModal";
+import { OntologyViewerTab } from "./OntologyViewerTab";
 import { api } from "../api";
 import { fetchUserProgress } from "../utils/userProgress";
 
@@ -107,8 +109,8 @@ export function UserDashboard({
   assignmentsRefreshToken,
 }: UserDashboardProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentTab, setCurrentTab] = useState<"assigned" | "finished" | "reports">(() =>
-    loadUserDashboardTab("assigned") as "assigned" | "finished" | "reports"
+  const [currentTab, setCurrentTab] = useState<"assigned" | "finished" | "reports" | "ontology">(
+    () => loadUserDashboardTab("assigned") as "assigned" | "finished" | "reports" | "ontology"
   );
 
   // Persist tab changes
@@ -812,14 +814,14 @@ export function UserDashboard({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#0a1122] text-slate-300 flex flex-col">
       {/* ======= TOP BAR ======= */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-[#050b14] border-b border-white/10 shrink-0">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Left */}
             <div className="flex items-center space-x-6">
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 className="text-xl font-semibold text-white">
                 Ethical AI Analysis Platform
               </h1>
 
@@ -836,7 +838,7 @@ export function UserDashboard({
                     placeholder="Search projects..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                    className="pl-9 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:ring-2 focus:ring-cyan-500 placeholder-slate-500"
                   />
                 </div>
               )}
@@ -868,7 +870,7 @@ export function UserDashboard({
               <div className="relative" ref={notificationRef}>
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors"
+                  className="relative p-2 text-gray-600 hover:text-white transition-colors"
                 >
                   <MessageSquare className="h-5 w-5" />
                   {unreadCount > 0 && (
@@ -883,7 +885,7 @@ export function UserDashboard({
 
                 {showNotifications && (
                   <div
-                    className="absolute left-auto right-0 top-full mt-2 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden flex flex-col"
+                    className="absolute left-auto right-0 top-full mt-2 bg-[#050b14] rounded-lg shadow-[0_0_15px_rgba(34,211,238,0.1)] border border-white/10 z-50 overflow-hidden flex flex-col"
                     style={{
                       // Anchor to the bell button's right edge so it opens leftwards (prevents off-screen overflow)
                       right: 0,
@@ -892,8 +894,8 @@ export function UserDashboard({
                       maxHeight: 'calc(100vh - 120px)',
                     }}
                   >
-                    <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
-                      <h3 className="font-semibold text-gray-900">Messages</h3>
+                    <div className="p-4 border-b border-white/10 flex items-center justify-between flex-shrink-0">
+                      <h3 className="font-semibold text-white">Messages</h3>
                       <button
                         onClick={() => setShowNotifications(false)}
                         className="p-1 hover:bg-gray-100 rounded-full"
@@ -925,7 +927,7 @@ export function UserDashboard({
                                     <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-medium">
                                       {conv.fromUserName?.charAt(0) || 'U'}
                                     </div>
-                                    <div className="font-medium text-gray-900 text-sm truncate">
+                                    <div className="font-medium text-white text-sm truncate">
                                       {conv.fromUserName}
                                     </div>
                                   </div>
@@ -956,15 +958,15 @@ export function UserDashboard({
       </div>
 
       {/* ======= MAIN LAYOUT ======= */}
-      <div className="flex">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* SIDEBAR */}
-        <div className="w-64 bg-white shadow-sm h-screen">
+        <div className="w-64 bg-[#050b14] border-r border-white/10 overflow-y-auto flex flex-col">
           <div className="p-6">
             <button
               onClick={() => setShowProfile(true)}
               className="w-full mb-6 hover:opacity-80 transition-opacity text-left"
             >
-              <div className="text-sm text-gray-600">Welcome back,</div>
+              <div className="text-sm text-slate-500">Welcome back,</div>
               <div className="flex items-center mt-2">
                 {(currentUser as any).profileImage ? (
                   <img
@@ -981,7 +983,7 @@ export function UserDashboard({
                   </div>
                 )}
                 <div>
-                  <div className="text-lg font-medium text-gray-900">
+                  <div className="text-lg font-medium text-white">
                     {currentUser.name}
                   </div>
                   <div
@@ -1001,7 +1003,7 @@ export function UserDashboard({
                   setCurrentTab("assigned");
                   onNavigate("dashboard");
                 }}
-                className={`w-full flex items-center px-3 py-2 text-gray-700 hover:bg-gray-100 ${!showChats && currentTab !== 'reports' ? 'bg-blue-50 border-r-2 border-blue-500' : ''
+                className={`w-full flex items-center px-3 py-2 text-slate-400 hover:bg-white/5 hover:text-white ${!showChats && currentTab !== 'reports' ? 'bg-cyan-500/10 border-r-2 border-cyan-400 text-cyan-400' : ''
                   }`}
               >
                 <Folder className="h-4 w-4 mr-3 text-blue-600" />
@@ -1012,22 +1014,33 @@ export function UserDashboard({
                   setShowChats(false);
                   setCurrentTab("reports");
                 }}
-                className={`w-full flex items-center px-3 py-2 text-gray-700 hover:bg-gray-100 ${!showChats && currentTab === 'reports' ? 'bg-blue-50 border-r-2 border-blue-500' : ''
+                className={`w-full flex items-center px-3 py-2 text-slate-400 hover:bg-white/5 hover:text-white ${!showChats && currentTab === 'reports' ? 'bg-cyan-500/10 border-r-2 border-cyan-400 text-cyan-400' : ''
                   }`}
               >
                 <FileText className="h-4 w-4 mr-3 text-orange-600" />
                 Reports
               </button>
               <button
+                onClick={() => {
+                  setShowChats(false);
+                  setCurrentTab("ontology");
+                }}
+                className={`w-full flex items-center px-3 py-2 text-slate-400 hover:bg-white/5 hover:text-white ${!showChats && currentTab === 'ontology' ? 'bg-cyan-500/10 border-r-2 border-cyan-400 text-cyan-400' : ''
+                  }`}
+              >
+                <Database className="h-4 w-4 mr-3 text-pink-600" />
+                Ontology
+              </button>
+              <button
                 onClick={() => onNavigate("shared-area")}
-                className="w-full flex items-center px-3 py-2 text-gray-700 hover:bg-gray-100"
+                className="w-full flex items-center px-3 py-2 text-slate-400 hover:bg-white/5 hover:text-white"
               >
                 <MessageSquare className="h-4 w-4 mr-3 text-green-600" />
                 Shared Area
               </button>
               <button
                 onClick={() => onNavigate("other-members")}
-                className="w-full flex items-center px-3 py-2 text-gray-700 hover:bg-gray-100"
+                className="w-full flex items-center px-3 py-2 text-slate-400 hover:bg-white/5 hover:text-white"
               >
                 <Users className="h-4 w-4 mr-3 text-purple-600" />
                 Other Members
@@ -1047,15 +1060,15 @@ export function UserDashboard({
         </div>
 
         {/* ======= MAIN CONTENT ======= */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-6 overflow-y-auto bg-[#0a1122]">
           {showChats ? (
             /* ===== CHATS LIST ===== */
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-6">Chats</h2>
+              <h2 className="text-2xl font-semibold text-white mb-6">Chats</h2>
               {allConversations.length === 0 ? (
                 <div className="text-center py-12">
                   <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg text-gray-900 mb-2">No conversations yet</h3>
+                  <h3 className="text-lg text-white mb-2">No conversations yet</h3>
                   <p className="text-gray-600">
                     Start a conversation with a team member to see it here.
                   </p>
@@ -1073,8 +1086,7 @@ export function UserDashboard({
                       <div
                         key={`${conv.projectId}-${conv.otherUserId}`}
                         onClick={() => handleOpenChat(conv)}
-                        className={`bg-white rounded-lg border p-4 cursor-pointer hover:shadow-md transition-all ${hasUnread ? 'border-blue-500 border-l-4' : 'border-gray-200'
-                          }`}
+                        className={`bg-[#050b14]/50 rounded-lg border p-4 cursor-pointer hover:shadow-[0_0_15px_rgba(34,211,238,0.1)] transition-all ${hasUnread ? 'border-cyan-500 border-l-4' : 'border-white/10'}`}
                       >
                         <div className="flex items-start space-x-4">
                           <div className="relative flex-shrink-0">
@@ -1093,7 +1105,7 @@ export function UserDashboard({
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between mb-1">
                               <div className="flex items-center space-x-2">
-                                <h3 className={`text-base font-medium ${hasUnread ? 'text-gray-900' : 'text-gray-700'}`}>
+                                <h3 className={`text-base font-medium ${hasUnread ? 'text-white' : 'text-gray-700'}`}>
                                   {otherUser.name}
                                 </h3>
                                 <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
@@ -1105,7 +1117,7 @@ export function UserDashboard({
                                 {formatTime(conv.lastMessageTime)}
                               </div>
                             </div>
-                            <p className={`text-sm ${hasUnread ? 'text-gray-900 font-medium' : 'text-gray-600'} line-clamp-2`}>
+                            <p className={`text-sm ${hasUnread ? 'text-white font-medium' : 'text-gray-600'} line-clamp-2`}>
                               {conv.lastMessage}
                             </p>
                           </div>
@@ -1116,6 +1128,8 @@ export function UserDashboard({
                 </div>
               )}
             </div>
+          ) : currentTab === "ontology" ? (
+            <OntologyViewerTab />
           ) : (
             <>
               {/* TABS */}
@@ -1151,12 +1165,12 @@ export function UserDashboard({
                   {filteredProjects.map((project) => (
                     <div
                       key={project.id}
-                      className="bg-white rounded-xl border shadow-sm hover:shadow-md transition-all"
+                      className="bg-[#050b14]/50 rounded-xl border border-white/10 shadow-sm hover:shadow-[0_0_15px_rgba(34,211,238,0.1)] transition-all"
                     >
                       <div className="p-6">
                         <div className="flex items-start justify-between mb-3">
                           <div>
-                            <h3 className="text-lg font-semibold text-gray-900">
+                            <h3 className="text-lg font-semibold text-white">
                               {project.title}
                             </h3>
                             <p className="text-gray-600 text-sm mt-1">
@@ -1464,7 +1478,7 @@ export function UserDashboard({
                       <div className="text-6xl mb-3">
                         {currentTab === "assigned" ? "📂" : "✅"}
                       </div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      <h3 className="text-lg font-medium text-white mb-2">
                         No {currentTab === "assigned" ? "assigned" : "finished"} projects found
                       </h3>
                       <p className="text-gray-600">
@@ -1483,10 +1497,10 @@ export function UserDashboard({
               {currentTab === "reports" && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-gray-900">Project Reports</h2>
+                    <h2 className="text-xl font-semibold text-white">Project Reports</h2>
                     <button
                       onClick={fetchReports}
-                      className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900 flex items-center gap-2 transition-colors"
+                      className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-white flex items-center gap-2 transition-colors"
                     >
                       <RefreshCw className="h-4 w-4" />
                       Refresh
@@ -1498,7 +1512,7 @@ export function UserDashboard({
                   ) : reports.length === 0 ? (
                     <div className="text-center py-12 bg-gray-50 rounded-lg">
                       <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No reports available</h3>
+                      <h3 className="text-lg font-medium text-white mb-2">No reports available</h3>
                       <p className="text-gray-600">
                         Reports for your assigned projects will appear here once they are generated.
                       </p>
@@ -1514,7 +1528,7 @@ export function UserDashboard({
                         return (
                           <div
                             key={reportId}
-                            className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                            className="bg-[#050b14]/50 border border-white/10 rounded-lg p-4 hover:shadow-[0_0_15px_rgba(34,211,238,0.1)] transition-shadow"
                           >
                             <div className="flex items-start justify-between">
                               <div
@@ -1530,7 +1544,7 @@ export function UserDashboard({
                                   handleViewReport(reportId);
                                 }}
                               >
-                                <h3 className="font-medium text-gray-900 mb-1">{report.title}</h3>
+                                <h3 className="font-medium text-white mb-1">{report.title}</h3>
                                 <p className="text-sm text-gray-600 mb-2">{projectTitle}</p>
                                 <div className="flex items-center gap-4 text-xs text-gray-500">
                                   <span>Created by: {generatedBy}</span>
@@ -1613,7 +1627,7 @@ export function UserDashboard({
           />
 
           {/* Right drawer */}
-          <div className="fixed inset-y-0 right-0 z-[70] w-full max-w-2xl bg-white shadow-2xl flex flex-col">
+          <div className="fixed inset-y-0 right-0 z-[70] w-full max-w-2xl bg-[#050b14] shadow-[0_0_15px_rgba(34,211,238,0.1)] border-l border-white/10 flex flex-col">
             <NotificationDetailPanel
               conversation={expandedNotification}
               currentUser={currentUser}
@@ -1648,7 +1662,7 @@ export function UserDashboard({
           {/* Center modal */}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div
-              className="w-full max-w-2xl bg-white shadow-2xl border border-gray-200 rounded-xl overflow-hidden flex flex-col"
+              className="w-full max-w-2xl bg-[#050b14] shadow-[0_0_15px_rgba(34,211,238,0.1)] border border-white/10 rounded-xl overflow-hidden flex flex-col"
               style={{ height: '70vh', maxHeight: 650, minHeight: 400 }}
               onClick={(e) => e.stopPropagation()}
               role="dialog"
@@ -1704,10 +1718,10 @@ export function UserDashboard({
       {/* REPORT VIEW MODAL - Updated to show Summary */}
       {selectedReport && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <div className="bg-[#050b14] border border-white/10 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">{selectedReport.title}</h2>
+                <h2 className="text-xl font-bold text-white">{selectedReport.title}</h2>
                 <p className="text-sm text-gray-500 mt-1">
                   {selectedReport.projectId?.title} • {new Date(selectedReport.generatedAt || selectedReport.createdAt).toLocaleString('en-US')}
                 </p>
@@ -1744,7 +1758,7 @@ export function UserDashboard({
               </div>
 
             </div>
-            <div className="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
+            <div className="px-6 py-4 border-t border-white/10 flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {

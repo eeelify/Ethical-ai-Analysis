@@ -346,21 +346,21 @@ export function UseCaseOwnerDashboard({
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen bg-[#0a1122] overflow-hidden text-slate-300">
 
       {/* Sidebar */}
-      <div className="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
+      <div className="w-64 bg-[#050b14] border-r border-white/10 flex flex-col flex-shrink-0">
 
-        <div className="h-1 bg-gradient-to-r from-green-500 to-green-600" />
+        <div className="h-1 bg-gradient-to-r from-cyan-500 to-blue-600 shadow-[0_0_15px_rgba(34,211,238,0.5)]" />
 
-        <div className="p-6 border-b border-gray-200">
-          <div className="text-xl text-gray-900 mb-1">Ethical AI Analysis</div>
-          <div className="text-xs text-gray-600">Use-case Owner Portal</div>
+        <div className="p-6 border-b border-white/10">
+          <div className="text-xl text-white mb-1">Ethical AI Analysis</div>
+          <div className="text-xs text-slate-500">Use-case Owner Portal</div>
         </div>
 
         <button
           onClick={() => setShowProfile(true)}
-          className="w-full px-6 py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors text-left"
+          className="w-full px-6 py-4 border-b border-white/10 hover:bg-white/5 transition-colors text-left"
         >
           <div className="flex items-center">
             {(currentUser as any).profileImage ? (
@@ -375,32 +375,32 @@ export function UseCaseOwnerDashboard({
               </div>
             )}
             <div className="text-sm">
-              <div className="text-gray-900">{currentUser.name}</div>
-              <div className="text-gray-500">Use-case Owner</div>
+              <div className="text-white">{currentUser.name}</div>
+              <div className="text-slate-500">Use-case Owner</div>
             </div>
           </div>
         </button>
 
         <nav className="flex-1 px-3 py-4">
-          <button className="w-full px-4 py-3 mb-2 flex items-center bg-green-50 text-green-700 rounded-lg">
-            <FolderOpen className="h-4 w-4 mr-3 text-green-600" />
+          <button className="w-full px-4 py-3 mb-2 flex items-center bg-cyan-500/10 text-cyan-400 rounded-lg">
+            <FolderOpen className="h-4 w-4 mr-3 text-cyan-400" />
             My Projects
           </button>
           {adminUser && (
             <button
               onClick={handleContactAdmin}
-              className="w-full px-4 py-3 mb-2 flex items-center text-gray-700 hover:bg-gray-100 rounded-lg"
+              className="w-full px-4 py-3 mb-2 flex items-center text-slate-400 hover:bg-white/5 hover:text-white rounded-lg"
             >
-              <MessageSquare className="h-4 w-4 mr-3 text-green-600" />
+              <MessageSquare className="h-4 w-4 mr-3" />
               Contact Admin
             </button>
           )}
         </nav>
 
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-white/10">
           <button
             onClick={onLogout}
-            className="w-full px-4 py-3 flex items-center text-gray-700 hover:bg-gray-100 rounded-lg"
+            className="w-full px-4 py-3 flex items-center text-slate-400 hover:bg-white/5 hover:text-white rounded-lg"
           >
             <LogOut className="h-4 w-4 mr-3" />
             Logout
@@ -412,11 +412,11 @@ export function UseCaseOwnerDashboard({
       <div className="flex-1 overflow-y-auto overflow-x-hidden">
 
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-8 py-6">
+        <div className="bg-[#050b14] border-b border-white/10 px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl text-gray-900 mb-2">Use-case Owner Dashboard</h1>
-              <p className="text-gray-600">Upload and monitor your AI system use cases</p>
+              <h1 className="text-2xl text-white mb-2">Use-case Owner Dashboard</h1>
+              <p className="text-slate-400">Upload and monitor your AI system use cases</p>
             </div>
             <div className="flex items-center space-x-4">
               {/* In-app Notifications Bell */}
@@ -433,7 +433,7 @@ export function UseCaseOwnerDashboard({
               <div className="relative" ref={notificationRef}>
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className="relative p-2 text-gray-600 hover:text-gray-900"
+                  className="relative p-2 text-gray-600 hover:text-white"
                 >
                   <MessageSquare className="h-5 w-5" />
                   {unreadCount > 0 && (
@@ -445,7 +445,7 @@ export function UseCaseOwnerDashboard({
 
                 {showNotifications && (
                   <div
-                    className="absolute left-auto right-0 top-full mt-2 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden flex flex-col"
+                    className="absolute left-auto right-0 top-full mt-2 bg-[#050b14] rounded-lg shadow-[0_0_15px_rgba(34,211,238,0.1)] border border-white/10 z-50 overflow-hidden flex flex-col"
                     style={{
                       // Anchor to the bell button's right edge so it opens leftwards (prevents off-screen overflow)
                       right: 0,
@@ -455,7 +455,7 @@ export function UseCaseOwnerDashboard({
                     }}
                   >
                     <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
-                      <h3 className="font-semibold text-gray-900">Notifications</h3>
+                      <h3 className="font-semibold text-white">Notifications</h3>
                       <button
                         onClick={() => setShowNotifications(false)}
                         className="p-1 hover:bg-gray-100 rounded-full"
@@ -483,7 +483,7 @@ export function UseCaseOwnerDashboard({
                                     <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-medium">
                                       {conv.fromUserName?.charAt(0) || 'U'}
                                     </div>
-                                    <div className="font-medium text-gray-900 text-sm truncate">
+                                    <div className="font-medium text-white text-sm truncate">
                                       {conv.fromUserName}
                                     </div>
                                   </div>
@@ -509,7 +509,7 @@ export function UseCaseOwnerDashboard({
               </div>
               <button
                 onClick={() => setShowNewUseCaseModal(true)}
-                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center shadow-sm"
+                className="px-6 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-500 flex items-center shadow-[0_0_15px_rgba(8,145,178,0.4)] transition-all"
               >
                 <Plus className="h-5 w-5 mr-2" />
                 New Use Case
@@ -522,7 +522,7 @@ export function UseCaseOwnerDashboard({
         <div className="px-8 py-6">
           {loadingUseCases ? (
             <div className="flex items-center justify-center py-12">
-              <div className="text-gray-500">Loading use cases...</div>
+              <div className="text-slate-400">Loading use cases...</div>
             </div>
           ) : myUseCases.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -555,12 +555,12 @@ export function UseCaseOwnerDashboard({
                 return (
                   <div
                     key={useCase.id}
-                    className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                    className="bg-[#050b14]/50 rounded-lg border border-white/10 p-4 hover:border-cyan-500/30 hover:shadow-[0_0_15px_rgba(34,211,238,0.1)] transition-all overflow-hidden"
                   >
                     {/* Status Badge */}
-                    <div className="px-6 pt-6 pb-4 border-b border-gray-100">
+                    <div className="px-6 pt-6 pb-4 border-b border-white/10">
                       <div className="flex items-start justify-between mb-3">
-                        <h3 className="text-lg text-gray-900 flex-1 mr-2">{useCase.title}</h3>
+                        <h3 className="text-lg text-white flex-1 mr-2">{useCase.title}</h3>
                         <div className="flex items-center space-x-2">
                           {showStatusBadge && (
                             <span
@@ -585,26 +585,26 @@ export function UseCaseOwnerDashboard({
                           </button>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-600 line-clamp-2">{useCase.description}</p>
+                      <p className="text-sm text-slate-400 line-clamp-2">{useCase.description}</p>
                     </div>
 
                     {/* Progress Bar */}
-                    <div className="px-6 py-4 border-b border-gray-100">
+                    <div className="px-6 py-4 border-b border-white/10">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs text-gray-600">Progress</span>
-                        <span className="text-xs text-gray-900">{displayProgress}%</span>
+                        <span className="text-xs text-slate-400">Progress</span>
+                        <span className="text-xs text-white">{displayProgress}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-white/10 rounded-full h-2">
                         <div
-                          className="bg-green-600 h-2 rounded-full transition-all"
+                          className="bg-cyan-500 h-2 rounded-full transition-all shadow-[0_0_10px_rgba(34,211,238,0.5)]"
                           style={{ width: `${displayProgress}%` }}
                         />
                       </div>
                     </div>
 
                     {/* Metadata + Experts */}
-                    <div className="px-6 py-4 bg-gray-50">
-                      <div className="flex items-center justify-between text-xs text-gray-600 mb-3">
+                    <div className="px-6 py-4 bg-white/5">
+                      <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
                         <div className="flex items-center">
                           <Clock className="h-3 w-3 mr-1" />
                           Last updated: {new Date(useCase.updatedAt).toLocaleDateString()}
@@ -614,7 +614,7 @@ export function UseCaseOwnerDashboard({
                       {/* Assigned Experts */}
                       {useCase.assignedExperts && useCase.assignedExperts.length > 0 && (
                         <div className="flex items-center mb-3">
-                          <span className="text-xs text-gray-600 mr-2">Assigned Experts:</span>
+                          <span className="text-xs text-slate-400 mr-2">Assigned Experts:</span>
                           <div className="flex -space-x-2">
                             {useCase.assignedExperts.slice(0, 3).map((expertId, idx) => (
                               <div
@@ -636,7 +636,7 @@ export function UseCaseOwnerDashboard({
 
                       <button
                         onClick={() => onViewUseCase(useCase)}
-                        className="w-full px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 text-sm flex items-center justify-center"
+                        className="w-full px-4 py-2 bg-white/5 border border-white/10 text-white rounded-lg hover:bg-white/10 hover:border-white/20 transition-all text-sm flex items-center justify-center"
                       >
                         <Eye className="h-4 w-4 mr-2" />
                         View Details
@@ -648,12 +648,12 @@ export function UseCaseOwnerDashboard({
             </div>
           ) : (
             <div className="text-center py-16">
-              <FolderOpen className="h-20 w-20 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl text-gray-900 mb-2">No Use Cases Yet</h3>
-              <p className="text-gray-600 mb-6">Create your first use case to get started with the evaluation process</p>
+              <FolderOpen className="h-20 w-20 text-slate-600 mx-auto mb-4" />
+              <h3 className="text-xl text-white mb-2">No Use Cases Yet</h3>
+              <p className="text-slate-400 mb-6">Create your first use case to get started with the evaluation process</p>
               <button
                 onClick={() => setShowNewUseCaseModal(true)}
-                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 inline-flex items-center"
+                className="px-6 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-500 inline-flex items-center shadow-[0_0_15px_rgba(8,145,178,0.4)]"
               >
                 <Plus className="h-5 w-5 mr-2" />
                 Create Use Case
@@ -691,7 +691,7 @@ export function UseCaseOwnerDashboard({
           />
 
           {/* Right drawer */}
-          <div className="fixed inset-y-0 right-0 z-50 w-full max-w-2xl bg-white shadow-2xl flex flex-col">
+          <div className="fixed inset-y-0 right-0 z-50 w-full max-w-2xl bg-[#050b14] border-l border-white/10 shadow-2xl flex flex-col">
             <NotificationDetailPanel
               conversation={expandedNotification}
               currentUser={currentUser}
@@ -729,7 +729,7 @@ export function UseCaseOwnerDashboard({
           {/* Center modal */}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div
-              className="w-full max-w-2xl bg-white shadow-2xl border border-gray-200 rounded-xl overflow-hidden flex flex-col min-h-0"
+              className="w-full max-w-2xl bg-[#050b14] shadow-[0_0_15px_rgba(34,211,238,0.1)] border border-white/10 rounded-xl overflow-hidden flex flex-col min-h-0"
               style={{ height: '70vh', maxHeight: 650 }}
               onClick={(e) => e.stopPropagation()}
               role="dialog"
@@ -1061,25 +1061,25 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
   };
 
   return (
-    <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
+    <div className="fixed inset-0 bg-[#0a1122] text-slate-300 z-50 overflow-y-auto">
       <div className="max-w-5xl mx-auto">
 
         {/* HEADER */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 shadow-sm z-10">
+        <div className="sticky top-0 bg-[#050b14] border-b border-white/10 shadow-sm z-10">
           <div className="px-6 py-4 flex items-center justify-between">
-            <h2 className="text-xl text-gray-900">Create New Use Case</h2>
+            <h2 className="text-xl text-white">Create New Use Case</h2>
             <div className="flex items-center space-x-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 rounded-lg border border-gray-300 hover:border-gray-400"
+                className="px-4 py-2 text-slate-400 hover:text-white rounded-lg border border-white/10 hover:bg-white/5"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 form="usecase-form"
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center"
+                className="px-6 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-500 shadow-[0_0_15px_rgba(8,145,178,0.4)] transition-all flex items-center"
               >
                 Submit Use Case
               </button>
@@ -1091,19 +1091,19 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
         <form id="usecase-form" onSubmit={handleSubmit} className="p-6 space-y-6">
 
           {/* BASIC INFORMATION */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
+          <div className="bg-[#050b14]/50 rounded-lg border border-white/10 p-6 space-y-6">
             <div>
-              <h3 className="text-lg text-gray-900 mb-4">🩺 Basic Information</h3>
+              <h3 className="text-lg text-white mb-4">🩺 Basic Information</h3>
             </div>
 
             {/* Title */}
             <div>
-              <label className="block text-sm mb-2 text-gray-700">Use Case Title *</label>
+              <label className="block text-sm mb-2 text-slate-300">Use Case Title *</label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-4 py-3 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 placeholder="e.g., Medical Image Analysis for Cancer Detection"
                 required
               />
@@ -1111,11 +1111,11 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
 
             {/* Description */}
             <div>
-              <label className="block text-sm mb-2 text-gray-700">Description *</label>
+              <label className="block text-sm mb-2 text-slate-300">Description *</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 min-h-[120px]"
+                className="w-full px-4 py-3 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 min-h-[120px]"
                 placeholder="Provide a detailed description of your use case..."
                 required
               />
@@ -1123,11 +1123,11 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
 
             {/* AI System Category */}
             <div>
-              <label className="block text-sm mb-2 text-gray-700">AI System Category *</label>
+              <label className="block text-sm mb-2 text-slate-300">AI System Category *</label>
               <select
                 value={aiSystemCategory}
                 onChange={(e) => setAiSystemCategory(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-4 py-3 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 required
               >
                 {categories.map((cat) => (
@@ -1138,7 +1138,7 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
 
             {/* File Upload */}
             <div className="mt-4">
-              <label className="block text-sm mb-2 text-gray-700">Attach Files (optional)</label>
+              <label className="block text-sm mb-2 text-slate-300">Attach Files (optional)</label>
               <div
                 onDragEnter={handleDrag}
                 onDragOver={handleDrag}
@@ -1157,14 +1157,14 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
                   <Upload className="w-4 h-4" />
                   <span>Click to upload or drag files here</span>
                 </label>
-                <p className="text-xs text-gray-500 mt-2">Files will be shared with assigned experts.</p>
+                <p className="text-xs text-slate-400 mt-2">Files will be shared with assigned experts.</p>
               </div>
               {files.length > 0 && (
                 <div className="mt-3 space-y-2">
                   {files.map((file) => (
                     <div key={file.name} className="flex items-center justify-between text-sm bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
                       <div className="flex items-center space-x-2">
-                        <FileText className="w-4 h-4 text-gray-500" />
+                        <FileText className="w-4 h-4 text-slate-400" />
                         <span className="text-gray-800">{file.name}</span>
                       </div>
                       <button
@@ -1182,34 +1182,34 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
           </div>
 
           {/* QUESTIONS SECTION */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
+          <div className="bg-[#050b14]/50 rounded-lg border border-white/10 p-6 space-y-6">
             <div>
-              <h3 className="text-lg text-gray-900 mb-4">📋 Use Case Questions</h3>
+              <h3 className="text-lg text-white mb-4">📋 Use Case Questions</h3>
               <p className="text-sm text-gray-600 mb-6">Please answer the following questions about your AI system use case.</p>
             </div>
 
             {/* AI System Link (optional) */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-300 mb-2">
                 AI System Link (optional)
               </label>
-              <p className="text-xs text-gray-500 mb-2">
+              <p className="text-xs text-slate-400 mb-2">
                 If available, provide a link to the AI system documentation, website, or repository.
               </p>
               <input
                 type="url"
                 value={aiSystemLink}
                 onChange={(e) => setAiSystemLink(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-4 py-3 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 placeholder="https://example.com/ai-system"
               />
             </div>
 
             {loadingQuestions ? (
-              <div className="text-center py-8 text-gray-500">Loading questions...</div>
+              <div className="text-center py-8 text-slate-400">Loading questions...</div>
             ) : questions.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-gray-500 mb-4">No questions available.</p>
+                <p className="text-slate-400 mb-4">No questions available.</p>
                 <p className="text-sm text-gray-400">Please seed questions in the database first.</p>
                 <button
                   type="button"
@@ -1247,7 +1247,7 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
                     )}
 
                     {/* Question text */}
-                    <label className="block text-sm font-bold text-gray-900 mb-2">
+                    <label className="block text-sm font-bold text-white mb-2">
                       {question.questionEn}
                     </label>
 
@@ -1255,7 +1255,7 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
                       <select
                         value={questionAnswers[question.id] || ''}
                         onChange={(e) => setQuestionAnswers(prev => ({ ...prev, [question.id]: e.target.value }))}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-4 py-3 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                       >
                         <option value="">Select an option...</option>
                         {question.options.map((option) => (
@@ -1267,7 +1267,7 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
                         <textarea
                           value={questionAnswers[question.id] || ''}
                           onChange={(e) => setQuestionAnswers(prev => ({ ...prev, [question.id]: e.target.value }))}
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 min-h-[100px]"
+                          className="w-full px-4 py-2 bg-[#0a1122] border border-white/10 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 min-h-[100px]"
                           placeholder={question.placeholder || "Enter your answer..."}
                         />
                         {/* Helper text below textarea */}

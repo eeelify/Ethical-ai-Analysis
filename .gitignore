@@ -85,3 +85,8 @@ coverage/
 # .nuxt/
 # .vuepress/dist/
 
+
+# Python virtual environments
+venv/
+.venv/
+__pycache__/

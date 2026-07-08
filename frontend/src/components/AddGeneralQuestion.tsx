@@ -142,23 +142,23 @@ export function AddGeneralQuestion({ project, currentUser, onBack, onComplete }:
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-[#0a1122] flex flex-col">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b sticky top-0 z-20">
+      <div className="bg-[#050b14] shadow-sm border-b sticky top-0 z-20">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
                 onClick={onBack}
-                className="flex items-center text-gray-600 hover:text-gray-900 transition-colors bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg text-sm font-medium"
+                className="flex items-center text-slate-400 hover:text-white transition-colors bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg text-sm font-medium"
               >
                 Back
               </button>
               <div>
-                <h1 className="text-xl text-gray-900 font-bold tracking-tight">
+                <h1 className="text-xl text-white font-bold tracking-tight">
                   Add Additional Questions (Optional)
                 </h1>
-                <p className="text-sm text-gray-600">Project: {project.title}</p>
+                <p className="text-sm text-slate-400">Project: {project.title}</p>
               </div>
             </div>
           </div>
@@ -166,26 +166,26 @@ export function AddGeneralQuestion({ project, currentUser, onBack, onComplete }:
       </div>
 
       <div className="flex-1 px-4 py-8 max-w-5xl mx-auto w-full flex flex-col">
-        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden flex flex-col flex-1">
-          <div className="p-8 border-b border-gray-100 bg-white">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-3">
+        <div className="bg-[#050b14] rounded-3xl shadow-xl shadow-gray-200/50 border border-white/5 overflow-hidden flex flex-col flex-1">
+          <div className="p-8 border-b border-white/5 bg-[#050b14]">
+            <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight mb-3">
               Add Custom Questions
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-slate-400">
               You can add additional questions if needed. This step is optional - you can skip it and proceed to tensions.
             </p>
           </div>
 
-          <div className="p-8 flex-1 bg-gray-50/30 overflow-y-auto">
+          <div className="p-8 flex-1 bg-[#0a1122]/30 overflow-y-auto">
             {customQuestions.length > 0 && (
               <div className="mb-6 space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">Added Questions</h3>
+                <h3 className="text-lg font-semibold text-white">Added Questions</h3>
                 {customQuestions.map((question) => (
-                  <div key={question.id} className="bg-white rounded-lg border border-gray-200 p-4 flex items-start justify-between">
+                  <div key={question.id} className="bg-[#050b14] rounded-lg border border-white/10 p-4 flex items-start justify-between">
                     <div className="flex-1">
-                      <p className="font-medium text-gray-900">{question.text}</p>
+                      <p className="font-medium text-white">{question.text}</p>
                       {question.description && (
-                        <p className="text-sm text-gray-600 mt-1">{question.description}</p>
+                        <p className="text-sm text-slate-400 mt-1">{question.description}</p>
                       )}
                       <span className="inline-block mt-2 px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded">
                         {question.type}
@@ -215,38 +215,38 @@ export function AddGeneralQuestion({ project, currentUser, onBack, onComplete }:
             )}
 
             {showAddQuestion && (
-              <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
+              <div className="bg-[#050b14] rounded-xl border-2 border-white/10 p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">New Question</h3>
+                  <h3 className="text-lg font-semibold text-white">New Question</h3>
                   <button
                     onClick={() => setShowAddQuestion(false)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-gray-400 hover:text-slate-400"
                   >
                     <XCircle className="w-5 h-5" />
                   </button>
                 </div>
                 <form onSubmit={handleSubmitQuestion} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    <label className="block text-sm font-semibold text-white mb-2">
                       Question Text <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       value={text}
                       onChange={(e) => setText(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-white/10 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
                       placeholder="Enter your question..."
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    <label className="block text-sm font-semibold text-white mb-2">
                       Principle (İlke) <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={principle}
                       onChange={(e) => setPrinciple(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-white/10 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
                       required
                     >
                       {QUESTION_PRINCIPLES.map((p) => (
@@ -257,24 +257,24 @@ export function AddGeneralQuestion({ project, currentUser, onBack, onComplete }:
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    <label className="block text-sm font-semibold text-white mb-2">
                       Description (Optional)
                     </label>
                     <textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       rows={2}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none resize-none"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-white/10 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none resize-none"
                       placeholder="Add description..."
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-900 mb-2">Answer Type</label>
+                      <label className="block text-sm font-semibold text-white mb-2">Answer Type</label>
                       <select
                         value={type}
                         onChange={(e) => setType(e.target.value as QuestionType)}
-                        className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
+                        className="w-full px-4 py-3 rounded-xl border-2 border-white/10 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
                       >
                         <option value="text">Open Text</option>
                         <option value="multiple-choice">Multiple Choice</option>
@@ -282,8 +282,8 @@ export function AddGeneralQuestion({ project, currentUser, onBack, onComplete }:
                         <option value="likert">Rating Scale (1-5)</option>
                       </select>
                     </div>
-                    <div className="flex items-center justify-between p-3 border-2 border-gray-200 rounded-xl">
-                      <span className="text-sm font-medium text-gray-900">Required?</span>
+                    <div className="flex items-center justify-between p-3 border-2 border-white/10 rounded-xl">
+                      <span className="text-sm font-medium text-white">Required?</span>
                       <button
                         type="button"
                         onClick={() => setRequired(!required)}
@@ -292,7 +292,7 @@ export function AddGeneralQuestion({ project, currentUser, onBack, onComplete }:
                         }`}
                       >
                         <span
-                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          className={`inline-block h-4 w-4 transform rounded-full bg-[#050b14] transition-transform ${
                             required ? 'translate-x-6' : 'translate-x-1'
                           }`}
                         />
@@ -300,8 +300,8 @@ export function AddGeneralQuestion({ project, currentUser, onBack, onComplete }:
                     </div>
                   </div>
                   {(type === 'multiple-choice' || type === 'checkbox' || type === 'select' || type === 'radio') && (
-                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                      <label className="block text-sm font-semibold text-gray-900 mb-3">Answer Options</label>
+                    <div className="bg-[#0a1122] p-4 rounded-xl border border-white/10">
+                      <label className="block text-sm font-semibold text-white mb-3">Answer Options</label>
                       <div className="space-y-2">
                         {options.map((opt, idx) => (
                           <div key={idx} className="flex gap-2">
@@ -309,7 +309,7 @@ export function AddGeneralQuestion({ project, currentUser, onBack, onComplete }:
                               type="text"
                               value={opt}
                               onChange={(e) => handleOptionChange(idx, e.target.value)}
-                              className="flex-1 px-3 py-2 rounded-lg border border-gray-200 focus:border-blue-500 outline-none text-sm"
+                              className="flex-1 px-3 py-2 rounded-lg border border-white/10 focus:border-blue-500 outline-none text-sm"
                               placeholder={`Option ${idx + 1}`}
                               required
                             />
@@ -338,7 +338,7 @@ export function AddGeneralQuestion({ project, currentUser, onBack, onComplete }:
                     <button
                       type="button"
                       onClick={() => setShowAddQuestion(false)}
-                      className="px-6 py-2 rounded-xl text-gray-700 font-medium hover:bg-gray-100 transition-colors"
+                      className="px-6 py-2 rounded-xl text-slate-300 font-medium hover:bg-gray-100 transition-colors"
                     >
                       Cancel
                     </button>
@@ -357,10 +357,10 @@ export function AddGeneralQuestion({ project, currentUser, onBack, onComplete }:
         </div>
 
         {/* Navigation Footer */}
-        <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 mt-8 flex justify-between items-center z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div className="sticky bottom-0 bg-[#050b14] border-t border-white/10 p-6 mt-8 flex justify-between items-center z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
           <button
             onClick={onBack}
-            className="flex items-center px-6 py-3 rounded-xl font-semibold transition-all border-2 text-gray-700 bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300 shadow-sm"
+            className="flex items-center px-6 py-3 rounded-xl font-semibold transition-all border-2 text-slate-300 bg-[#050b14] border-white/10 hover:bg-[#0a1122] hover:border-gray-300 shadow-sm"
           >
             Back
           </button>

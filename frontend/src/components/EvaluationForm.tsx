@@ -52,7 +52,7 @@ const getScoreClasses = (value: number, selected: number | null | undefined) => 
   const isSelected = selected !== null && selected !== undefined && typeof selected === 'number' && selected === value;
 
   if (!isSelected) {
-    return 'border-gray-200 bg-white hover:bg-gray-50';
+    return 'border-white/10 bg-[#050b14] hover:bg-[#0a1122]';
   }
 
   // Use same color scheme as GeneralQuestions for consistency
@@ -60,7 +60,7 @@ const getScoreClasses = (value: number, selected: number | null | undefined) => 
     case 4:
       return 'border-green-500 bg-green-50 shadow-md';
     case 3:
-      return 'border-blue-500 bg-blue-50 shadow-md';
+      return 'border-blue-500 bg-cyan-500/10 shadow-md';
     case 2:
       return 'border-yellow-600 bg-yellow-50 shadow-md';
     case 1:
@@ -1732,29 +1732,29 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#0a1122]">
         <div className="flex flex-col items-center">
-          <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-4" />
-          <p className="text-gray-500">Loading evaluation data...</p>
+          <Loader2 className="w-10 h-10 text-cyan-400 animate-spin mb-4" />
+          <p className="text-slate-400">Loading evaluation data...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-[#0a1122] flex flex-col">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b sticky top-0 z-[9999]">
+      <div className="bg-[#050b14] shadow-sm border-b sticky top-0 z-[9999]">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
 
               <div>
-                <h1 className="text-xl text-gray-900 font-bold tracking-tight">
+                <h1 className="text-xl text-white font-bold tracking-tight">
                   {currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1)} Evaluation
                 </h1>
                 {/* PROJE DURUMUNU GÖSTERME DÜZELTMESİ */}
-                <div className="flex items-center gap-2 text-xs text-gray-500 font-medium uppercase tracking-wide">
+                <div className="flex items-center gap-2 text-xs text-slate-400 font-medium uppercase tracking-wide">
                   <span>Project: {project.title}</span>
                   <span className="text-gray-300">|</span>
                   <span className={`px-2 py-0.5 rounded ${project.stage === 'set-up' ? 'bg-blue-100 text-blue-700' :
@@ -1769,8 +1769,8 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
             <div className="flex items-center space-x-4">
               <div className="text-right">
-                <p className="text-xs text-gray-500 font-medium">Progress</p>
-                <p className="text-sm font-bold text-gray-900">{getCompletionPercentage()}%</p>
+                <p className="text-xs text-slate-400 font-medium">Progress</p>
+                <p className="text-sm font-bold text-white">{getCompletionPercentage()}%</p>
               </div>
             </div>
           </div>
@@ -1779,15 +1779,15 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
       <div className="flex-1 px-4 py-8 pb-32 max-w-5xl mx-auto w-full flex flex-col">
         {/* Stage Navigation Tabs */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 mb-8 flex justify-between items-center sticky top-[88px] z-40 backdrop-blur-sm bg-white/90">
+        <div className="bg-[#050b14] rounded-2xl shadow-sm border border-white/5 p-2 mb-8 flex justify-between items-center sticky top-[88px] z-40 backdrop-blur-sm bg-[#050b14]/90">
           <div className="flex space-x-1 bg-gray-100/50 p-1 rounded-xl">
             {stages.map((stage) => (
               <button
                 key={stage.key}
                 onClick={() => setCurrentStage(stage.key)}
                 className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center ${currentStage === stage.key
-                  ? 'bg-white text-gray-900 shadow-md ring-1 ring-black/5 transform scale-100'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'
+                  ? 'bg-[#050b14] text-white shadow-md ring-1 ring-black/5 transform scale-100'
+                  : 'text-slate-400 hover:text-slate-300 hover:bg-gray-200/50'
                   }`}
               >
                 <span className="mr-2 text-lg">{stage.icon}</span> {stage.label}
@@ -1798,7 +1798,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
           {currentStage !== 'resolve' && currentStage !== 'set-up' && (
             <button
               onClick={() => setShowAddQuestion(true)}
-              className="px-4 py-2 text-sm font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-all flex items-center shadow-sm"
+              className="px-4 py-2 text-sm font-bold text-blue-700 bg-cyan-500/10 border border-blue-200 rounded-xl hover:bg-blue-100 transition-all flex items-center shadow-sm"
             >
               <Plus className="h-4 w-4 mr-2" /> Add Question
             </button>
@@ -1808,20 +1808,20 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
         <div className="flex-1 flex flex-col min-h-[500px]">
           {showReviewScreen ? (
             <div className="flex-1 flex flex-col gap-6">
-              <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Review</h2>
+              <div className="bg-[#050b14] rounded-3xl shadow-xl shadow-gray-200/50 border border-white/5 p-6">
+                <h2 className="text-2xl font-bold text-white mb-6">Review</h2>
                 <div className="space-y-6">
                   {/* Assess Cevapları */}
-                  <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-5">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                      <Info className="w-5 h-5 mr-2 text-blue-600" />
+                  <div className="bg-cyan-500/10/50 border border-blue-100 rounded-xl p-5">
+                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                      <Info className="w-5 h-5 mr-2 text-cyan-400" />
                       Assessment Answers
                     </h3>
                     <div className="space-y-3 max-h-96 overflow-y-auto">
                       {assessQuestions.map((question) => (
-                        <div key={question.id} className="bg-white rounded-lg p-4 border border-gray-200">
-                          <div className="text-sm font-medium text-gray-700 mb-2">{question.text}</div>
-                          <div className="text-sm text-gray-900 bg-gray-50 px-3 py-2 rounded">
+                        <div key={question.id} className="bg-[#050b14] rounded-lg p-4 border border-white/10">
+                          <div className="text-sm font-medium text-slate-300 mb-2">{question.text}</div>
+                          <div className="text-sm text-white bg-[#0a1122] px-3 py-2 rounded">
                             {getAnswerValue(question) || 'No answer provided'}
                           </div>
                           {questionPriorities[question.id] && (
@@ -1844,7 +1844,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
                         <AlertTriangle className="w-5 h-5 text-orange-600" />
-                        <h3 className="text-lg font-semibold text-gray-900">General Risks</h3>
+                        <h3 className="text-lg font-semibold text-white">General Risks</h3>
                       </div>
                       <button
                         onClick={() => {
@@ -1862,9 +1862,9 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                     </div>
                     <div className="space-y-3 max-h-80 overflow-y-auto">
                       {generalRisks.length === 0 ? (
-                        <div className="text-center py-8 bg-white rounded-lg border-2 border-dashed border-gray-300">
+                        <div className="text-center py-8 bg-[#050b14] rounded-lg border-2 border-dashed border-gray-300">
                           <AlertTriangle className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-                          <p className="text-sm text-gray-500 italic">No risks added yet.</p>
+                          <p className="text-sm text-slate-400 italic">No risks added yet.</p>
                         </div>
                       ) : (
                         generalRisks.map((risk, index) => {
@@ -1874,14 +1874,14 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                           return (
                             <div
                               key={risk.id}
-                              className="bg-white rounded-lg border border-gray-200 p-4 transition-colors"
+                              className="bg-[#050b14] rounded-lg border border-white/10 p-4 transition-colors"
                               onClick={() => setEditingRiskIdReview(risk.id)}
                             >
                               <div className="flex items-start gap-3">
                                 <div className="flex-1 space-y-3" onClick={(e) => isEditing && e.stopPropagation()}>
                                   {!isEditing && (
                                     <div className="flex items-center justify-between">
-                                      <div className="text-sm font-semibold text-gray-900">
+                                      <div className="text-sm font-semibold text-white">
                                         Risk {index + 1}: {risk.title || 'Untitled risk'}
                                       </div>
                                       <span className={`px-2 py-0.5 text-xs font-semibold rounded-full border ${severity === 'critical' ? 'bg-purple-50 text-purple-700 border-purple-200' :
@@ -1896,19 +1896,19 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                   {isEditing && (
                                     <>
                                       <div className="flex items-center justify-between">
-                                        <span className="text-xs text-gray-500">Editing Risk {index + 1}</span>
+                                        <span className="text-xs text-slate-400">Editing Risk {index + 1}</span>
                                         <button
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             setEditingRiskIdReview(null);
                                           }}
-                                          className="text-xs text-gray-500 hover:text-gray-800"
+                                          className="text-xs text-slate-400 hover:text-slate-200"
                                         >
                                           Done
                                         </button>
                                       </div>
                                       <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                                        <label className="block text-sm font-medium text-slate-300 mb-1">Title *</label>
                                         <input
                                           type="text"
                                           value={risk.title}
@@ -1923,7 +1923,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                         />
                                       </div>
                                       <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Description (optional)</label>
+                                        <label className="block text-sm font-medium text-slate-300 mb-1">Description (optional)</label>
                                         <textarea
                                           value={risk.description}
                                           onChange={(e) => {
@@ -1938,7 +1938,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                         />
                                       </div>
                                       <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Severity</label>
+                                        <label className="block text-sm font-medium text-slate-300 mb-1">Severity</label>
                                         <select
                                           value={severity}
                                           onChange={(e) => {
@@ -1955,12 +1955,12 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                         </select>
                                       </div>
                                       <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Related Assess Questions (optional)</label>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-44 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50/50">
+                                        <label className="block text-sm font-medium text-slate-300 mb-2">Related Assess Questions (optional)</label>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-44 overflow-y-auto border border-white/10 rounded-lg p-2 bg-[#0a1122]/50">
                                           {assessQuestions.map(q => {
                                             const checked = relatedQuestions.includes(q.id);
                                             return (
-                                              <label key={q.id} className="flex items-start gap-2 text-sm text-gray-700">
+                                              <label key={q.id} className="flex items-start gap-2 text-sm text-slate-300">
                                                 <input
                                                   type="checkbox"
                                                   checked={checked}
@@ -1986,10 +1986,10 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                   {!isEditing && (
                                     <>
                                       {risk.description && (
-                                        <div className="text-xs text-gray-600 mt-1">{risk.description}</div>
+                                        <div className="text-xs text-slate-400 mt-1">{risk.description}</div>
                                       )}
-                                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                                        <span className="px-2 py-0.5 bg-gray-100 rounded-full border border-gray-200">
+                                      <div className="flex items-center gap-2 text-xs text-slate-400">
+                                        <span className="px-2 py-0.5 bg-gray-100 rounded-full border border-white/10">
                                           {relatedQuestions.length} related question(s)
                                         </span>
                                         <span className="text-gray-400">Click to edit</span>
@@ -2020,56 +2020,56 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
             </div>
           ) : currentStage === 'set-up' ? (
             // Set-up Stage: Admin'in girdiği Project Context bilgilerini göster
-            <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden flex flex-col flex-1 animate-in fade-in slide-in-from-bottom-4 duration-300 mb-24">
-              <div className="p-8 border-b border-gray-100 bg-white">
+            <div className="bg-[#050b14] rounded-3xl shadow-xl shadow-gray-200/50 border border-white/5 overflow-hidden flex flex-col flex-1 animate-in fade-in slide-in-from-bottom-4 duration-300 mb-24">
+              <div className="p-8 border-b border-white/5 bg-[#050b14]">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-600 text-sm font-medium rounded-full">
+                  <span className="px-3 py-1 bg-blue-100 text-cyan-400 text-sm font-medium rounded-full">
                     Project Context and Scope
                   </span>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+                <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight">
                   Project Information
                 </h2>
-                <p className="text-gray-600 mt-2">Review the project context and scope information provided by the administrator.</p>
+                <p className="text-slate-400 mt-2">Review the project context and scope information provided by the administrator.</p>
               </div>
 
-              <div className="p-8 flex-1 bg-gray-50/30 space-y-6 overflow-y-auto pb-24">
+              <div className="p-8 flex-1 bg-[#0a1122]/30 space-y-6 overflow-y-auto pb-24">
                 {/* Project Context and Scope - Admin'in girdiği bilgiler */}
                 {project.inspectionContext ? (
                   <div className="space-y-6">
-                    <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <Info className="w-5 h-5 mr-2 text-blue-600" />
+                    <div className="bg-cyan-500/10/50 border border-blue-100 rounded-2xl p-6">
+                      <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                        <Info className="w-5 h-5 mr-2 text-cyan-400" />
                         Project Context and Scope
                       </h3>
                       <div className="grid grid-cols-1 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">1. Who requested the inspection?</label>
-                          <p className="text-gray-900 bg-white px-4 py-2 rounded-lg border border-gray-200">{project.inspectionContext.requester || 'Not provided'}</p>
+                          <label className="block text-sm font-medium text-slate-300 mb-1">1. Who requested the inspection?</label>
+                          <p className="text-white bg-[#050b14] px-4 py-2 rounded-lg border border-white/10">{project.inspectionContext.requester || 'Not provided'}</p>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">2. Why carry out an inspection?</label>
-                          <p className="text-gray-900 bg-white px-4 py-2 rounded-lg border border-gray-200">{project.inspectionContext.inspectionReason || 'Not provided'}</p>
+                          <label className="block text-sm font-medium text-slate-300 mb-1">2. Why carry out an inspection?</label>
+                          <p className="text-white bg-[#050b14] px-4 py-2 rounded-lg border border-white/10">{project.inspectionContext.inspectionReason || 'Not provided'}</p>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">3. For whom is the inspection relevant?</label>
-                          <p className="text-gray-900 bg-white px-4 py-2 rounded-lg border border-gray-200">{project.inspectionContext.relevantFor || 'Not provided'}</p>
+                          <label className="block text-sm font-medium text-slate-300 mb-1">3. For whom is the inspection relevant?</label>
+                          <p className="text-white bg-[#050b14] px-4 py-2 rounded-lg border border-white/10">{project.inspectionContext.relevantFor || 'Not provided'}</p>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">4. Is it recommended or required (mandatory inspection)?</label>
-                          <p className="text-gray-900 bg-white px-4 py-2 rounded-lg border border-gray-200 capitalize">{project.inspectionContext.isMandatory || 'Not provided'}</p>
+                          <label className="block text-sm font-medium text-slate-300 mb-1">4. Is it recommended or required (mandatory inspection)?</label>
+                          <p className="text-white bg-[#050b14] px-4 py-2 rounded-lg border border-white/10 capitalize">{project.inspectionContext.isMandatory || 'Not provided'}</p>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">5. What are the sufficient vs. necessary conditions that need to be analyzed?</label>
-                          <p className="text-gray-900 bg-white px-4 py-2 rounded-lg border border-gray-200 whitespace-pre-wrap">{project.inspectionContext.conditionsToAnalyze || 'Not provided'}</p>
+                          <label className="block text-sm font-medium text-slate-300 mb-1">5. What are the sufficient vs. necessary conditions that need to be analyzed?</label>
+                          <p className="text-white bg-[#050b14] px-4 py-2 rounded-lg border border-white/10 whitespace-pre-wrap">{project.inspectionContext.conditionsToAnalyze || 'Not provided'}</p>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">6. How are the inspection results to be used?</label>
-                          <p className="text-gray-900 bg-white px-4 py-2 rounded-lg border border-gray-200">{project.inspectionContext.resultsUsage || 'Not provided'}</p>
+                          <label className="block text-sm font-medium text-slate-300 mb-1">6. How are the inspection results to be used?</label>
+                          <p className="text-white bg-[#050b14] px-4 py-2 rounded-lg border border-white/10">{project.inspectionContext.resultsUsage || 'Not provided'}</p>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">7. Will the results be shared (public) or kept private?</label>
-                          <p className="text-gray-900 bg-white px-4 py-2 rounded-lg border border-gray-200 whitespace-pre-wrap">{project.inspectionContext.resultsSharing || 'Not provided'}</p>
+                          <label className="block text-sm font-medium text-slate-300 mb-1">7. Will the results be shared (public) or kept private?</label>
+                          <p className="text-white bg-[#050b14] px-4 py-2 rounded-lg border border-white/10 whitespace-pre-wrap">{project.inspectionContext.resultsSharing || 'Not provided'}</p>
                         </div>
                       </div>
                     </div>
@@ -2083,11 +2083,11 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                 {/* Use Case Owner Information - Sadece başlık olarak */}
                 {linkedUseCase && (
                   <div className="bg-green-50/50 border border-green-100 rounded-2xl p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                    <h3 className="text-lg font-semibold text-white mb-2 flex items-center">
                       <Info className="w-5 h-5 mr-2 text-green-600" />
                       Use Case Owner Information
                     </h3>
-                    <p className="text-sm text-gray-600 italic">This section will be available soon.</p>
+                    <p className="text-sm text-slate-400 italic">This section will be available soon.</p>
                   </div>
                 )}
 
@@ -2096,7 +2096,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="w-5 h-5 text-orange-600" />
-                      <h3 className="text-lg font-semibold text-gray-900">General Risks</h3>
+                      <h3 className="text-lg font-semibold text-white">General Risks</h3>
                     </div>
                     {generalRisks.length > 0 && (
                       <button
@@ -2116,9 +2116,9 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
                   <div className="space-y-4">
                     {generalRisks.length === 0 ? (
-                      <div className="text-center py-8 bg-white rounded-lg border-2 border-dashed border-gray-300">
+                      <div className="text-center py-8 bg-[#050b14] rounded-lg border-2 border-dashed border-gray-300">
                         <AlertTriangle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-sm text-gray-500 italic mb-6">No risks added yet. Click "Add Risk" to start.</p>
+                        <p className="text-sm text-slate-400 italic mb-6">No risks added yet. Click "Add Risk" to start.</p>
                         <button
                           onClick={() => {
                             setGeneralRisks([
@@ -2137,11 +2137,11 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                         const severity = risk.severity || 'medium';
                         const relatedQuestions = risk.relatedQuestions || [];
                         return (
-                          <div key={risk.id} className="bg-white rounded-lg border border-gray-200 p-4">
+                          <div key={risk.id} className="bg-[#050b14] rounded-lg border border-white/10 p-4">
                             <div className="flex items-start gap-3">
                               <div className="flex-1 space-y-3">
                                 <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  <label className="block text-sm font-medium text-slate-300 mb-1">
                                     Risk {index + 1} Title *
                                   </label>
                                   <input
@@ -2158,7 +2158,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                   />
                                 </div>
                                 <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  <label className="block text-sm font-medium text-slate-300 mb-1">
                                     Description (Optional)
                                   </label>
                                   <textarea
@@ -2200,16 +2200,16 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
               {showQuestionNav && (
                 <div className="fixed inset-0 z-50 md:hidden">
                   <div className="absolute inset-0 bg-black/30" onClick={() => setShowQuestionNav(false)} />
-                  <div className="absolute left-0 top-0 bottom-0 w-72 max-w-[80vw] bg-white shadow-2xl border-r border-gray-200 flex flex-col">
-                    <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                      <div className="font-semibold text-gray-900">Questions</div>
+                  <div className="absolute left-0 top-0 bottom-0 w-72 max-w-[80vw] bg-[#050b14] shadow-2xl border-r border-white/10 flex flex-col">
+                    <div className="p-4 border-b border-white/10 flex items-center justify-between">
+                      <div className="font-semibold text-white">Questions</div>
                       <button
                         type="button"
                         className="p-2 rounded-lg hover:bg-gray-100"
                         onClick={() => setShowQuestionNav(false)}
                         aria-label="Close questions"
                       >
-                        <X className="w-5 h-5 text-gray-600" />
+                        <X className="w-5 h-5 text-slate-400" />
                       </button>
                     </div>
                     <div className="p-3 overflow-y-auto">
@@ -2226,8 +2226,8 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                 setShowQuestionNav(false);
                               }}
                               className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${active
-                                ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                                : 'text-gray-700 hover:bg-gray-50'
+                                ? 'bg-cyan-500/10 text-blue-700 border border-blue-200'
+                                : 'text-slate-300 hover:bg-[#0a1122]'
                                 }`}
                             >
                               <span className="font-medium">Q{idx + 1}</span>
@@ -2243,8 +2243,8 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
               {/* Desktop: left question list */}
               <div className="hidden md:block md:w-56 lg:w-64 shrink-0">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-3 md:sticky md:top-[180px] max-h-[calc(100vh-200px)] overflow-y-auto">
-                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 pb-2">
+                <div className="bg-[#050b14] rounded-2xl shadow-sm border border-white/5 p-3 md:sticky md:top-[180px] max-h-[calc(100vh-200px)] overflow-y-auto">
+                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-2 pb-2">
                     Questions
                   </div>
                   <div className="space-y-1">
@@ -2257,8 +2257,8 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                           type="button"
                           onClick={() => setCurrentQuestionIndex(idx)}
                           className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${active
-                            ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                            : 'text-gray-700 hover:bg-gray-50'
+                            ? 'bg-cyan-500/10 text-blue-700 border border-blue-200'
+                            : 'text-slate-300 hover:bg-[#0a1122]'
                             }`}
                         >
                           <span className="font-medium">Q{idx + 1}</span>
@@ -2271,16 +2271,16 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
               </div>
 
               {/* Right: Active question card */}
-              <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden flex flex-col flex-1 animate-in fade-in slide-in-from-bottom-4 duration-300 min-h-0 mb-24">
-                <div className="p-8 border-b border-gray-100 bg-white">
+              <div className="bg-[#050b14] rounded-3xl shadow-xl shadow-gray-200/50 border border-white/5 overflow-hidden flex flex-col flex-1 animate-in fade-in slide-in-from-bottom-4 duration-300 min-h-0 mb-24">
+                <div className="p-8 border-b border-white/5 bg-[#050b14]">
                   <div className="flex flex-wrap items-center gap-3 mb-4">
-                    <span className="px-3 py-1 bg-gray-100 text-gray-600 text-sm font-medium rounded-full">
+                    <span className="px-3 py-1 bg-gray-100 text-slate-400 text-sm font-medium rounded-full">
                       Question {currentQuestionIndex + 1} of {currentQuestions.length}
                     </span>
                     <button
                       type="button"
                       onClick={() => setShowQuestionNav(true)}
-                      className="px-3 py-1 bg-blue-50 text-blue-700 text-sm font-medium rounded-full border border-blue-100 hover:bg-blue-100"
+                      className="px-3 py-1 bg-cyan-500/10 text-blue-700 text-sm font-medium rounded-full border border-blue-100 hover:bg-blue-100"
                     >
                       Q list
                     </button>
@@ -2291,13 +2291,13 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                     )}
                   </div>
 
-                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+                  <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight">
                     {activeQuestion.text}
                   </h2>
 
                   {activeQuestion.description && (
-                    <div className="flex items-start gap-3 mt-4 bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50">
-                      <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex items-start gap-3 mt-4 bg-cyan-500/10/50 p-4 rounded-2xl border border-blue-100/50">
+                      <Info className="w-5 h-5 text-cyan-400 mt-0.5 flex-shrink-0" />
                       <p className="text-blue-900 text-base leading-relaxed">
                         {activeQuestion.description}
                       </p>
@@ -2305,7 +2305,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                   )}
                 </div>
 
-                <div className="p-8 flex-1 bg-gray-50/30">
+                <div className="p-8 flex-1 bg-[#0a1122]/30">
                   {/* INPUT TYPES (Same as before) */}
                   {(activeQuestion.type === 'select' || activeQuestion.type === 'multiple-choice' || activeQuestion.type === 'radio') && (
                     <div className="space-y-3 max-w-2xl">
@@ -2317,12 +2317,12 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                         const isSelected = currentAnswer === optionValue;
                         return (
                           <label key={optionValue} className={`group flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${isSelected
-                            ? 'border-blue-600 bg-blue-50/50 shadow-sm'
-                            : 'border-gray-200 hover:border-blue-300 hover:bg-white'
+                            ? 'border-blue-600 bg-cyan-500/10/50 shadow-sm'
+                            : 'border-white/10 hover:border-blue-300 hover:bg-[#050b14]'
                             }`}>
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 transition-colors ${isSelected ? 'border-blue-600 bg-blue-600' : 'border-gray-300 group-hover:border-blue-400'
                               }`}>
-                              <div className="w-2 h-2 rounded-full bg-white" />
+                              <div className="w-2 h-2 rounded-full bg-[#050b14]" />
                             </div>
                             <input
                               type="radio"
@@ -2332,7 +2332,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                               onChange={(e) => handleAnswerChange(activeQuestion.id, e.target.value)}
                               className="hidden"
                             />
-                            <span className={`text-lg font-medium transition-colors ${isSelected ? 'text-blue-900' : 'text-gray-700'
+                            <span className={`text-lg font-medium transition-colors ${isSelected ? 'text-blue-900' : 'text-slate-300'
                               }`}>{optionLabel}</span>
                           </label>
                         );
@@ -2346,7 +2346,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                         value={getAnswerValue(activeQuestion) || ''}
                         onChange={(e) => handleAnswerChange(activeQuestion.id, e.target.value)}
                         rows={6}
-                        className="w-full px-5 py-4 text-lg text-gray-800 border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all resize-none placeholder-gray-400 bg-white"
+                        className="w-full px-5 py-4 text-lg text-slate-200 border-2 border-white/10 rounded-2xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all resize-none placeholder-gray-400 bg-[#050b14]"
                         placeholder="Type your assessment here..."
                       />
                     </div>
@@ -2354,7 +2354,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
                   {(activeQuestion.type === 'likert' || activeQuestion.type === 'rating') && (
                     <div className="py-4 max-w-2xl">
-                      <div className="flex justify-between text-sm font-semibold text-gray-500 mb-4 px-2 uppercase tracking-wide">
+                      <div className="flex justify-between text-sm font-semibold text-slate-400 mb-4 px-2 uppercase tracking-wide">
                         <span>{activeQuestion.min || 'Low'}</span>
                         <span>{activeQuestion.max || 'High'}</span>
                       </div>
@@ -2371,7 +2371,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                               onClick={() => handleAnswerChange(activeQuestion.id, optionValue)}
                               className={`aspect-square rounded-2xl text-xl font-bold transition-all duration-200 flex items-center justify-center ${isSelected
                                 ? 'bg-blue-600 text-white shadow-md scale-105 ring-2 ring-blue-200'
-                                : 'bg-white border-2 border-gray-200 text-gray-500 hover:border-blue-400 hover:text-blue-600'
+                                : 'bg-[#050b14] border-2 border-white/10 text-slate-400 hover:border-blue-400 hover:text-cyan-400'
                                 }`}
                             >
                               {optionLabel}
@@ -2391,8 +2391,8 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                         const isChecked = currentAnswers.includes(optionValue);
                         return (
                           <label key={optionValue} className={`group flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${isChecked
-                            ? 'border-blue-600 bg-blue-50/50 shadow-sm'
-                            : 'border-gray-200 hover:border-blue-300 hover:bg-white'
+                            ? 'border-blue-600 bg-cyan-500/10/50 shadow-sm'
+                            : 'border-white/10 hover:border-blue-300 hover:bg-[#050b14]'
                             }`}>
                             <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center mr-4 transition-colors ${isChecked ? 'border-blue-600 bg-blue-600' : 'border-gray-300 group-hover:border-blue-400'
                               }`}>
@@ -2409,7 +2409,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                               }}
                               className="hidden"
                             />
-                            <span className={`text-lg font-medium transition-colors ${isChecked ? 'text-blue-900' : 'text-gray-700'
+                            <span className={`text-lg font-medium transition-colors ${isChecked ? 'text-blue-900' : 'text-slate-300'
                               }`}>{optionLabel}</span>
                           </label>
                         );
@@ -2418,10 +2418,10 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                   )}
 
                   {/* Önem Derecesi Belirleme - Her Soru İçin */}
-                  <div className="mt-8 pt-6 border-t border-gray-200">
+                  <div className="mt-8 pt-6 border-t border-white/10">
                     <div className="flex items-center gap-2 mb-4">
                       <AlertTriangle className="w-5 h-5 text-orange-500" />
-                      <h3 className="text-lg font-semibold text-gray-900">Importance Level for This Question</h3>
+                      <h3 className="text-lg font-semibold text-white">Importance Level for This Question</h3>
                       {currentStage === 'assess' && (
                         <span className="px-2.5 py-0.5 bg-red-50 text-red-600 text-xs font-medium rounded-full border border-red-100">
                           Required
@@ -2440,7 +2440,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                 : level === 'medium'
                                   ? 'border-yellow-500 bg-yellow-50 shadow-md'
                                   : 'border-red-500 bg-red-50 shadow-md'
-                              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                              : 'border-white/10 hover:border-gray-300 hover:bg-[#0a1122]'
                               }`}
                           >
                             <input
@@ -2466,7 +2466,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                               {level === 'high' && <XCircle className="w-6 h-6" />}
                             </div>
                             <span
-                              className={`text-sm font-bold capitalize ${isSelected ? 'text-gray-900' : 'text-gray-500'
+                              className={`text-sm font-bold capitalize ${isSelected ? 'text-white' : 'text-slate-400'
                                 }`}
                             >
                               {level}
@@ -2478,9 +2478,9 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                   </div>
 
                   {/* Risk Score Selection (0-4) */}
-                  <div className="mt-8 pt-6 border-t border-gray-200" key={`risk-scores-${activeQuestion.id}-${riskScores[activeQuestion.id] || riskScores[activeQuestion.code || ''] || 'none'}`}>
+                  <div className="mt-8 pt-6 border-t border-white/10" key={`risk-scores-${activeQuestion.id}-${riskScores[activeQuestion.id] || riskScores[activeQuestion.code || ''] || 'none'}`}>
                     <div className="flex items-center gap-2 mb-4">
-                      <h3 className="text-lg font-semibold text-gray-900">Importance Score for This Question</h3>
+                      <h3 className="text-lg font-semibold text-white">Importance Score for This Question</h3>
                       <span className="px-2.5 py-0.5 bg-red-50 text-red-600 text-xs font-medium rounded-full border border-red-100">
                         Required
                       </span>
@@ -2543,11 +2543,11 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
                         // Color scheme: 4 = highest risk (red), 0 = no risk (green)
                         const colorClasses = {
-                          red: isSelected ? 'border-2 border-red-700 bg-red-200 shadow-md' : 'border-2 border-gray-200 hover:border-red-300 hover:bg-red-50',
-                          orange: isSelected ? 'border-2 border-orange-600 bg-orange-200 shadow-md' : 'border-2 border-gray-200 hover:border-orange-300 hover:bg-orange-50',
-                          yellow: isSelected ? 'border-2 border-yellow-600 bg-yellow-50 shadow-md' : 'border-2 border-gray-200 hover:border-yellow-300 hover:bg-yellow-50/30',
-                          blue: isSelected ? 'border-2 border-blue-500 bg-blue-50 shadow-md' : 'border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50/30',
-                          green: isSelected ? 'border-2 border-green-500 bg-green-50 shadow-md' : 'border-2 border-gray-200 hover:border-green-300 hover:bg-green-50/30'
+                          red: isSelected ? 'border-2 border-red-700 bg-red-200 shadow-md' : 'border-2 border-white/10 hover:border-red-300 hover:bg-red-50',
+                          orange: isSelected ? 'border-2 border-orange-600 bg-orange-200 shadow-md' : 'border-2 border-white/10 hover:border-orange-300 hover:bg-orange-50',
+                          yellow: isSelected ? 'border-2 border-yellow-600 bg-yellow-50 shadow-md' : 'border-2 border-white/10 hover:border-yellow-300 hover:bg-yellow-50/30',
+                          blue: isSelected ? 'border-2 border-blue-500 bg-blue-50 shadow-md' : 'border-2 border-white/10 hover:border-blue-300 hover:bg-blue-50/30',
+                          green: isSelected ? 'border-2 border-green-500 bg-green-50 shadow-md' : 'border-2 border-white/10 hover:border-green-300 hover:bg-green-50/30'
                         };
                         const bgColorClasses = {
                           red: isSelected ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-400',
@@ -2604,8 +2604,8 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                             <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-colors ${bgColorClasses[color]}`}>
                               <span className="text-lg font-bold">{value}</span>
                             </div>
-                            <span className={`text-sm font-semibold mt-2 ${isSelected ? 'text-gray-900' : 'text-gray-700'}`}>{label}</span>
-                            <span className={`text-xs text-center mt-1 leading-tight ${isSelected ? 'text-gray-600' : 'text-gray-400'}`}>
+                            <span className={`text-sm font-semibold mt-2 ${isSelected ? 'text-white' : 'text-slate-300'}`}>{label}</span>
+                            <span className={`text-xs text-center mt-1 leading-tight ${isSelected ? 'text-slate-400' : 'text-gray-400'}`}>
                               {desc}
                             </span>
                           </label>
@@ -2617,14 +2617,14 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
               </div>
             </div>
           ) : (
-            <div className="text-center py-32 bg-white rounded-3xl shadow-sm border border-dashed border-gray-200 flex flex-col items-center justify-center">
-              <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6 ring-8 ring-gray-50/50">
+            <div className="text-center py-32 bg-[#050b14] rounded-3xl shadow-sm border border-dashed border-white/10 flex flex-col items-center justify-center">
+              <div className="w-24 h-24 bg-[#0a1122] rounded-full flex items-center justify-center mb-6 ring-8 ring-gray-50/50">
                 <Info className="w-12 h-12 text-gray-300" />
               </div>
 
               <>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">No Questions in this Stage</h3>
-                <p className="text-gray-500 max-w-md mx-auto mb-10 text-lg">
+                <h3 className="text-2xl font-bold text-white mb-3">No Questions in this Stage</h3>
+                <p className="text-slate-400 max-w-md mx-auto mb-10 text-lg">
                   There are no questions defined for the <strong>{currentStage}</strong> stage for your role (<strong>{currentUser.role}</strong>).
                 </p>
               </>
@@ -2639,12 +2639,12 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
           )}
         </div>
 
-        <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 mt-8 flex justify-between items-center z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div className="sticky bottom-0 bg-[#050b14] border-t border-white/10 p-6 mt-8 flex justify-between items-center z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
           {showReviewScreen ? (
             <>
               <button
                 onClick={() => setShowReviewScreen(false)}
-                className="flex items-center px-6 py-3 rounded-xl font-semibold transition-all border-2 text-gray-700 bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300 shadow-sm"
+                className="flex items-center px-6 py-3 rounded-xl font-semibold transition-all border-2 text-slate-300 bg-[#050b14] border-white/10 hover:bg-[#0a1122] hover:border-gray-300 shadow-sm"
               >
                 <ChevronLeft className="w-5 h-5 mr-2" /> Back to Questions
               </button>
@@ -2674,8 +2674,8 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                 onClick={handleBack}
                 disabled={currentStage === 'set-up'}
                 className={`flex items-center px-6 py-3 rounded-xl font-semibold transition-all border-2 ${currentStage === 'set-up'
-                  ? 'text-gray-300 border-gray-100 cursor-not-allowed bg-gray-50'
-                  : 'text-gray-700 bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300 shadow-sm'
+                  ? 'text-gray-300 border-white/5 cursor-not-allowed bg-[#0a1122]'
+                  : 'text-slate-300 bg-[#050b14] border-white/10 hover:bg-[#0a1122] hover:border-gray-300 shadow-sm'
                   }`}
               >
                 <ChevronLeft className="w-5 h-5 mr-2" /> Previous
@@ -2769,38 +2769,38 @@ function AddQuestionModal({ currentStage, onClose, onAdd }: AddQuestionModalProp
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
-        <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-white">
+      <div className="bg-[#050b14] rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+        <div className="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-[#050b14]">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Add Custom Question</h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <h2 className="text-2xl font-bold text-white">Add Custom Question</h2>
+            <p className="text-sm text-slate-400 mt-1">
               Adding to <span className="font-semibold text-blue-600 uppercase">{currentStage}</span> stage
             </p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors bg-gray-50 p-2 rounded-full hover:bg-gray-100">
+          <button onClick={onClose} className="text-gray-400 hover:text-slate-400 transition-colors bg-[#0a1122] p-2 rounded-full hover:bg-gray-100">
             <XCircle className="w-6 h-6" />
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="p-8 space-y-6 bg-gray-50/30">
+        <form onSubmit={handleSubmit} className="p-8 space-y-6 bg-[#0a1122]/30">
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">Question Text <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-semibold text-white mb-2">Question Text <span className="text-red-500">*</span></label>
             <input
               type="text"
               value={text}
               onChange={(e) => setText(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none bg-white"
+              className="w-full px-4 py-3 rounded-xl border-2 border-white/10 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none bg-[#050b14]"
               placeholder="e.g., Does the system have a rollback mechanism?"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label className="block text-sm font-semibold text-white mb-2">
               Principle (İlke) <span className="text-red-500">*</span>
             </label>
             <select
               value={principle}
               onChange={(e) => setPrinciple(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none bg-white"
+              className="w-full px-4 py-3 rounded-xl border-2 border-white/10 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none bg-[#050b14]"
               required
             >
               {QUESTION_PRINCIPLES.map((p) => (
@@ -2811,22 +2811,22 @@ function AddQuestionModal({ currentStage, onClose, onAdd }: AddQuestionModalProp
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">Description / Rationale <span className="text-gray-400 font-normal">(Optional)</span></label>
+            <label className="block text-sm font-semibold text-white mb-2">Description / Rationale <span className="text-gray-400 font-normal">(Optional)</span></label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none resize-none bg-white"
+              className="w-full px-4 py-3 rounded-xl border-2 border-white/10 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none resize-none bg-[#050b14]"
               placeholder="Explain why this question is important..."
             />
           </div>
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Answer Type</label>
+              <label className="block text-sm font-semibold text-white mb-2">Answer Type</label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as QuestionType)}
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none bg-white"
+                className="w-full px-4 py-3 rounded-xl border-2 border-white/10 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none bg-[#050b14]"
               >
                 <option value="text">Open Text</option>
                 <option value="multiple-choice">Multiple Choice (Radio)</option>
@@ -2834,22 +2834,22 @@ function AddQuestionModal({ currentStage, onClose, onAdd }: AddQuestionModalProp
                 <option value="likert">Rating Scale (1-5)</option>
               </select>
             </div>
-            <div className="flex items-center justify-between p-3 border-2 border-gray-200 rounded-xl bg-white">
-              <span className="text-sm font-medium text-gray-900">Is this required?</span>
+            <div className="flex items-center justify-between p-3 border-2 border-white/10 rounded-xl bg-[#050b14]">
+              <span className="text-sm font-medium text-white">Is this required?</span>
               <button
                 type="button"
                 onClick={() => setRequired(!required)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${required ? 'bg-blue-600' : 'bg-gray-200'
                   }`}
               >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${required ? 'translate-x-6' : 'translate-x-1'
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-[#050b14] transition-transform ${required ? 'translate-x-6' : 'translate-x-1'
                   }`} />
               </button>
             </div>
           </div>
           {(type === 'multiple-choice' || type === 'checkbox' || type === 'select' || type === 'radio') && (
-            <div className="bg-white p-6 rounded-xl border-2 border-gray-200 animate-in slide-in-from-top-2">
-              <label className="block text-sm font-semibold text-gray-900 mb-3">Answer Options</label>
+            <div className="bg-[#050b14] p-6 rounded-xl border-2 border-white/10 animate-in slide-in-from-top-2">
+              <label className="block text-sm font-semibold text-white mb-3">Answer Options</label>
               <div className="space-y-3">
                 {options.map((opt, idx) => (
                   <div key={idx} className="flex gap-3">
@@ -2857,7 +2857,7 @@ function AddQuestionModal({ currentStage, onClose, onAdd }: AddQuestionModalProp
                       type="text"
                       value={opt}
                       onChange={(e) => handleOptionChange(idx, e.target.value)}
-                      className="flex-1 px-4 py-2 rounded-lg border-2 border-gray-200 focus:border-blue-500 outline-none text-sm"
+                      className="flex-1 px-4 py-2 rounded-lg border-2 border-white/10 focus:border-blue-500 outline-none text-sm"
                       placeholder={`Option ${idx + 1}`}
                       required
                     />
@@ -2882,11 +2882,11 @@ function AddQuestionModal({ currentStage, onClose, onAdd }: AddQuestionModalProp
               </button>
             </div>
           )}
-          <div className="pt-6 border-t border-gray-100 flex justify-end gap-3">
+          <div className="pt-6 border-t border-white/5 flex justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 rounded-xl text-gray-700 font-medium hover:bg-gray-100 transition-colors border-2 border-transparent hover:border-gray-200"
+              className="px-6 py-3 rounded-xl text-slate-300 font-medium hover:bg-gray-100 transition-colors border-2 border-transparent hover:border-white/10"
             >
               Cancel
             </button>

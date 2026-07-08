@@ -24,12 +24,12 @@ export function ContactUserModal({ user, onClose }: ContactUserModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4">
-        <div className="px-6 py-4 border-b flex items-center justify-between">
-          <h2 className="text-xl text-gray-900">Contact {user.name}</h2>
+      <div className="bg-[#050b14] rounded-lg shadow-xl max-w-lg w-full mx-4 border border-white/10">
+        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+          <h2 className="text-xl text-white">Contact {user.name}</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-slate-200"
           >
             <X className="h-5 w-5" />
           </button>
@@ -45,15 +45,15 @@ export function ContactUserModal({ user, onClose }: ContactUserModalProps) {
               {user.name.charAt(0)}
             </div>
             <div>
-              <div className="text-lg text-gray-900">{user.name}</div>
-              <div className="text-sm text-gray-600">{formatRoleName(user.role)}</div>
-              <div className="text-sm text-gray-500">{user.email}</div>
+              <div className="text-lg text-white">{user.name}</div>
+              <div className="text-sm text-slate-400">{formatRoleName(user.role)}</div>
+              <div className="text-sm text-slate-400">{user.email}</div>
             </div>
           </div>
 
           {/* Contact Method */}
           <div className="mb-4">
-            <label className="block text-sm mb-2 text-gray-700">Contact Method</label>
+            <label className="block text-sm mb-2 text-slate-300">Contact Method</label>
             <div className="flex space-x-4">
               <label className="flex items-center">
                 <input
@@ -85,12 +85,12 @@ export function ContactUserModal({ user, onClose }: ContactUserModalProps) {
           {/* Message */}
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label className="block text-sm mb-2 text-gray-700">Message</label>
+              <label className="block text-sm mb-2 text-slate-300">Message</label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder={`Send a ${contactMethod} to ${user.name}...`}
                 required
               />
@@ -100,7 +100,7 @@ export function ContactUserModal({ user, onClose }: ContactUserModalProps) {
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                className="px-4 py-2 text-slate-400 hover:text-slate-200"
               >
                 Cancel
               </button>

@@ -41,8 +41,8 @@ export function EthicalTensionMap({ tensions }: EthicalTensionMapProps) {
 
   if (tensions.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
-        <GitBranch className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+      <div className="text-center py-8 text-slate-400">
+        <GitBranch className="h-12 w-12 mx-auto mb-2 text-slate-200" />
         <p className="text-sm">No tension data available</p>
       </div>
     );
@@ -51,11 +51,11 @@ export function EthicalTensionMap({ tensions }: EthicalTensionMapProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg text-gray-900 flex items-center">
+        <h3 className="text-lg text-white flex items-center">
           <GitBranch className="h-5 w-5 mr-2" />
           Ethical Tension Map
         </h3>
-        <div className="text-xs text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+        <div className="text-xs text-slate-400 border-white/5 px-3 py-1 rounded-full">
           {tensionPairs.length} tensions identified
         </div>
       </div>
@@ -68,7 +68,7 @@ export function EthicalTensionMap({ tensions }: EthicalTensionMapProps) {
         </p>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-[#050b14] rounded-lg border border-white/10 p-6">
         <svg
           viewBox="0 0 100 100"
           className="w-full h-96"
@@ -143,12 +143,12 @@ export function EthicalTensionMap({ tensions }: EthicalTensionMapProps) {
       {/* Tension Details Modal */}
       {selectedTension && selectedTensionData && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg text-gray-900">Tension Details</h3>
+          <div className="bg-[#050b14] rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-[#050b14] px-6 py-4 border-b border-white/10 flex items-center justify-between">
+              <h3 className="text-lg text-white">Tension Details</h3>
               <button
                 onClick={() => setSelectedTension(null)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-slate-400"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -158,18 +158,18 @@ export function EthicalTensionMap({ tensions }: EthicalTensionMapProps) {
               <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg">
                 <div className="flex items-center">
                   <GitBranch className="h-5 w-5 text-purple-600 mr-2" />
-                  <span className="text-lg text-gray-900">{selectedTension}</span>
+                  <span className="text-lg text-white">{selectedTension}</span>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-gray-600">Average Severity</div>
-                  <div className="text-xl text-gray-900">
+                  <div className="text-sm text-slate-400">Average Severity</div>
+                  <div className="text-xl text-white">
                     {selectedTensionData.avgSeverity.toFixed(1)}
                   </div>
                 </div>
               </div>
 
               <div>
-                <div className="text-sm text-gray-700 mb-3">
+                <div className="text-sm text-slate-300 mb-3">
                   {selectedTensionData.count} tensions involve this conflict:
                 </div>
                 <div className="space-y-2">
@@ -199,7 +199,7 @@ export function EthicalTensionMap({ tensions }: EthicalTensionMapProps) {
                         className={`p-4 rounded-lg border ${colors.border} ${colors.bg}`}
                       >
                         <div className="flex items-start justify-between mb-2">
-                          <span className="text-sm text-gray-900">{tension.claimStatement}</span>
+                          <span className="text-sm text-white">{tension.claimStatement}</span>
                           <span
                             className={`ml-2 w-3 h-3 rounded-full flex-shrink-0 ${colors.badge}`}
                           />
@@ -208,7 +208,7 @@ export function EthicalTensionMap({ tensions }: EthicalTensionMapProps) {
                         {/* Consensus Progress Bar */}
                         {totalVotes > 0 && (
                           <div className="flex items-center space-x-2 mb-2">
-                            <span className="text-xs text-gray-500 font-medium">Consensus:</span>
+                            <span className="text-xs text-slate-400 font-medium">Consensus:</span>
                             <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden shadow-inner relative">
                               <div 
                                 className="h-full transition-all duration-500 ease-out rounded-full"
@@ -220,13 +220,13 @@ export function EthicalTensionMap({ tensions }: EthicalTensionMapProps) {
                                 }}
                               />
                             </div>
-                            <span className="text-xs text-gray-500 w-20 text-right">
+                            <span className="text-xs text-slate-400 w-20 text-right">
                               {agreePercentage}% agree
                             </span>
                           </div>
                         )}
                         
-                        <div className="text-xs text-gray-600">
+                        <div className="text-xs text-slate-400">
                           Created: {new Date(tension.createdAt).toLocaleDateString()}
                         </div>
                       </div>
@@ -240,8 +240,8 @@ export function EthicalTensionMap({ tensions }: EthicalTensionMapProps) {
       )}
 
       {/* Tension List */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
-        <h4 className="text-sm text-gray-700 mb-3">All Tensions</h4>
+      <div className="bg-[#050b14] rounded-lg border border-white/10 p-4">
+        <h4 className="text-sm text-slate-300 mb-3">All Tensions</h4>
         <div className="space-y-2">
           {tensionPairs.map(({ pair, count, avgSeverity }) => {
             const severityLevel = avgSeverity >= 2.5 ? 'high' : avgSeverity >= 1.5 ? 'medium' : 'low';
@@ -251,15 +251,15 @@ export function EthicalTensionMap({ tensions }: EthicalTensionMapProps) {
               <button
                 key={pair}
                 onClick={() => setSelectedTension(pair)}
-                className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                className="w-full text-left p-3 rounded-lg border border-white/10 hover:bg-[#0a1122] transition-colors"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <GitBranch className="h-4 w-4 text-gray-400 mr-2" />
-                    <span className="text-sm text-gray-900">{pair}</span>
+                    <span className="text-sm text-white">{pair}</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <span className="text-xs text-gray-600">{count} tensions</span>
+                    <span className="text-xs text-slate-400">{count} tensions</span>
                     <span className={`text-xs px-2 py-1 rounded-full ${colors.bg} ${colors.text}`}>
                       Avg: {avgSeverity.toFixed(1)}
                     </span>

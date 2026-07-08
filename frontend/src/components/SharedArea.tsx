@@ -251,19 +251,19 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
     : messages.filter(msg => msg.relatedProject === selectedProject || msg.isPinned);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#0a1122]">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-[#050b14] shadow-sm border-b">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
 
               <div>
-                <h1 className="text-xl text-gray-900 flex items-center">
+                <h1 className="text-xl text-white flex items-center">
                   <MessageSquare className="h-5 w-5 mr-2" />
                   Shared Discussion Area
                 </h1>
-                <p className="text-gray-600">Collaborative space for cross-functional discussions</p>
+                <p className="text-slate-400">Collaborative space for cross-functional discussions</p>
               </div>
             </div>
 
@@ -271,7 +271,7 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
               <select
                 value={selectedProject}
                 onChange={(e) => setSelectedProject(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 bg-[#0a1122] text-slate-300 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
               >
                 <option value="all">All Discussions</option>
                 {projects.map(project => (
@@ -289,7 +289,7 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
         <div className="flex-1 overflow-y-auto px-6 py-6">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+              <Loader2 className="h-8 w-8 animate-spin text-slate-500" />
             </div>
           ) : (
             <div className="max-w-4xl mx-auto space-y-4">
@@ -302,7 +302,7 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
                 const userColor = user ? roleColors[user.role as keyof typeof roleColors] : '#6B7280';
 
               return (
-                <div key={message.id} className={`${message.isPinned ? 'bg-yellow-50 border border-yellow-200' : 'bg-white border'} rounded-lg p-4 shadow-sm`}>
+                <div key={message.id} className={`${message.isPinned ? 'bg-yellow-900/30 border border-yellow-700/50' : 'bg-[#050b14] border'} rounded-lg p-4 shadow-sm`}>
                   <div className="flex items-start space-x-3">
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm flex-shrink-0"
@@ -313,11 +313,11 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2 mb-1">
-                        <span className="text-sm text-gray-900">{user?.name}</span>
+                        <span className="text-sm text-white">{user?.name}</span>
                         <span className="text-xs px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: userColor }}>
                           {user?.role}
                         </span>
-                        <span className="text-xs text-gray-500">{formatTime(message.timestamp)}</span>
+                        <span className="text-xs text-slate-400">{formatTime(message.timestamp)}</span>
                         {message.isPinned && (
                           <Pin className="h-3 w-3 text-yellow-600" />
                         )}
@@ -346,18 +346,18 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
                         if (!replyToText) return null;
                         
                         return (
-                          <div className="bg-gray-50 border-l-2 border-blue-500 pl-3 py-2 mb-2 rounded text-xs text-gray-600">
-                            <div className="font-medium text-gray-700">
+                          <div className="bg-[#0a1122] border-l-2 border-blue-500 pl-3 py-2 mb-2 rounded text-xs text-slate-400">
+                            <div className="font-medium text-slate-300">
                               Replying to {replyToUserName ? `${replyToUserName}:` : 'message:'}
                             </div>
-                            <div className="text-gray-600 mt-1">
+                            <div className="text-slate-400 mt-1">
                               {replyToText.substring(0, 100)}{replyToText.length > 100 ? '...' : ''}
                             </div>
                           </div>
                         );
                       })()}
 
-                      <p className="text-gray-800 text-sm leading-relaxed">{message.text}</p>
+                      <p className="text-slate-300 text-sm leading-relaxed">{message.text}</p>
 
                       <div className="flex items-center space-x-3 mt-2">
                         <button 
@@ -369,14 +369,14 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
                               textarea?.focus();
                             }, 100);
                           }}
-                          className="text-xs text-gray-500 hover:text-gray-700"
+                          className="text-xs text-slate-400 hover:text-slate-300"
                         >
                           Reply
                         </button>
                         {currentUser.role === 'admin' && (
                           <button
                             onClick={() => togglePin(message.id)}
-                            className="text-xs text-gray-500 hover:text-gray-700 flex items-center"
+                            className="text-xs text-slate-400 hover:text-slate-300 flex items-center"
                           >
                             <Pin className="h-3 w-3 mr-1" />
                             {message.isPinned ? 'Unpin' : 'Pin'}
@@ -401,8 +401,8 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
               {filteredMessages.length === 0 && !loading && (
                 <div className="text-center py-12">
                   <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg text-gray-900 mb-2">No discussions yet</h3>
-                  <p className="text-gray-600">Start the conversation by posting the first message.</p>
+                  <h3 className="text-lg text-white mb-2">No discussions yet</h3>
+                  <p className="text-slate-400">Start the conversation by posting the first message.</p>
                 </div>
               )}
             </div>
@@ -410,7 +410,7 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
         </div>
 
         {/* Message Input */}
-        <div className="bg-white border-t px-6 py-4">
+        <div className="bg-[#050b14] border-t px-6 py-4">
           <div className="max-w-4xl mx-auto">
             <form onSubmit={handleSendMessage} className="flex space-x-4">
               <div className="flex-1">
@@ -418,16 +418,16 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
                   const replyToMessage = discussionsData.find(d => d._id === replyingTo);
                   const replyToUser = replyToMessage ? getUserFromMessage(replyingTo) : null;
                   return (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 mb-2 flex items-center justify-between">
-                      <div className="text-xs text-gray-700">
+                    <div className="bg-blue-900/30 border border-blue-700/50 rounded-lg p-2 mb-2 flex items-center justify-between">
+                      <div className="text-xs text-slate-300">
                         <span className="font-medium">Replying to {replyToUser?.name || 'message'}:</span>
-                        <span className="ml-2 text-gray-600">
+                        <span className="ml-2 text-slate-400">
                           {replyToMessage?.text.substring(0, 50)}{replyToMessage && replyToMessage.text.length > 50 ? '...' : ''}
                         </span>
                       </div>
                       <button
                         onClick={() => setReplyingTo(null)}
-                        className="text-xs text-gray-500 hover:text-gray-700"
+                        className="text-xs text-slate-400 hover:text-slate-300"
                       >
                         Cancel
                       </button>
@@ -439,7 +439,7 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
                   onChange={(e) => setNewMessage(e.target.value)}
                   placeholder={replyingTo ? 'Write your reply...' : `Share your thoughts${selectedProject !== 'all' ? ` about ${getProjectById(selectedProject, projects)?.title}` : ''}...`}
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full px-4 py-3 bg-[#0a1122] text-slate-300 placeholder-slate-500 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
@@ -450,7 +450,7 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
                     }
                   }}
                 />
-                <div className="text-xs text-gray-500 mt-1">
+                <div className="text-xs text-slate-400 mt-1">
                   {replyingTo ? 'Press Enter to send reply, Esc to cancel' : 'Use @username to mention someone • Press Enter to send, Shift+Enter for new line'}
                 </div>
               </div>
@@ -458,7 +458,7 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
               <button
                 type="submit"
                 disabled={!newMessage.trim() || sending}
-                className={`px-6 py-3 text-white rounded-lg transition-colors hover:opacity-90 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center ${
+                className={`px-6 py-3 text-white rounded-lg transition-colors hover:opacity-90 disabled:bg-gray-800 disabled:cursor-not-allowed flex items-center ${
                   newMessage.trim() && !sending ? 'shadow-md' : ''
                 }`}
                 style={{ backgroundColor: newMessage.trim() && !sending ? '#2563eb' : roleColor }}
@@ -475,9 +475,9 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
       </div>
 
       {/* Guidelines Sidebar */}
-      <div className="fixed right-6 top-24 w-72 bg-white rounded-lg shadow-lg border p-4 max-h-96 overflow-y-auto hidden lg:block">
-        <h3 className="text-sm mb-3 text-gray-900">Discussion Guidelines</h3>
-        <div className="space-y-2 text-xs text-gray-600">
+      <div className="fixed right-6 top-24 w-72 bg-[#050b14] rounded-lg shadow-lg border p-4 max-h-96 overflow-y-auto hidden lg:block">
+        <h3 className="text-sm mb-3 text-white">Discussion Guidelines</h3>
+        <div className="space-y-2 text-xs text-slate-400">
           <div className="flex items-start">
             <span className="text-blue-500 mr-2">•</span>
             <span>Keep discussions focused on ethical AI evaluation topics</span>

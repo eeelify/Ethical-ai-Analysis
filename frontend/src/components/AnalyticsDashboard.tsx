@@ -164,14 +164,14 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
     return (
       <div className="flex items-center justify-center p-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-3 text-gray-600">Loading analytics...</span>
+        <span className="ml-3 text-slate-400">Loading analytics...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-6 bg-red-50 border border-red-200 rounded-lg">
+      <div className="p-6 bg-red-50 border border-white/10 rounded-lg">
         <div className="flex items-center text-red-800">
           <AlertCircle className="h-5 w-5 mr-2" />
           <span>{error}</span>
@@ -182,7 +182,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
 
   if (!analytics) {
     return (
-      <div className="p-6 text-gray-500">No analytics data available.</div>
+      <div className="p-6 text-slate-400">No analytics data available.</div>
     );
   }
 
@@ -203,10 +203,10 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
       {/* KPI Cards - Expanded grid for 5 cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Card 1: Overall Risk (Normalized Avg) */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border">
+        <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Normalized Avg ERC</p>
+              <p className="text-sm text-slate-400">Normalized Avg ERC</p>
               <p className="text-2xl font-bold" style={{ color: getRiskColor(analytics.principleBar.reduce((sum, p) => sum + p.avgScore, 0) / analytics.principleBar.length) }}>
                 {(analytics.principleBar.reduce((sum, p) => sum + p.avgScore, 0) / analytics.principleBar.length).toFixed(2)} / 4
               </p>
@@ -216,14 +216,14 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
         </div>
 
         {/* Card 2: Cumulative Risk Volume (ADDED) */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border">
+        <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Cumulative Risk Data</p>
-              <p className="text-2xl font-bold text-gray-800">
+              <p className="text-sm text-slate-400">Cumulative Risk Data</p>
+              <p className="text-2xl font-bold text-slate-200">
                 {analytics.overallTotals?.cumulativeRiskVolume?.toFixed(2) || '0.00'}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 Max: {(analytics.overallTotals?.quantitativeQuestions ? (analytics.overallTotals.quantitativeQuestions * 4).toFixed(0) : 'N/A')} (from {analytics.overallTotals?.quantitativeQuestions || 0} Qs)
               </p>
             </div>
@@ -231,10 +231,10 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg shadow-sm border">
+        <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Team Completion</p>
+              <p className="text-sm text-slate-400">Team Completion</p>
               <p className="text-2xl font-bold text-blue-600">
                 {analytics.participation.submittedCount}/{analytics.participation.assignedCount}
               </p>
@@ -243,10 +243,10 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg shadow-sm border">
+        <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Evidence Coverage</p>
+              <p className="text-sm text-slate-400">Evidence Coverage</p>
               <p className="text-2xl font-bold text-emerald-600">
                 {analytics.evidenceMetrics.coveragePct.toFixed(1)}%
               </p>
@@ -255,10 +255,10 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg shadow-sm border">
+        <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Disputed Tensions</p>
+              <p className="text-sm text-slate-400">Disputed Tensions</p>
               <p className="text-2xl font-bold text-red-600">
                 {analytics.tensionsSummary.disputed}
               </p>
@@ -269,7 +269,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
       </div>
 
       {/* Principle Bar Chart */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border">
+      <div className="bg-[#050b14] p-6 rounded-lg shadow-sm border">
         <h3 className="text-lg font-semibold mb-4">Ethical Principles Score Overview</h3>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3">
@@ -296,10 +296,10 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-            <p className="text-xs text-gray-500 mt-2">Averages exclude N/A responses.</p>
+            <p className="text-xs text-slate-400 mt-2">Averages exclude N/A responses.</p>
           </div>
           <div className="lg:col-span-1">
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-[#0a1122] p-4 rounded-lg">
               <h4 className="font-semibold text-sm mb-3">Scale 0–4 (0 = lowest risk, 4 = highest risk)</h4>
               <div className="space-y-2 text-xs">
                 <div className="flex items-center">
@@ -325,7 +325,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
       </div>
 
       {/* Role × Principle Heatmap */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border">
+      <div className="bg-[#050b14] p-6 rounded-lg shadow-sm border">
         <h3 className="text-lg font-semibold mb-4">Role × Principle Score Matrix</h3>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
@@ -366,16 +366,16 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
             </tbody>
           </table>
         </div>
-        <p className="text-xs text-gray-500 mt-2">Cells show evaluator's average risk score per principle (0-4 scale, 0 = lowest risk, 4 = highest risk). N/A = not submitted.</p>
+        <p className="text-xs text-slate-400 mt-2">Cells show evaluator's average risk score per principle (0-4 scale, 0 = lowest risk, 4 = highest risk). N/A = not submitted.</p>
       </div>
 
       {/* Top Risky Questions */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border">
+      <div className="bg-[#050b14] p-6 rounded-lg shadow-sm border">
         <h3 className="text-lg font-semibold mb-4">Top Risky Questions</h3>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
-              <tr className="bg-gray-50">
+              <tr className="bg-[#0a1122]">
                 <th className="px-4 py-2 text-left border-b">Rank</th>
                 <th className="px-4 py-2 text-left border-b">Principle</th>
                 <th className="px-4 py-2 text-left border-b">Question</th>
@@ -389,7 +389,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
                 const question = questions[q.questionId];
                 const questionText = question?.questionEn || question?.text || question?.title || `Question ${q.questionId}`;
                 return (
-                  <tr key={q.questionId} className="hover:bg-gray-50">
+                  <tr key={q.questionId} className="hover:bg-[#0a1122]">
                     <td className="px-4 py-2 border-b">{idx + 1}</td>
                     <td className="px-4 py-2 border-b">{q.principleKey}</td>
                     <td className="px-4 py-2 border-b max-w-md">
@@ -424,12 +424,12 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
       </div>
 
       {/* Tensions Table */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border">
+      <div className="bg-[#050b14] p-6 rounded-lg shadow-sm border">
         <h3 className="text-lg font-semibold mb-4">Ethical Tensions</h3>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
-              <tr className="bg-gray-50">
+              <tr className="bg-[#0a1122]">
                 <th className="px-4 py-2 text-left border-b">Conflict</th>
                 <th className="px-4 py-2 text-center border-b">Severity</th>
                 <th className="px-4 py-2 text-center border-b">Review State</th>
@@ -441,7 +441,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
             </thead>
             <tbody>
               {analytics.tensionsTable.map(t => (
-                <tr key={t.tensionId} className="hover:bg-gray-50">
+                <tr key={t.tensionId} className="hover:bg-[#0a1122]">
                   <td className="px-4 py-2 border-b">
                     {t.conflict.principle1} ↔ {t.conflict.principle2}
                   </td>
@@ -454,14 +454,14 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
                     <span className={`px-2 py-1 rounded text-xs font-semibold ${t.reviewState === 'Accepted' ? 'bg-green-100 text-green-800' :
                       t.reviewState === 'Disputed' ? 'bg-red-100 text-red-800' :
                         t.reviewState === 'Under review' ? 'bg-blue-100 text-blue-800' :
-                          'bg-gray-100 text-gray-800'
+                          'bg-gray-100 text-slate-200'
                       }`}>
                       {t.reviewState}
                     </span>
                   </td>
                   <td className="px-4 py-2 text-center border-b text-xs">
                     {t.agreeCount} agree / {t.disagreeCount} disagree<br />
-                    <span className="text-gray-500">({t.agreePct.toFixed(1)}% agree)</span>
+                    <span className="text-slate-400">({t.agreePct.toFixed(1)}% agree)</span>
                   </td>
                   <td className="px-4 py-2 text-center border-b">
                     {t.evidenceCount > 0 ? (
@@ -488,7 +488,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
       </div>
 
       {/* Evidence Coverage Donut */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border">
+      <div className="bg-[#050b14] p-6 rounded-lg shadow-sm border">
         <h3 className="text-lg font-semibold mb-4">Evidence Coverage</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2">
@@ -515,14 +515,14 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
           <div className="md:col-span-1">
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-gray-600">Coverage</p>
+                <p className="text-sm text-slate-400">Coverage</p>
                 <p className="text-2xl font-bold text-emerald-600">{analytics.evidenceMetrics.coveragePct.toFixed(1)}%</p>
-                <p className="text-xs text-gray-500">Tensions with evidence</p>
+                <p className="text-xs text-slate-400">Tensions with evidence</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Total Evidence</p>
+                <p className="text-sm text-slate-400">Total Evidence</p>
                 <p className="text-2xl font-bold text-blue-600">{analytics.evidenceMetrics.totalEvidenceCount}</p>
-                <p className="text-xs text-gray-500">Evidence items</p>
+                <p className="text-xs text-slate-400">Evidence items</p>
               </div>
             </div>
           </div>
@@ -532,13 +532,13 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
       {/* Question Detail Modal */}
       {selectedQuestion && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+          <div className="bg-[#050b14] rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Question Details</h3>
                 <button
                   onClick={() => setSelectedQuestion(null)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-slate-400 hover:text-slate-300"
                 >
                   ✕
                 </button>
@@ -552,28 +552,28 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
                 return (
                   <div className="space-y-4">
                     <div>
-                      <p className="text-sm text-gray-600 mb-1">Question</p>
+                      <p className="text-sm text-slate-400 mb-1">Question</p>
                       <p className="font-medium">{question?.questionEn || question?.text || 'Question not found'}</p>
                     </div>
 
                     {questionData && (
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <p className="text-sm text-gray-600 mb-1">Average Risk Score</p>
+                          <p className="text-sm text-slate-400 mb-1">Average Risk Score</p>
                           <p className="text-lg font-semibold" style={{ color: getRiskColor(questionData.avgRiskScore) }}>
                             {questionData.avgRiskScore.toFixed(2)}/4.0
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600 mb-1">Principle</p>
+                          <p className="text-sm text-slate-400 mb-1">Principle</p>
                           <p className="font-medium">{questionData.principleKey}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600 mb-1">Responses</p>
+                          <p className="text-sm text-slate-400 mb-1">Responses</p>
                           <p className="font-medium">{questionData.n}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600 mb-1">Roles Involved</p>
+                          <p className="text-sm text-slate-400 mb-1">Roles Involved</p>
                           <p className="font-medium">{questionData.rolesInvolved.join(', ')}</p>
                         </div>
                       </div>
@@ -584,14 +584,14 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
                         <p className="text-sm font-semibold mb-2">Answer Excerpts by Role</p>
                         <div className="space-y-3">
                           {contexts.map((ctx, idx) => (
-                            <div key={idx} className="bg-gray-50 p-3 rounded border-l-4 border-blue-500">
+                            <div key={idx} className="bg-[#0a1122] p-3 rounded border-l-4 border-blue-500">
                               <div className="flex justify-between items-start mb-1">
                                 <span className="text-xs font-semibold text-blue-600">{ctx.role}</span>
                                 <span className="text-xs px-2 py-0.5 rounded text-white" style={{ backgroundColor: getRiskColor(ctx.score) }}>
                                   Score: {ctx.score.toFixed(2)}
                                 </span>
                               </div>
-                              <p className="text-sm text-gray-700">{ctx.answerSnippet}</p>
+                              <p className="text-sm text-slate-300">{ctx.answerSnippet}</p>
                             </div>
                           ))}
                         </div>

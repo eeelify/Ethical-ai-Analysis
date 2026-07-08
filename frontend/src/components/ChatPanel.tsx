@@ -363,9 +363,9 @@ export function ChatPanel({
   // Minimized (only for non-inline mode)
   if (isMinimized && !inline) {
     return (
-      <div className="fixed bottom-4 right-4 w-80 bg-white shadow-2xl rounded-lg border border-gray-200 z-50">
+      <div className="fixed bottom-4 right-4 w-80 bg-[#050b14] shadow-2xl rounded-lg border border-white/10 z-50">
         <div
-          className="bg-gray-50 border-b border-gray-200 p-3 flex items-center justify-between cursor-pointer rounded-t-lg"
+          className="bg-[#0a1122] border-b border-white/10 p-3 flex items-center justify-between cursor-pointer rounded-t-lg"
           onClick={() => setIsMinimized(false)}
         >
           <div className="flex items-center space-x-3">
@@ -373,7 +373,7 @@ export function ChatPanel({
               {otherUser.name?.charAt(0) || 'U'}
             </div>
             <div>
-              <div className="font-medium text-gray-900 text-sm">{otherUser.name}</div>
+              <div className="font-medium text-white text-sm">{otherUser.name}</div>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -384,7 +384,7 @@ export function ChatPanel({
               }}
               className="p-2.5 hover:bg-gray-200 rounded-lg transition-colors"
             >
-              <Maximize2 className="h-5 w-5 text-gray-600" />
+              <Maximize2 className="h-5 w-5 text-slate-400" />
             </button>
             <button
               onClick={(e) => {
@@ -393,7 +393,7 @@ export function ChatPanel({
               }}
               className="p-2.5 hover:bg-gray-200 rounded-lg transition-colors"
             >
-              <X className="h-6 w-6 text-gray-600" />
+              <X className="h-6 w-6 text-slate-400" />
             </button>
           </div>
         </div>
@@ -403,8 +403,8 @@ export function ChatPanel({
 
   // Layout classes
   const containerClasses = inline
-    ? `w-full max-w-full bg-white border border-gray-200 overflow-hidden flex flex-col`
-    : `fixed ${isFullscreen ? 'inset-0' : 'bottom-4 right-4 w-96'} bg-white shadow-2xl z-50 border border-gray-200 rounded-lg flex flex-col min-h-0`;
+    ? `w-full max-w-full bg-[#050b14] border border-white/10 overflow-hidden flex flex-col`
+    : `fixed ${isFullscreen ? 'inset-0' : 'bottom-4 right-4 w-96'} bg-[#050b14] shadow-2xl z-50 border border-white/10 rounded-lg flex flex-col min-h-0`;
 
   const fixedHeight = isFullscreen ? '100vh' : `min(600px, calc(100vh - 2rem))`;
 
@@ -438,13 +438,13 @@ export function ChatPanel({
       }
     >
       {/* Header - Fixed height */}
-      <div className="bg-gray-50 border-b border-gray-200 p-4 flex items-center justify-between" style={{ flexShrink: 0, flex: '0 0 auto' }}>
+      <div className="bg-[#0a1122] border-b border-white/10 p-4 flex items-center justify-between" style={{ flexShrink: 0, flex: '0 0 auto' }}>
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center">
             {otherUser.name?.charAt(0) || 'U'}
           </div>
           <div>
-            <div className="font-medium text-gray-900">{otherUser.name}</div>
+            <div className="font-medium text-white">{otherUser.name}</div>
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -461,7 +461,7 @@ export function ChatPanel({
             className="p-2.5 hover:bg-gray-200 rounded-lg transition-colors"
             title="Close"
           >
-            <X className="h-6 w-6 text-gray-600" />
+            <X className="h-6 w-6 text-slate-400" />
           </button>
         </div>
       </div>
@@ -469,7 +469,7 @@ export function ChatPanel({
       {/* Messages (scroll area) - Scrollable container with flex: 1 */}
       <div
         ref={messagesContainerRef}
-        className="bg-gray-50 overscroll-contain touch-pan-y chat-messages-scroll"
+        className="bg-[#0a1122] overscroll-contain touch-pan-y chat-messages-scroll"
         tabIndex={0}
         aria-label="Chat messages"
         style={{
@@ -484,10 +484,10 @@ export function ChatPanel({
         }}
       >
         {loading && messages.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">Loading messages...</div>
+          <div className="text-center text-slate-400 py-8">Loading messages...</div>
         ) : messages.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">
-            <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+          <div className="text-center text-slate-400 py-8">
+            <MessageSquare className="h-12 w-12 text-slate-200 mx-auto mb-2" />
             <p>No messages yet. Start the conversation!</p>
           </div>
         ) : (
@@ -496,7 +496,7 @@ export function ChatPanel({
               <React.Fragment key={dateGroupIdx}>
                 {/* Date separator */}
                 <div className="flex items-center justify-center my-2">
-                  <div className="bg-gray-200 text-gray-600 text-xs px-3 py-1 rounded-full">
+                  <div className="bg-[#1a2333] text-slate-400 text-xs px-3 py-1 rounded-full">
                     {formatDate(dateGroup.date)}
                   </div>
                 </div>
@@ -525,7 +525,7 @@ export function ChatPanel({
                       <div className={`flex flex-col ${isFromMe ? 'items-end' : 'items-start'}`} style={{ maxWidth: 'calc(100% - 3rem)' }}>
                         {/* Sender name - only for others, show on each group */}
                         {showSenderName && (
-                          <div className="text-xs font-medium text-gray-600 mb-1 px-1">
+                          <div className="text-xs font-medium text-slate-400 mb-1 px-1">
                             {senderGroup.senderName}
                           </div>
                         )}
@@ -538,11 +538,11 @@ export function ChatPanel({
                                 key={message.id}
                                 className={`rounded-lg px-3 py-2 ${isFromMe
                                   ? 'bg-blue-600 text-white'
-                                  : 'bg-white text-gray-900 border border-gray-200 shadow-sm'
+                                  : 'bg-[#1a2333] text-white border border-white/5 shadow-sm'
                                   }`}
                               >
                                 <div className="text-sm whitespace-pre-wrap break-words">{message.text}</div>
-                                <div className={`text-xs mt-1 ${isFromMe ? 'text-blue-100' : 'text-gray-500'}`}>
+                                <div className={`text-xs mt-1 ${isFromMe ? 'text-blue-100' : 'text-slate-400'}`}>
                                   {formatTime(message.createdAt)}
                                 </div>
                               </div>
@@ -571,11 +571,11 @@ export function ChatPanel({
 
       {/* Input (fixed at bottom) - Fixed height row */}
       <div
-        className="border-t border-gray-200 px-4 py-3 bg-white"
+        className="border-t border-white/10 px-4 py-3 bg-[#050b14]"
         style={{
           flexShrink: 0,
           flex: '0 0 auto',
-          borderTop: '1px solid #e5e7eb',
+          borderTop: '1px solid #1a2333',
           position: 'relative',
           zIndex: 10
         }}
@@ -592,7 +592,7 @@ export function ChatPanel({
               }
             }}
             placeholder="Type a message..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 px-4 py-2 border border-white/5 bg-[#0a1122] text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={sending}
             style={{ height: '40px', minHeight: '40px' }}
           />
