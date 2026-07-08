@@ -67,6 +67,42 @@ const generateReport = async (payload) => {
 };
 
 /**
+ * Analyze a free-text AI system description through the Ontology API
+ */
+const analyzeText = async (payload) => {
+  if (!ontologyConfig.enabled) throw new Error('Ontology service is disabled.');
+  try {
+    const client = createClient();
+    const response = await client.post('/analyze-text', payload);
+    return response.data;
+  } catch (error) {
+    console.error('Ontology API Analyze Text Failed:', error.message);
+    if (error.response) {
+      throw new Error(`Ontology service error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
+    }
+    throw new Error('Could not analyze text with Ontology service: ' + error.message);
+  }
+};
+
+/**
+ * Generate an explainable graph trace for a free-text AI system description
+ */
+const graphTrace = async (payload) => {
+  if (!ontologyConfig.enabled) throw new Error('Ontology service is disabled.');
+  try {
+    const client = createClient();
+    const response = await client.post('/graph-trace', payload);
+    return response.data;
+  } catch (error) {
+    console.error('Ontology API Graph Trace Failed:', error.message);
+    if (error.response) {
+      throw new Error(`Ontology service error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
+    }
+    throw new Error('Could not generate ontology graph trace: ' + error.message);
+  }
+};
+
+/**
  * Get ethical violations for a specific system
  */
 const getViolations = async (systemName) => {
@@ -100,6 +136,8 @@ module.exports = {
   checkHealth,
   startAssessment,
   generateReport,
+  analyzeText,
+  graphTrace,
   getViolations,
   getTensions
 };

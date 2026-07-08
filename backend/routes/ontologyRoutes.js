@@ -18,6 +18,60 @@ router.get('/health', async (req, res) => {
   }
 });
 
+// POST /api/ontology/analyze-text
+// Runs a standalone ontology-driven assessment from free text.
+router.post('/analyze-text', async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text || !String(text).trim()) {
+      return res.status(400).json({ success: false, error: 'text is required' });
+    }
+
+    const result = await ontologyService.analyzeText({ text });
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('Error analyzing text with ontology:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to analyze text with ontology' });
+  }
+});
+
+// POST /api/ontology/graph-trace
+// Returns the deterministic reasoning chain used by the ontology service.
+router.post('/graph-trace', async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text || !String(text).trim()) {
+      return res.status(400).json({ success: false, error: 'text is required' });
+    }
+
+    const result = await ontologyService.graphTrace({ text });
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('Error generating ontology graph trace:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to generate ontology graph trace' });
+  }
+});
+
+// POST /api/ontology/text-report
+// Generates a standalone GraphRAG report from free text.
+router.post('/text-report', async (req, res) => {
+  try {
+    const { systemName, text } = req.body;
+    if (!text || !String(text).trim()) {
+      return res.status(400).json({ success: false, error: 'text is required' });
+    }
+
+    const result = await ontologyService.generateReport({
+      system_name: systemName || 'Standalone Ontology Assessment',
+      text
+    });
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('Error generating ontology text report:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to generate ontology text report' });
+  }
+});
+
 // POST /api/ontology/report
 // Generates a report through the ontology API
 router.post('/report', async (req, res) => {

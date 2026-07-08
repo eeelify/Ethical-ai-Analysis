@@ -631,6 +631,13 @@ export function AdminDashboardEnhanced({
             Expert Questions
           </button>
           <button
+            onClick={() => onNavigate('ontology-assessment')}
+            className="w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+          >
+            <Database className="h-5 w-5 mr-3 text-indigo-600" />
+            Ontology
+          </button>
+          <button
             onClick={() => onNavigate('other-members')}
             className="w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
           >
