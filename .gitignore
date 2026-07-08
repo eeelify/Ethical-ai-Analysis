@@ -7,6 +7,14 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Python Virtual Environments
+.venv-msys-broken/
+.venv-win/
+venv/
+.venv/
+env/
+.env/
+
 # Environment variables
 .env
 .env.local
@@ -84,4 +92,3 @@ coverage/
 # out/
 # .nuxt/
 # .vuepress/dist/
-
