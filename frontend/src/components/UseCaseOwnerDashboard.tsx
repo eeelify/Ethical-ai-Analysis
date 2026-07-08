@@ -17,6 +17,7 @@ interface UseCaseOwnerDashboardProps {
   onCreateUseCase: (useCase: Partial<UseCase>) => void;
   onViewUseCase: (useCase: UseCase) => void;
   onDeleteUseCase: (useCaseId: string) => void;
+  onNavigate?: (view: string) => void;
   onLogout: () => void;
   onUpdateUser?: (user: User) => void;
   onOpenChat?: (project: Project, otherUser: User) => void;
@@ -42,6 +43,7 @@ export function UseCaseOwnerDashboard({
   onCreateUseCase,
   onViewUseCase,
   onDeleteUseCase,
+  onNavigate,
   onLogout,
   onUpdateUser,
   onOpenChat
@@ -386,6 +388,15 @@ export function UseCaseOwnerDashboard({
             <FolderOpen className="h-4 w-4 mr-3 text-green-600" />
             My Projects
           </button>
+          {onNavigate && (
+            <button
+              onClick={() => onNavigate("ontology-assessment")}
+              className="w-full px-4 py-3 mb-2 flex items-center text-gray-700 hover:bg-gray-100 rounded-lg"
+            >
+              <Database className="h-4 w-4 mr-3 text-indigo-600" />
+              Ontology
+            </button>
+          )}
           {adminUser && (
             <button
               onClick={handleContactAdmin}

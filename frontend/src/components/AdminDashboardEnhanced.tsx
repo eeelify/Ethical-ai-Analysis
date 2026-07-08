@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { saveAdminDashboardTab, loadAdminDashboardTab } from '../utils/persistence';
-import { Plus, Folder, MessageSquare, Users, LogOut, Search, BarChart3, UserPlus, X, Link as LinkIcon, CheckCircle2, Trash2, Bell, Clock, FileText, Download } from 'lucide-react';
+import { Plus, Folder, MessageSquare, Users, LogOut, Search, BarChart3, UserPlus, X, Link as LinkIcon, CheckCircle2, Trash2, Bell, Clock, FileText, Download, Database } from 'lucide-react';
 import { Project, User, UseCase } from '../types';
 import { fetchUserProgress } from '../utils/userProgress';
 import { ChatPanel } from './ChatPanel';
@@ -628,6 +628,13 @@ export function AdminDashboardEnhanced({
           >
             <FileText className="h-5 w-5 mr-3 text-pink-600" />
             Expert Questions
+          </button>
+          <button
+            onClick={() => onNavigate('ontology-assessment')}
+            className="w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+          >
+            <Database className="h-5 w-5 mr-3 text-indigo-600" />
+            Ontology
           </button>
           <button
             onClick={() => onNavigate('other-members')}

@@ -16,6 +16,7 @@ import { SharedArea } from "./components/SharedArea";
 import { OtherMembers } from "./components/OtherMembers";
 import { PreconditionApproval } from "./components/PreconditionApproval";
 import { ReportReview } from "./components/ReportReview";
+import { OntologyAssessment } from "./components/OntologyAssessment";
 import {
   User,
   Project,
@@ -841,6 +842,7 @@ function App() {
               onCreateUseCase={handleCreateUseCase}
               onViewUseCase={handleViewUseCase}
               onDeleteUseCase={handleDeleteUseCase}
+              onNavigate={setCurrentView}
               onLogout={handleLogout}
               onUpdateUser={(updatedUser) => setCurrentUser(updatedUser)}
             />
@@ -925,6 +927,7 @@ function App() {
               onCreateUseCase={handleCreateUseCase}
               onViewUseCase={handleViewUseCase}
               onDeleteUseCase={handleDeleteUseCase}
+              onNavigate={setCurrentView}
               onLogout={handleLogout}
               onUpdateUser={(updatedUser) => setCurrentUser(updatedUser)}
             />
@@ -1008,6 +1011,7 @@ function App() {
               onCreateUseCase={handleCreateUseCase}
               onViewUseCase={handleViewUseCase}
               onDeleteUseCase={handleDeleteUseCase}
+              onNavigate={setCurrentView}
               onLogout={handleLogout}
               onUpdateUser={(updatedUser) => setCurrentUser(updatedUser)}
             />
@@ -1106,6 +1110,13 @@ function App() {
             onBack={handleBackToDashboard}
           />
         );
+      case "ontology-assessment":
+        return (
+          <OntologyAssessment
+            currentUser={currentUser}
+            onBack={handleBackToDashboard}
+          />
+        );
       case "usecase-detail":
         return selectedUseCase ? (
           <UseCaseDetail
@@ -1126,6 +1137,7 @@ function App() {
               onCreateUseCase={handleCreateUseCase}
               onViewUseCase={handleViewUseCase}
               onDeleteUseCase={handleDeleteUseCase}
+              onNavigate={setCurrentView}
               onLogout={handleLogout}
               onUpdateUser={(updatedUser) => setCurrentUser(updatedUser)}
             />
@@ -1188,6 +1200,7 @@ function App() {
               onCreateUseCase={handleCreateUseCase}
               onViewUseCase={handleViewUseCase}
               onDeleteUseCase={handleDeleteUseCase}
+              onNavigate={setCurrentView}
               onLogout={handleLogout}
               onUpdateUser={(updatedUser) => setCurrentUser(updatedUser)}
             />

@@ -17,6 +17,7 @@ import {
   Trash2,
   RefreshCw,
   CheckCircle,
+  Database,
 } from "lucide-react";
 import { Project, User, UseCase } from "../types";
 import { ChatPanel } from "./ChatPanel";
@@ -1017,6 +1018,16 @@ export function UserDashboard({
               >
                 <FileText className="h-4 w-4 mr-3 text-orange-600" />
                 Reports
+              </button>
+              <button
+                onClick={() => {
+                  setShowChats(false);
+                  onNavigate("ontology-assessment");
+                }}
+                className="w-full flex items-center px-3 py-2 text-gray-700 hover:bg-gray-100"
+              >
+                <Database className="h-4 w-4 mr-3 text-indigo-600" />
+                Ontology
               </button>
               <button
                 onClick={() => onNavigate("shared-area")}
