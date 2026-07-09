@@ -18,6 +18,18 @@ router.get('/health', async (req, res) => {
   }
 });
 
+// GET /api/ontology/graph
+// Returns the Neo4j ontology graph
+router.get('/graph', async (req, res) => {
+  try {
+    const graphData = await ontologyService.getGraph();
+    res.json({ success: true, data: graphData });
+  } catch (error) {
+    console.error('Error fetching ontology graph:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to fetch ontology graph' });
+  }
+});
+
 // POST /api/ontology/analyze-text
 // Runs a standalone ontology-driven assessment from free text.
 router.post('/analyze-text', async (req, res) => {

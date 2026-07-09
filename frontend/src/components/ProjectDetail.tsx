@@ -66,6 +66,7 @@ export function ProjectDetail({
   const [linkedUseCase, setLinkedUseCase] = useState<UseCase | null>(null);
   const [useCaseQuestions, setUseCaseQuestions] = useState<any[]>([]);
   // Chat panel state
+  const [chatPanelOpen, setChatPanelOpen] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
   const [ontologyReportData, setOntologyReportData] = useState<any>(null);
   const [chatOtherUser, setChatOtherUser] = useState<User | null>(null);
@@ -950,7 +951,7 @@ export function ProjectDetail({
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab as any)}
-                  className={`px-6 py-3 text-sm capitalize flex items-center ${activeTab === tab ? 'border-b-2 border-blue-500 text-blue-600 bg-blue-50' : 'text-slate-400 hover:text-slate-300'}`}
+                  className={`px-6 py-3 text-sm capitalize flex items-center transition-colors ${activeTab === tab ? 'border-b-2 border-blue-500 text-blue-400 bg-blue-500/10' : 'text-slate-400 hover:text-slate-300 hover:bg-white/5'}`}
                 >
                   {tab === 'tensions' ? `Tensions (${tensions.length})` : tab === 'dashboard' ? 'Analytics' : tab}
                 </button>

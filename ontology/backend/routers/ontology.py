@@ -15,13 +15,10 @@ def get_ontology_graph():
     """
     nodes_query = """
     MATCH (n)
-    WHERE n:AI_Category OR n:RiskLevel OR n:Regulation OR n:EthicalPrinciple
-    RETURN toString(id(n)) as id, labels(n)[0] as label_type, coalesce(n.name, n.term, toString(id(n))) as name
+    RETURN toString(id(n)) as id, labels(n)[0] as label_type, coalesce(n.name, n.term, n.title, toString(id(n))) as name
     """
     edges_query = """
     MATCH (n)-[r]->(m)
-    WHERE (n:AI_Category OR n:RiskLevel OR n:Regulation OR n:EthicalPrinciple) 
-      AND (m:AI_Category OR m:RiskLevel OR m:Regulation OR m:EthicalPrinciple)
     RETURN toString(id(r)) as id, toString(id(n)) as source, toString(id(m)) as target, type(r) as label
     """
     try:

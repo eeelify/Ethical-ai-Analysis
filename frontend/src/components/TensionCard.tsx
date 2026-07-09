@@ -88,11 +88,11 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
   // Card border rengini userVote'a göre belirle - GeneralQuestions'taki gibi
   const getCardBorderClass = () => {
     if (userVote === 'agree') {
-      return 'border-2 border-green-500 bg-green-50 shadow-md';
+      return 'border border-green-500/50 bg-green-500/10 shadow-md';
     } else if (userVote === 'disagree') {
-      return 'border-2 border-red-500 bg-red-50 shadow-md';
+      return 'border border-red-500/50 bg-red-500/10 shadow-md';
     }
-    return 'border-2 border-gray-200 bg-white';
+    return 'border border-white/10 bg-[#0a1122]';
   };
 
   return (
@@ -100,20 +100,20 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
       {/* Üst Kısım: Risk Badge, Review Badge ve Tarih */}
       <div className="flex justify-between items-start mb-2">
         <div className="flex items-center space-x-2 flex-wrap">
-          <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-            tension.severity === 'high' ? 'bg-red-100 text-red-800' :
-            tension.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-            'bg-green-100 text-green-800'
+          <span className={`px-2 py-1 text-xs rounded-full font-medium border ${
+            tension.severity === 'high' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
+            tension.severity === 'medium' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
+            'bg-green-500/20 text-green-400 border-green-500/30'
           }`}>
             Risk: {(tension.severity || 'medium').toUpperCase()}
           </span>
           <div className="relative inline-flex items-center">
-            <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-              reviewState.color === 'gray' ? 'bg-gray-100 text-gray-800' :
-              reviewState.color === 'light-blue' ? 'bg-blue-50 text-blue-700' :
-              reviewState.color === 'blue' ? 'bg-blue-100 text-blue-800' :
-              reviewState.color === 'green' ? 'bg-green-100 text-green-800' :
-              'bg-red-100 text-red-800'
+            <span className={`px-2 py-1 text-xs rounded-full font-medium border ${
+              reviewState.color === 'gray' ? 'bg-white/10 text-slate-300 border-white/20' :
+              reviewState.color === 'light-blue' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
+              reviewState.color === 'blue' ? 'bg-blue-500/30 text-blue-300 border-blue-500/40' :
+              reviewState.color === 'green' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+              'bg-red-500/20 text-red-400 border-red-500/30'
             }`}>
               Review: {reviewState.state}
             </span>
@@ -127,12 +127,12 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
               <Info className="h-3 w-3" />
             </button>
             {showReviewTooltip && (
-              <div className="absolute z-10 w-56 p-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg left-0 bottom-full mb-1">
+              <div className="absolute z-10 w-56 p-2 bg-slate-800 text-slate-200 border border-white/10 text-xs rounded-lg shadow-lg left-0 bottom-full mb-1">
                 Review is computed from expert votes (no admin approval).
               </div>
             )}
           </div>
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-slate-500">
             {new Date(tension.createdAt).toLocaleDateString()}
           </span>
         </div>
@@ -150,22 +150,22 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
       </div>
 
       {/* Başlık ve Açıklama */}
-      <h4 className="text-md font-semibold text-gray-900 mb-1">
+      <h4 className="text-md font-semibold text-white mb-1">
         {tension.claimStatement || "No claim statement"}
       </h4>
-      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+      <p className="text-sm text-slate-400 mb-3 line-clamp-2">
         {tension.description}
       </p>
 
       {/* İlkeler Arasındaki Gerilim */}
-      <div className="text-xs font-medium text-blue-600 mb-4 bg-blue-50 inline-block px-2 py-1 rounded border border-blue-100">
+      <div className="text-xs font-medium text-blue-400 mb-4 bg-blue-500/10 inline-block px-2 py-1 rounded border border-blue-500/20">
         {tension.principle1} ↔ {tension.principle2}
       </div>
 
       {/* Consensus Bar */}
       <div className="flex items-center space-x-2 mb-4">
-        <span className="text-xs text-gray-500 font-medium">Consensus:</span>
-        <div className="flex-1 h-6 bg-gray-200 rounded-full overflow-hidden" style={{ position: 'relative' }}>
+        <span className="text-xs text-slate-400 font-medium">Consensus:</span>
+        <div className="flex-1 h-6 bg-white/5 rounded-full overflow-hidden" style={{ position: 'relative' }}>
           <div 
             style={{ 
               position: 'absolute',
@@ -182,19 +182,19 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
             }}
           />
         </div>
-        <span className="text-xs text-gray-500 w-24 text-right">
+        <span className="text-xs text-slate-400 w-24 text-right">
           {agreePercentage}% agree ({totalVotes})
         </span>
       </div>
 
       {/* Discussion Recommended Callout (Under review only) */}
       {isUnderReview && (
-        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
           <div className="flex items-start">
-            <Info className="h-4 w-4 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
+            <Info className="h-4 w-4 text-blue-400 mt-0.5 mr-2 flex-shrink-0" />
             <div className="flex-1">
-              <div className="text-sm font-semibold text-blue-900">Discussion recommended</div>
-              <div className="text-xs text-blue-700 mt-0.5">
+              <div className="text-sm font-semibold text-blue-300">Discussion recommended</div>
+              <div className="text-xs text-blue-400 mt-0.5">
                 Experts disagree —{' '}
                 <button
                   onClick={(e) => {
@@ -202,7 +202,7 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
                     setDrawerDefaultTab('discussion');
                     setShowDrawer(true);
                   }}
-                  className="text-blue-700 underline hover:text-blue-900 font-medium"
+                  className="text-blue-400 underline hover:text-blue-300 font-medium"
                 >
                   add evidence or comments
                 </button>
@@ -214,7 +214,7 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
       )}
 
       {/* --- BUTONLAR (GÜNCELLENDİ) --- */}
-      <div className="flex items-center justify-between pt-3 border-t border-gray-50">
+      <div className="flex items-center justify-between pt-3 border-t border-white/10">
         <div className="flex space-x-3">
           {/* AGREE */}
           <button
@@ -226,9 +226,9 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
             disabled={!canVote}
             className={`flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${
               userVote === 'agree'
-                ? 'bg-green-100 text-green-700 border-green-300'
-                : 'bg-white text-gray-600 border-gray-200 hover:bg-green-50'
-            } ${!canVote ? 'opacity-50 cursor-not-allowed hover:bg-white' : ''}`}
+                ? 'bg-green-500/20 text-green-400 border-green-500/50'
+                : 'bg-transparent text-slate-400 border-white/10 hover:bg-green-500/10 hover:text-green-400 hover:border-green-500/30'
+            } ${!canVote ? 'opacity-50 cursor-not-allowed hover:bg-transparent hover:text-slate-400 hover:border-white/10' : ''}`}
           >
             <ThumbsUp className={`w-4 h-4 mr-1.5 ${userVote === 'agree' ? 'fill-current' : ''}`} />
             Agree ({agreeCount})
@@ -244,9 +244,9 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
             disabled={!canVote}
             className={`flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${
               userVote === 'disagree'
-                ? 'bg-red-100 text-red-700 border-red-300'
-                : 'bg-white text-gray-600 border-gray-200 hover:bg-red-50'
-            } ${!canVote ? 'opacity-50 cursor-not-allowed hover:bg-white' : ''}`}
+                ? 'bg-red-500/20 text-red-400 border-red-500/50'
+                : 'bg-transparent text-slate-400 border-white/10 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30'
+            } ${!canVote ? 'opacity-50 cursor-not-allowed hover:bg-transparent hover:text-slate-400 hover:border-white/10' : ''}`}
           >
             <ThumbsDown className={`w-4 h-4 mr-1.5 ${userVote === 'disagree' ? 'fill-current' : ''}`} />
             Disagree ({disagreeCount})
@@ -260,7 +260,7 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
             setDrawerDefaultTab('evidence');
             setShowDrawer(true);
           }}
-          className="flex items-center text-blue-600 hover:text-blue-800 text-sm px-3 py-1.5 rounded-full bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-colors"
+          className="flex items-center text-blue-400 hover:text-blue-300 text-sm px-3 py-1.5 rounded-full bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 transition-colors"
         >
           <BookOpen className="w-4 h-4 mr-1.5" />
           View Details ({evidenceCount} evidence{evidenceCount !== 1 ? 's' : ''}, {commentCount} comment{commentCount !== 1 ? 's' : ''})

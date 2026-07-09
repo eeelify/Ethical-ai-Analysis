@@ -132,6 +132,21 @@ const getTensions = async (systemName) => {
   }
 };
 
+/**
+ * Get the ontology graph (nodes and edges)
+ */
+const getGraph = async () => {
+  if (!ontologyConfig.enabled) return { nodes: [], edges: [] };
+  try {
+    const client = createClient();
+    const response = await client.get('/ontology-graph');
+    return response.data;
+  } catch (error) {
+    console.error('Ontology API Get Graph Failed:', error.message);
+    throw new Error('Failed to retrieve ontology graph: ' + error.message);
+  }
+};
+
 module.exports = {
   checkHealth,
   startAssessment,
@@ -139,5 +154,6 @@ module.exports = {
   analyzeText,
   graphTrace,
   getViolations,
-  getTensions
+  getTensions,
+  getGraph
 };
