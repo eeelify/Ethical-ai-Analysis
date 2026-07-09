@@ -26,8 +26,9 @@ def get_ontology_graph():
         edges = run_query(edges_query)
         return {"nodes": nodes, "edges": edges}
     except Exception as e:
-        logger.error(f"Error fetching ontology graph: {e}")
-        raise HTTPException(status_code=500, detail="Failed to fetch ontology graph")
+        import traceback
+        logger.error(f"Error fetching ontology graph: {traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch ontology graph: {str(e)}")
 
 @router.get("/ontology-health", response_model=OntologyHealthResponse, tags=["ontology"])
 def ontology_health_endpoint():

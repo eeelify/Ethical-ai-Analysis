@@ -133,13 +133,83 @@ export function OntologyViewerTab() {
               height={dimensions.height}
               graphData={graphData}
               nodeLabel={(node: any) => `${node.name} (${node.group})`}
-              nodeColor={node => getNodeColor((node as any).group)}
               nodeRelSize={6}
+              nodeCanvasObject={(node: any, ctx, globalScale) => {
+                const size = 5;
+                // Düğümü çiz (yuvarlak)
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, size, 0, 2 * Math.PI, false);
+                ctx.fillStyle = getNodeColor(node.group);
+                ctx.fill();
+
+                // Sadece belirli bir yakınlaştırma seviyesinden sonra yazıları göster
+                if (globalScale >= 1.5) {
+                  const label = node.name;
+                  const fontSize = 12 / globalScale;
+                  ctx.font = `${fontSize}px Sans-Serif`;
+                  
+                  const textWidth = ctx.measureText(label).width;
+                  const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2);
+                  
+                  // Yazı arka planı
+                  ctx.fillStyle = 'rgba(10, 17, 34, 0.8)';
+                  ctx.fillRect(
+                    node.x - bckgDimensions[0] / 2, 
+                    node.y + size + 2, 
+                    bckgDimensions[0], 
+                    bckgDimensions[1]
+                  );
+                  
+                  // Yazı
+                  ctx.textAlign = 'center';
+                  ctx.textBaseline = 'top';
+                  ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                  ctx.fillText(label, node.x, node.y + size + 2 + (fontSize * 0.1));
+                }
+              }}
+              linkLabel={(link: any) => link.name}
               linkColor={() => 'rgba(255,255,255,0.2)'}
               linkDirectionalArrowLength={3.5}
               linkDirectionalArrowRelPos={1}
+              linkCanvasObjectMode={() => 'after'}
+              linkCanvasObject={(link: any, ctx, globalScale) => {
+                if (globalScale >= 2.0) { // İlişki yazıları daha da yaklaşıldığında görünsün
+                  const start = link.source;
+                  const end = link.target;
+                  if (typeof start !== 'object' || typeof end !== 'object') return;
+
+                  const textPos = {
+                    x: start.x + (end.x - start.x) / 2,
+                    y: start.y + (end.y - start.y) / 2
+                  };
+
+                  const relLink = { x: end.x - start.x, y: end.y - start.y };
+                  let textAngle = Math.atan2(relLink.y, relLink.x);
+                  if (textAngle > Math.PI / 2) textAngle = -(Math.PI - textAngle);
+                  if (textAngle < -Math.PI / 2) textAngle = -(-Math.PI - textAngle);
+
+                  const label = link.name;
+                  const fontSize = 8 / globalScale;
+                  ctx.font = `${fontSize}px Sans-Serif`;
+
+                  ctx.save();
+                  ctx.translate(textPos.x, textPos.y);
+                  ctx.rotate(textAngle);
+
+                  const textWidth = ctx.measureText(label).width;
+                  const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2);
+                  
+                  ctx.fillStyle = 'rgba(10, 17, 34, 0.8)';
+                  ctx.fillRect(-bckgDimensions[0] / 2, -bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
+
+                  ctx.textAlign = 'center';
+                  ctx.textBaseline = 'middle';
+                  ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
+                  ctx.fillText(label, 0, 0);
+                  ctx.restore();
+                }
+              }}
               onNodeClick={(node: any) => {
-                // Focus on node
                 console.log(node);
               }}
             />
