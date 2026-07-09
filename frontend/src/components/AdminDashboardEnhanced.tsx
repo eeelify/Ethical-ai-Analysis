@@ -173,8 +173,8 @@ export function AdminDashboardEnhanced({
   onLogout,
   onUpdateUser
 }: AdminDashboardEnhancedProps) {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'use-case-assignments' | 'project-creation' | 'reports' | 'chats' | 'created-reports' | 'expert-questions'>(() =>
-    loadAdminDashboardTab('dashboard') as 'dashboard' | 'use-case-assignments' | 'project-creation' | 'reports' | 'chats' | 'created-reports' | 'expert-questions'
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'use-case-assignments' | 'project-creation' | 'reports' | 'chats' | 'created-reports' | 'expert-questions' | 'ontology' | 'platform-info'>(() =>
+    loadAdminDashboardTab('dashboard') as 'dashboard' | 'use-case-assignments' | 'project-creation' | 'reports' | 'chats' | 'created-reports' | 'expert-questions' | 'ontology' | 'platform-info'
   );
 
   // Persist tab changes
@@ -589,7 +589,7 @@ export function AdminDashboardEnhanced({
           </div>
         </button>
 
-        <nav className="flex-1 px-3 py-6 space-y-1">
+        <nav className="flex-1 overflow-y-auto px-3 py-6 space-y-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <button
             onClick={() => setActiveTab('dashboard')}
             className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'dashboard' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-white/5 hover:text-white'
@@ -631,13 +631,6 @@ export function AdminDashboardEnhanced({
             Expert Questions
           </button>
           <button
-            onClick={() => onNavigate('ontology-assessment')}
-            className="w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
-          >
-            <Database className="h-5 w-5 mr-3 text-indigo-600" />
-            Ontology
-          </button>
-          <button
             onClick={() => onNavigate('other-members')}
             className="w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
           >
@@ -661,15 +654,23 @@ export function AdminDashboardEnhanced({
             <Database className="h-5 w-5 mr-3 text-pink-600" />
             Ontology
           </button>
+          <button
+            onClick={() => setActiveTab('platform-info')}
+            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'platform-info' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+              }`}
+          >
+            <BarChart3 className="h-5 w-5 mr-3 text-amber-500" />
+            Platform Info
+          </button>
         </nav>
 
-        <div className="p-4 border-t border-white/10">
+        <div className="p-4 border-t border-white/10 mt-auto">
           <button
             onClick={onLogout}
-            className="w-full px-4 py-2 flex items-center text-red-600 hover:bg-red-50 rounded-lg text-sm font-medium transition-colors"
+            className="w-full px-4 py-3 flex items-center gap-3 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 group"
           >
-            <LogOut className="h-5 w-5 mr-3" />
-            Logout
+            <LogOut className="h-4 w-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+            Log Out
           </button>
         </div>
       </div>
@@ -686,6 +687,8 @@ export function AdminDashboardEnhanced({
               {activeTab === 'created-reports' && 'Created Reports'}
               {activeTab === 'expert-questions' && 'Expert Questions'}
               {activeTab === 'chats' && 'Chats'}
+              {activeTab === 'ontology' && 'Ontology'}
+              {activeTab === 'platform-info' && 'Platform Info'}
             </h2>
           </div>
           <div className="flex items-center space-x-4">
@@ -1096,6 +1099,10 @@ export function AdminDashboardEnhanced({
 
           {activeTab === 'ontology' && (
             <OntologyViewerTab />
+          )}
+
+          {activeTab === 'platform-info' && (
+            <AdminPlatformInfoTab />
           )}
         </div>
       </div>
@@ -2785,6 +2792,268 @@ function AssignExpertsModal({ project, useCase, users, onClose, onAssign }: Assi
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   ADMIN-ONLY: Platform Info Tab
+   Technical architecture & scoring details removed from
+   the public homepage — visible only to admin users.
+═══════════════════════════════════════════════════════ */
+function AdminPlatformInfoTab() {
+  return (
+    <div className="flex-1 overflow-y-auto bg-[#050b14] p-6 md:p-10 space-y-10">
+
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+          <BarChart3 className="w-5 h-5 text-amber-400" />
+        </div>
+        <div>
+          <p className="text-xs text-amber-400 font-semibold uppercase tracking-widest">Admin Only</p>
+          <h2 className="text-2xl font-bold text-white">Platform Technical Info</h2>
+        </div>
+      </div>
+      <p className="text-slate-400 text-sm leading-relaxed max-w-3xl">
+        This section is visible to administrators only. It contains detailed information about the platform's system architecture and risk scoring methodology.
+      </p>
+
+      {/* ── Section 1: System Architecture ── */}
+      <section className="rounded-3xl border border-white/10 bg-[#070e1a] overflow-hidden p-8 shadow-xl">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shrink-0">
+            <span className="text-indigo-400 text-lg">🏗️</span>
+          </div>
+          <div>
+            <p className="text-xs text-indigo-400 font-semibold uppercase tracking-widest">System Architecture</p>
+            <h3 className="text-xl font-bold text-white">How the System Components Communicate</h3>
+          </div>
+        </div>
+
+        {/* Legend */}
+        <div className="flex flex-wrap gap-4 mb-8 justify-center">
+          {[
+            { color: 'bg-sky-400', label: 'Frontend' },
+            { color: 'bg-indigo-400', label: 'Backend API' },
+            { color: 'bg-violet-400', label: 'AI / Ontology Engine' },
+            { color: 'bg-emerald-400', label: 'Data Layer' },
+            { color: 'bg-amber-400', label: 'Output' },
+          ].map((l, i) => (
+            <div key={i} className="flex items-center gap-2 text-xs text-slate-400">
+              <div className={`w-2.5 h-2.5 rounded-full ${l.color}`} />
+              {l.label}
+            </div>
+          ))}
+        </div>
+
+        {/* ─── Flow Diagram ─── */}
+        <div className="relative">
+          {/* Subtle bg grid */}
+          <div className="absolute inset-0 opacity-[0.025] rounded-2xl"
+            style={{ backgroundImage: 'linear-gradient(rgba(99,102,241,1) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,1) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+          <div className="absolute top-1/4 left-1/4 w-48 h-48 rounded-full bg-indigo-500/5 blur-3xl pointer-events-none animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-cyan-500/5 blur-3xl pointer-events-none animate-pulse" style={{ animationDelay: '1s' }} />
+
+          <div className="relative z-10 py-4">
+
+            {/* ROW 1: Expert User */}
+            <div className="flex justify-center mb-4">
+              <ArchDiagramNode color="sky" icon="👤" title="Expert User" sub="Multi-role team" />
+            </div>
+            <ArchDiagramArrow label="HTTPS / REST" />
+
+            {/* ROW 2: React Frontend */}
+            <div className="flex justify-center mb-4">
+              <ArchDiagramNode color="sky" icon="⚛️" title="React + Vite" sub="Frontend Application" badge="TypeScript" />
+            </div>
+            <ArchDiagramArrow label="REST API calls" />
+
+            {/* ROW 3: Node.js hub with branches */}
+            <div className="flex items-start justify-center gap-6 mb-4 flex-wrap md:flex-nowrap">
+              {/* Left branch: MongoDB */}
+              <div className="flex flex-col items-center w-40">
+                <div className="h-16 w-[2px] bg-gradient-to-b from-indigo-500/50 to-emerald-500/50" />
+                <ArchDiagramNode color="emerald" icon="🍃" title="MongoDB Atlas" sub="Users · Projects · Responses" badge="NoSQL" small />
+              </div>
+              {/* Center: Node.js */}
+              <div className="flex flex-col items-center">
+                <ArchDiagramNode color="indigo" icon="🟢" title="Node.js + Express" sub="REST Backend API" badge="Core Hub" large />
+              </div>
+              {/* Right branch: Resend */}
+              <div className="flex flex-col items-center w-40">
+                <div className="h-16 w-[2px] bg-gradient-to-b from-indigo-500/50 to-amber-500/50" />
+                <ArchDiagramNode color="amber" icon="📧" title="Resend API" sub="Email verification & welcome" badge="External" small />
+              </div>
+            </div>
+
+            <ArchDiagramArrow label="HTTP → FastAPI Ontology Service" color="violet" />
+
+            {/* ROW 4: FastAPI hub with branches */}
+            <div className="flex items-start justify-center gap-6 mb-4 flex-wrap md:flex-nowrap">
+              {/* Left: OWL Reasoner */}
+              <div className="flex flex-col items-center w-44">
+                <div className="h-16 w-[2px] bg-gradient-to-b from-violet-500/50 to-violet-400/50" />
+                <ArchDiagramNode color="violet" icon="🧠" title="OWL/SWRL Reasoner" sub="Formal logic inference" badge="Hermit / Pellet" small />
+              </div>
+              {/* Center: FastAPI */}
+              <div className="flex flex-col items-center">
+                <ArchDiagramNode color="violet" icon="⚡" title="FastAPI + Python" sub="Ontology Reasoning Engine" badge="AI Core" large />
+              </div>
+              {/* Right: Neo4j */}
+              <div className="flex flex-col items-center w-44">
+                <div className="h-16 w-[2px] bg-gradient-to-b from-violet-500/50 to-emerald-500/50" />
+                <ArchDiagramNode color="emerald" icon="🕸️" title="Neo4j Graph DB" sub="Knowledge Graph · Cypher queries" badge="GraphDB" small />
+              </div>
+            </div>
+
+            <ArchDiagramArrow label="Ontology conclusions → GraphRAG context" color="amber" />
+
+            {/* ROW 5: Gemini LLM */}
+            <div className="flex justify-center mb-4">
+              <ArchDiagramNode color="amber" icon="✨" title="Google Gemini LLM" sub="GraphRAG narrative generation only" badge="Presentation Layer" />
+            </div>
+
+            <ArchDiagramArrow label="Structured report data" color="rose" />
+
+            {/* ROW 6: PDF Report */}
+            <div className="flex justify-center">
+              <ArchDiagramNode color="rose" icon="📄" title="PDF / DOCX Report" sub="Regulatory-ready export" badge="EU AI Act Compliant" />
+            </div>
+          </div>
+        </div>
+
+        {/* Data flow key */}
+        <div className="mt-8 grid sm:grid-cols-3 gap-4">
+          {([
+            { from: 'Expert Input', to: 'Node.js', via: 'React forms & questionnaires', color: 'border-sky-500/20 bg-sky-500/5', accent: 'text-sky-400' },
+            { from: 'Node.js', to: 'FastAPI', via: 'Structured JSON answers via REST', color: 'border-violet-500/20 bg-violet-500/5', accent: 'text-violet-400' },
+            { from: 'Ontology Engine', to: 'Gemini', via: 'Only logical facts — no hallucination', color: 'border-amber-500/20 bg-amber-500/5', accent: 'text-amber-400' },
+          ] as const).map((row, i) => (
+            <div key={i} className={`rounded-2xl border p-4 ${row.color}`}>
+              <div className={`text-xs font-bold mb-2 ${row.accent}`}>{row.from} → {row.to}</div>
+              <p className="text-slate-400 text-xs leading-relaxed">{row.via}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Section 2: Risk Score Calculator ── */}
+      <section className="rounded-3xl border border-white/10 bg-[#070e1a] overflow-hidden p-8 shadow-xl">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0">
+            <span className="text-rose-400 text-lg">📐</span>
+          </div>
+          <div>
+            <p className="text-xs text-rose-400 font-semibold uppercase tracking-widest">Scoring Methodology</p>
+            <h3 className="text-xl font-bold text-white">How the Risk Score is Calculated</h3>
+          </div>
+        </div>
+
+        {/* Core formula */}
+        <div className="rounded-2xl border border-white/10 bg-[#040910] p-8 text-center mb-6">
+          <p className="text-xs text-slate-500 uppercase tracking-widest mb-5">Per-question Ethical Risk Contribution</p>
+          <div className="font-mono text-2xl md:text-3xl font-bold flex flex-wrap items-center justify-center gap-3">
+            <span className="text-amber-400">Risk</span>
+            <span className="text-slate-600">=</span>
+            <span className="text-indigo-400">Importance</span>
+            <span className="text-slate-600">×</span>
+            <span className="text-rose-400">(1 − Answer Score)</span>
+          </div>
+          <div className="mt-5 flex flex-wrap justify-center gap-6 text-xs text-slate-500">
+            <span><span className="text-indigo-400 font-semibold">Importance</span> — expert priority weight, 1 (low) to 4 (critical)</span>
+            <span><span className="text-rose-400 font-semibold">Answer Score</span> — compliance level, 0.0 (none) to 1.0 (full)</span>
+          </div>
+        </div>
+
+        {/* 3-step aggregation */}
+        <div className="grid md:grid-cols-3 gap-4 mb-6">
+          {([
+            { step: '1', color: 'border-indigo-500/20 bg-indigo-500/5', accent: 'text-indigo-400', title: 'Per Question', formula: 'Risk = Importance × (1 − Score)', note: 'Computed for every answered question' },
+            { step: '2', color: 'border-violet-500/20 bg-violet-500/5', accent: 'text-violet-400', title: 'Per Principle', formula: 'Principle Risk = Σ Question Risks', note: 'Summed across each of the 7 HLEG principles' },
+            { step: '3', color: 'border-cyan-500/20 bg-cyan-500/5', accent: 'text-cyan-400', title: 'Overall', formula: 'Overall Risk = Σ Principle Risks', note: 'Final project score — no normalisation' },
+          ] as const).map((s) => (
+            <div key={s.step} className={`rounded-2xl border p-5 ${s.color}`}>
+              <div className={`text-xs font-bold uppercase tracking-widest mb-3 ${s.accent}`}>Step {s.step} · {s.title}</div>
+              <div className={`font-mono text-sm font-semibold mb-2 ${s.accent}`}>{s.formula}</div>
+              <p className="text-slate-500 text-xs">{s.note}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Worked example */}
+        <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/5 p-6">
+          <p className="text-xs text-emerald-400 font-semibold uppercase tracking-wider mb-4">📐 Worked Example</p>
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div className="font-mono text-xs space-y-2 text-slate-400">
+              <div className="flex justify-between"><span>Question</span><span className="text-slate-300">Biometric data without consent?</span></div>
+              <div className="flex justify-between"><span>Answer Score</span><span className="text-rose-400">0.0 — non-compliant</span></div>
+              <div className="flex justify-between"><span>Importance</span><span className="text-indigo-400">4 — critical</span></div>
+              <div className="h-px bg-white/5" />
+              <div className="flex justify-between text-sm font-bold">
+                <span className="text-white">Risk Contribution</span>
+                <span className="text-rose-400">4 × (1 − 0.0) = 4.0</span>
+              </div>
+            </div>
+            <div className="flex items-center">
+              <p className="text-slate-400 text-sm leading-relaxed">
+                This single answer contributes <strong className="text-rose-300">4.0 risk units</strong> — the maximum possible — directly to the <em className="text-rose-200">Privacy & Data Governance</em> principle and surfaces as the top driver in the final report.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  );
+}
+
+// Helper components for the Architecture Diagram
+function ArchDiagramNode({ color, icon, title, sub, badge, small, large }: { color: string, icon: string, title: string, sub: string, badge?: string, small?: boolean, large?: boolean }) {
+  const colorMap: Record<string, string> = {
+    sky: 'border-sky-500/30 bg-sky-500/10 text-sky-400 shadow-[0_0_15px_rgba(14,165,233,0.15)]',
+    indigo: 'border-indigo-500/30 bg-indigo-500/10 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.15)]',
+    violet: 'border-violet-500/30 bg-violet-500/10 text-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.15)]',
+    emerald: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.15)]',
+    amber: 'border-amber-500/30 bg-amber-500/10 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.15)]',
+    rose: 'border-rose-500/30 bg-rose-500/10 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.15)]',
+  };
+
+  return (
+    <div className={`relative flex flex-col items-center justify-center rounded-2xl border backdrop-blur-sm transition-transform hover:scale-105 duration-300 ${colorMap[color]} ${small ? 'px-3 pb-3 pt-5 w-32' : large ? 'px-5 pb-5 pt-7 w-56' : 'px-4 pb-4 pt-6 w-48'} ${badge ? 'mt-3' : ''}`}>
+      <div className={`flex items-center justify-center ${small ? 'text-2xl mb-1' : 'text-3xl mb-2'}`}>
+        {icon}
+      </div>
+      {badge && (
+        <div className={`absolute -top-2.5 bg-[#050b14] px-2 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-widest z-10 ${colorMap[color]}`}>
+          {badge}
+        </div>
+      )}
+      <div className={`font-bold text-center text-white ${small ? 'text-xs' : 'text-sm'} leading-tight`}>{title}</div>
+      <div className={`text-center opacity-80 mt-1 leading-tight ${small ? 'text-[10px]' : 'text-xs'}`}>{sub}</div>
+    </div>
+  );
+}
+
+function ArchDiagramArrow({ label, color = 'slate' }: { label: string, color?: string }) {
+  const colorMap: Record<string, string> = {
+    slate: 'bg-gradient-to-b from-slate-500/50 to-slate-400/50',
+    violet: 'bg-gradient-to-b from-indigo-500/50 to-violet-500/50',
+    amber: 'bg-gradient-to-b from-violet-500/50 to-amber-500/50',
+    rose: 'bg-gradient-to-b from-amber-500/50 to-rose-500/50',
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center h-24 relative mb-2">
+      <div className={`w-[2px] h-full ${colorMap[color]} relative`}>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-white" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-r-[4px] border-t-[6px] border-l-transparent border-r-transparent border-t-white/80" />
+      </div>
+      <div className="absolute bg-[#070e1a] px-3 py-1 rounded-full border border-white/5 text-[10px] text-slate-400 font-medium whitespace-nowrap shadow-sm backdrop-blur-md z-10">
+        {label}
       </div>
     </div>
   );

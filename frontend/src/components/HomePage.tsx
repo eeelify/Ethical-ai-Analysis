@@ -351,131 +351,7 @@ export function HomePage({ navigateTo }: { navigateTo?: (path: string) => void }
         </div>
       </section>
 
-      {/* Architecture Diagram Section */}
-      <section id="architecture" className="py-24 relative z-10 border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-semibold tracking-wider uppercase mb-6">
-              <Network className="w-4 h-4" /> System Architecture
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">How the System Components Communicate</h2>
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto">A unified pipeline bridging structured expert evaluation, formal ontology reasoning, and AI-powered report generation.</p>
-          </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }}
-            className="relative rounded-3xl border border-white/10 bg-[#070e1a] overflow-hidden p-8 md:p-12 shadow-2xl">
-
-            {/* Background grid */}
-            <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(99,102,241,1) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,1) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-
-            {/* Animated background glow blobs */}
-            <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-indigo-500/5 blur-3xl pointer-events-none animate-pulse" />
-            <div className="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full bg-cyan-500/5 blur-3xl pointer-events-none animate-pulse" style={{ animationDelay: '1s' }} />
-
-            {/* Legend */}
-            <div className="relative z-10 flex flex-wrap gap-4 mb-10 justify-center">
-              {[
-                { color: 'bg-sky-400', label: 'Frontend' },
-                { color: 'bg-indigo-400', label: 'Backend API' },
-                { color: 'bg-violet-400', label: 'AI / Ontology Engine' },
-                { color: 'bg-emerald-400', label: 'Data Layer' },
-                { color: 'bg-amber-400', label: 'Output' },
-              ].map((l, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs text-slate-400">
-                  <div className={`w-2.5 h-2.5 rounded-full ${l.color}`} />
-                  {l.label}
-                </div>
-              ))}
-            </div>
-
-            {/* === DIAGRAM === */}
-            <div className="relative z-10">
-
-              {/* ROW 1: User + Frontend */}
-              <div className="flex justify-center mb-4">
-                <ArchNode color="sky" icon="👤" title="Expert User" sub="Multi-role team" />
-              </div>
-              <FlowArrow label="HTTPS / REST" />
-
-              {/* ROW 2: React Frontend */}
-              <div className="flex justify-center mb-4">
-                <ArchNode color="sky" icon="⚛️" title="React + Vite" sub="Frontend Application" badge="TypeScript" />
-              </div>
-              <FlowArrow label="REST API calls" />
-
-              {/* ROW 3: Node.js — center hub with branches */}
-              <div className="flex items-start justify-center gap-6 mb-4 flex-wrap md:flex-nowrap">
-                {/* Left branch: MongoDB */}
-                <div className="flex flex-col items-center gap-0 w-40">
-                  <div className="h-8 w-[2px] bg-gradient-to-b from-indigo-500/50 to-emerald-500/50" />
-                  <ArchNode color="emerald" icon="🍃" title="MongoDB Atlas" sub="Users · Projects · Responses" badge="NoSQL" small />
-                </div>
-
-                {/* Center: Node.js */}
-                <div className="flex flex-col items-center">
-                  <ArchNode color="indigo" icon="🟢" title="Node.js + Express" sub="REST Backend API" badge="Core Hub" large />
-                </div>
-
-                {/* Right branch: Resend email */}
-                <div className="flex flex-col items-center gap-0 w-40">
-                  <div className="h-8 w-[2px] bg-gradient-to-b from-indigo-500/50 to-amber-500/50" />
-                  <ArchNode color="amber" icon="📧" title="Resend API" sub="Email verification & welcome" badge="External" small />
-                </div>
-              </div>
-
-              <FlowArrow label="HTTP → FastAPI Ontology Service" color="violet" />
-
-              {/* ROW 4: FastAPI Ontology */}
-              <div className="flex items-start justify-center gap-6 mb-4 flex-wrap md:flex-nowrap">
-                {/* Left: OWL/SWRL Reasoner */}
-                <div className="flex flex-col items-center gap-0 w-44">
-                  <div className="h-8 w-[2px] bg-gradient-to-b from-violet-500/50 to-violet-400/50" />
-                  <ArchNode color="violet" icon="🧠" title="OWL/SWRL Reasoner" sub="Formal logic inference" badge="Hermit / Pellet" small />
-                </div>
-
-                {/* Center: FastAPI */}
-                <div className="flex flex-col items-center">
-                  <ArchNode color="violet" icon="⚡" title="FastAPI + Python" sub="Ontology Reasoning Engine" badge="AI Core" large />
-                </div>
-
-                {/* Right: Neo4j */}
-                <div className="flex flex-col items-center gap-0 w-44">
-                  <div className="h-8 w-[2px] bg-gradient-to-b from-violet-500/50 to-emerald-500/50" />
-                  <ArchNode color="emerald" icon="🕸️" title="Neo4j Graph DB" sub="Knowledge Graph · Cypher queries" badge="GraphDB" small />
-                </div>
-              </div>
-
-              <FlowArrow label="Ontology conclusions → GraphRAG context" color="amber" />
-
-              {/* ROW 5: Gemini LLM */}
-              <div className="flex justify-center mb-4">
-                <ArchNode color="amber" icon="✨" title="Google Gemini LLM" sub="GraphRAG narrative generation only" badge="Presentation Layer" />
-              </div>
-
-              <FlowArrow label="Structured report data" color="rose" />
-
-              {/* ROW 6: PDF Report */}
-              <div className="flex justify-center">
-                <ArchNode color="rose" icon="📄" title="PDF / DOCX Report" sub="Regulatory-ready export" badge="EU AI Act Compliant" />
-              </div>
-            </div>
-
-            {/* Data flow key */}
-            <div className="relative z-10 mt-12 grid sm:grid-cols-3 gap-4">
-              {[
-                { from: 'Expert Input', to: 'Node.js', via: 'React forms & questionnaires', color: 'border-sky-500/20 bg-sky-500/5', accent: 'text-sky-400' },
-                { from: 'Node.js', to: 'FastAPI', via: 'Structured JSON answers via REST', color: 'border-violet-500/20 bg-violet-500/5', accent: 'text-violet-400' },
-                { from: 'Ontology Engine', to: 'Gemini', via: 'Only logical facts — no hallucination', color: 'border-amber-500/20 bg-amber-500/5', accent: 'text-amber-400' },
-              ].map((row, i) => (
-                <div key={i} className={`rounded-2xl border p-4 ${row.color}`}>
-                  <div className={`text-xs font-bold mb-2 ${row.accent}`}>{row.from} → {row.to}</div>
-                  <p className="text-slate-400 text-xs leading-relaxed">{row.via}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
 
       {/* Features Section */}
       <section id="features" className="py-24 relative z-10">
@@ -551,73 +427,57 @@ export function HomePage({ navigateTo }: { navigateTo?: (path: string) => void }
         </div>
       </section>
 
-      {/* Scoring Methodology Section */}
-      <section id="scoring" className="py-24 relative z-10 border-t border-white/5 bg-[#0a1122]/40">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm font-semibold tracking-wider uppercase mb-6">
-              <Scale className="w-4 h-4" /> Scoring Methodology
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">How the Risk Score is Calculated</h2>
-            <p className="text-slate-400 max-w-xl mx-auto">A single transparent formula — no hidden weights, no black boxes.</p>
-          </motion.div>
+      {/* How to Use Section */}
+      <section id="how-to-use" className="py-24 relative z-10 border-t border-white/5 bg-[#050b14]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">How to Use the Platform</h2>
+            <p className="text-lg text-slate-400">A structured workflow from initial setup to formal compliance documentation.</p>
+          </div>
 
-          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="space-y-5">
-
-            {/* Core formula */}
-            <div className="rounded-2xl border border-white/10 bg-[#070e1a] p-8 text-center">
-              <p className="text-xs text-slate-500 uppercase tracking-widest mb-5">Per-question Ethical Risk Contribution</p>
-              <div className="font-mono text-2xl md:text-3xl font-bold flex flex-wrap items-center justify-center gap-3">
-                <span className="text-amber-400">Risk</span>
-                <span className="text-slate-600">=</span>
-                <span className="text-indigo-400">Importance</span>
-                <span className="text-slate-600">×</span>
-                <span className="text-rose-400">(1 − Answer Score)</span>
-              </div>
-              <div className="mt-5 flex flex-wrap justify-center gap-6 text-xs text-slate-500">
-                <span><span className="text-indigo-400 font-semibold">Importance</span> — expert priority weight, 1 (low) to 4 (critical)</span>
-                <span><span className="text-rose-400 font-semibold">Answer Score</span> — compliance level, 0.0 (none) to 1.0 (full)</span>
-              </div>
-            </div>
-
-            {/* 3-step aggregation */}
-            <div className="grid md:grid-cols-3 gap-4">
-              {([
-                { step: '1', color: 'border-indigo-500/20 bg-indigo-500/5', accent: 'text-indigo-400', title: 'Per Question', formula: 'Risk = Importance × (1 − Score)', note: 'Computed for every answered question' },
-                { step: '2', color: 'border-violet-500/20 bg-violet-500/5', accent: 'text-violet-400', title: 'Per Principle', formula: 'Principle Risk = Σ Question Risks', note: 'Summed across each of the 7 HLEG principles' },
-                { step: '3', color: 'border-cyan-500/20 bg-cyan-500/5', accent: 'text-cyan-400', title: 'Overall', formula: 'Overall Risk = Σ Principle Risks', note: 'Final project score — no normalisation' },
-              ] as const).map((s) => (
-                <div key={s.step} className={`rounded-2xl border p-5 ${s.color}`}>
-                  <div className={`text-xs font-bold uppercase tracking-widest mb-3 ${s.accent}`}>Step {s.step} · {s.title}</div>
-                  <div className={`font-mono text-sm font-semibold mb-2 ${s.accent}`}>{s.formula}</div>
-                  <p className="text-slate-500 text-xs">{s.note}</p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+            {[
+              {
+                icon: <Users className="w-8 h-8 text-blue-400" />,
+                title: '1. Project Setup & Assignment',
+                desc: 'Administrators define the AI system constraints and assign targeted ethical questionnaires to multi-disciplinary experts (e.g., Data Scientists, Legal, Security).',
+                color: 'from-blue-500/20 to-blue-500/5',
+                borderColor: 'border-blue-500/20'
+              },
+              {
+                icon: <CheckCircle2 className="w-8 h-8 text-emerald-400" />,
+                title: '2. Expert Evaluation',
+                desc: 'Assigned domain experts log in and submit comprehensive answers regarding the AI system. The platform tracks progress and ensures no critical blind spots remain.',
+                color: 'from-emerald-500/20 to-emerald-500/5',
+                borderColor: 'border-emerald-500/20'
+              },
+              {
+                icon: <Network className="w-8 h-8 text-amber-400" />,
+                title: '3. Ontology Reasoning',
+                desc: 'Inputs are processed through a custom OWL/SWRL Ontology Engine and mapped into a Neo4j Knowledge Graph to infer hidden risks and validate logical consistency.',
+                color: 'from-amber-500/20 to-amber-500/5',
+                borderColor: 'border-amber-500/20'
+              },
+              {
+                icon: <FileText className="w-8 h-8 text-purple-400" />,
+                title: '4. GraphRAG & Final Report',
+                desc: 'Using GraphRAG and Google Gemini, the platform compiles all inferred facts into an EU AI Act-compliant PDF report, completely eliminating AI hallucinations.',
+                color: 'from-purple-500/20 to-purple-500/5',
+                borderColor: 'border-purple-500/20'
+              }
+            ].map((step, i) => (
+              <div key={i} className={`rounded-3xl p-6 lg:p-8 bg-gradient-to-b ${step.color} border ${step.borderColor} backdrop-blur-sm hover:-translate-y-2 transition-transform duration-300 relative overflow-hidden group flex flex-col`}>
+                <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+                  {step.icon}
                 </div>
-              ))}
-            </div>
-
-            {/* Worked example */}
-            <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/3 p-6">
-              <p className="text-xs text-emerald-400 font-semibold uppercase tracking-wider mb-4">📐 Worked Example</p>
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div className="font-mono text-xs space-y-2 text-slate-400">
-                  <div className="flex justify-between"><span>Question</span><span className="text-slate-300">Biometric data without consent?</span></div>
-                  <div className="flex justify-between"><span>Answer Score</span><span className="text-rose-400">0.0 — non-compliant</span></div>
-                  <div className="flex justify-between"><span>Importance</span><span className="text-indigo-400">4 — critical</span></div>
-                  <div className="h-px bg-white/5" />
-                  <div className="flex justify-between text-sm font-bold">
-                    <span className="text-white">Risk Contribution</span>
-                    <span className="text-rose-400">4 × (1 − 0.0) = 4.0</span>
-                  </div>
+                <div className="w-14 h-14 rounded-2xl bg-[#050b14] border border-white/10 flex items-center justify-center mb-6 shadow-lg shrink-0">
+                  {step.icon}
                 </div>
-                <div className="flex items-center">
-                  <p className="text-slate-400 text-sm leading-relaxed">
-                    This single answer contributes <strong className="text-rose-300">4.0 risk units</strong> — the maximum possible — directly to the <em className="text-rose-200">Privacy & Data Governance</em> principle and surfaces as the top driver in the final report.
-                  </p>
-                </div>
+                <h3 className="text-lg lg:text-xl font-bold text-white mb-3 leading-tight">{step.title}</h3>
+                <p className="text-slate-400 text-sm leading-relaxed flex-1">{step.desc}</p>
               </div>
-            </div>
-
-          </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 

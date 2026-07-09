@@ -960,8 +960,8 @@ export function UserDashboard({
       {/* ======= MAIN LAYOUT ======= */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* SIDEBAR */}
-        <div className="w-64 bg-[#050b14] border-r border-white/10 overflow-y-auto flex flex-col">
-          <div className="p-6">
+        <div className="w-64 bg-[#050b14] border-r border-white/10 flex flex-col flex-shrink-0">
+          <div className="p-6 flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <button
               onClick={() => setShowProfile(true)}
               className="w-full mb-6 hover:opacity-80 transition-opacity text-left"
@@ -1048,13 +1048,13 @@ export function UserDashboard({
             </nav>
           </div>
 
-          <div className="absolute bottom-0 w-64 p-6">
+          <div className="p-4 border-t border-white/10">
             <button
               onClick={onLogout}
-              className="w-full flex items-center px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+              className="w-full flex items-center gap-3 px-3 py-3 text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-lg transition-all duration-200 group"
             >
-              <LogOut className="h-4 w-4 mr-3" />
-              Logout
+              <LogOut className="h-4 w-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+              Log Out
             </button>
           </div>
         </div>

@@ -383,7 +383,7 @@ export function UseCaseOwnerDashboard({
           </div>
         </button>
 
-        <nav className="flex-1 px-3 py-4">
+        <nav className="flex-1 overflow-y-auto px-3 py-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <button className="w-full px-4 py-3 mb-2 flex items-center bg-cyan-500/10 text-cyan-400 rounded-lg">
             <FolderOpen className="h-4 w-4 mr-3 text-cyan-400" />
             My Projects
@@ -408,13 +408,13 @@ export function UseCaseOwnerDashboard({
           )}
         </nav>
 
-        <div className="p-4 border-t border-white/10">
+        <div className="p-4 border-t border-white/10 mt-auto">
           <button
             onClick={onLogout}
-            className="w-full px-4 py-3 flex items-center text-slate-400 hover:bg-white/5 hover:text-white rounded-lg"
+            className="w-full px-4 py-3 flex items-center gap-3 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 group"
           >
-            <LogOut className="h-4 w-4 mr-3" />
-            Logout
+            <LogOut className="h-4 w-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+            Log Out
           </button>
         </div>
       </div>
