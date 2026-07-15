@@ -189,6 +189,54 @@ CATEGORIES = [
         "regulations": ["GDPR", "KVKK"], "principles": ["Privacy", "Security"],
         "tensions": ["Efficiency vs Accountability"],
         "violations": ["Sensitive Data Processing"], "keywords": ["data processing", "analytics", "big data"]
+    },
+    {
+        "name": "BiometricAI", "risk_level": "ProhibitedRisk", "description": "AI identifying individuals via biological traits.",
+        "regulations": ["EU AI Act", "GDPR", "KVKK"], "principles": ["Privacy", "Human Autonomy"],
+        "tensions": ["Privacy vs Transparency", "Security vs Explainability"],
+        "violations": ["Biometric Misuse", "Privacy Violation", "Mass Surveillance"], "keywords": ["biometric", "facial recognition", "fingerprint"]
+    },
+    {
+        "name": "SurveillanceAI", "risk_level": "ProhibitedRisk", "description": "AI monitoring public or private spaces.",
+        "regulations": ["EU AI Act", "GDPR"], "principles": ["Privacy", "Human Autonomy"],
+        "tensions": ["Privacy vs Transparency", "Safety vs Efficiency"],
+        "violations": ["Mass Surveillance", "Privacy Violation"], "keywords": ["surveillance", "camera", "cctv"]
+    },
+    {
+        "name": "EducationalAI", "risk_level": "HighRisk", "description": "AI for student evaluation and proctoring.",
+        "regulations": ["EU AI Act", "GDPR"], "principles": ["Fairness", "Privacy"],
+        "tensions": ["Fairness vs Accuracy", "Privacy vs Personalization"],
+        "violations": ["Bias", "Sensitive Data Processing"], "keywords": ["education", "student", "grading"]
+    },
+    {
+        "name": "LawEnforcementAI", "risk_level": "ProhibitedRisk", "description": "AI predicting criminal behavior or aiding threat detection.",
+        "regulations": ["EU AI Act"], "principles": ["Justice", "Non-discrimination", "Accountability"],
+        "tensions": ["Fairness vs Accuracy", "Efficiency vs Accountability"],
+        "violations": ["Discrimination", "Mass Surveillance", "Lack of Transparency"], "keywords": ["policing", "crime", "predictive"]
+    },
+    {
+        "name": "RecommendationAI", "risk_level": "LimitedRisk", "description": "AI suggesting content or products.",
+        "regulations": ["GDPR"], "principles": ["Transparency", "Human Autonomy"],
+        "tensions": ["Privacy vs Personalization"],
+        "violations": ["Manipulation"], "keywords": ["recommendation", "suggestion", "feed"]
+    },
+    {
+        "name": "GenerativeAI", "risk_level": "LimitedRisk", "description": "AI generating content or synthetic media.",
+        "regulations": ["EU AI Act", "GDPR"], "principles": ["Transparency", "Safety"],
+        "tensions": ["Human Oversight vs Automation"],
+        "violations": ["Lack of Transparency", "Manipulation", "Unsafe Automation"], "keywords": ["generative", "llm", "deepfake"]
+    },
+    {
+        "name": "ProfilingAI", "risk_level": "HighRisk", "description": "AI building digital behavioral profiles.",
+        "regulations": ["GDPR", "KVKK"], "principles": ["Privacy", "Security"],
+        "tensions": ["Efficiency vs Accountability"],
+        "violations": ["Privacy Violation", "Sensitive Data Processing", "Discrimination"], "keywords": ["profiling", "tracking", "microtargeting"]
+    },
+    {
+        "name": "SocialScoringAI", "risk_level": "ProhibitedRisk", "description": "AI ranking citizen trustworthiness or behaviour.",
+        "regulations": ["EU AI Act", "GDPR"], "principles": ["Justice", "Non-discrimination", "Accountability"],
+        "tensions": ["Fairness vs Accuracy", "Efficiency vs Accountability"],
+        "violations": ["Discrimination", "Privacy Violation", "Manipulation", "Lack of Human Oversight"], "keywords": ["social scoring", "social credit", "ranking"]
     }
 ]
 
@@ -205,6 +253,148 @@ VIOLATION_RELATIONS = {
     "Manipulation": {"mitigations": ["Human Review", "Model Documentation"], "evidence": ["Automated decision making"]},
     "Lack of Human Oversight": {"mitigations": ["Human Review", "Audit Logging"], "evidence": ["No human intervention"]},
     "Unsafe Automation": {"mitigations": ["Continuous Risk Assessment", "Human Review"], "evidence": ["Automated decision making", "No human intervention"]}
+}
+
+HARMS = [
+    {"name": "Financial", "description": "Monetary loss, theft, or economic disadvantage imposed on individuals or organisations."},
+    {"name": "Psychological", "description": "Mental distress, anxiety, manipulation, or cognitive harm experienced by individuals."},
+    {"name": "Physical", "description": "Bodily injury, health deterioration, or physical endangerment caused by system failures."},
+    {"name": "Social", "description": "Societal polarization, systemic bias, discrimination, or erosion of democratic values."},
+    {"name": "Environmental", "description": "Ecological degradation, excessive carbon footprint, or depletion of natural resources."},
+    {"name": "Reputational", "description": "Damage to character, brand value, social status, or trust in individuals or organizations."}
+]
+
+VIOLATION_HARMS = {
+    "Bias": ["Social", "Psychological", "Financial"],
+    "Discrimination": ["Social", "Financial", "Psychological"],
+    "Lack of Transparency": ["Reputational", "Social"],
+    "Privacy Violation": ["Reputational", "Psychological", "Financial"],
+    "Mass Surveillance": ["Social", "Psychological"],
+    "Biometric Misuse": ["Psychological", "Reputational"],
+    "Sensitive Data Processing": ["Financial", "Reputational", "Psychological"],
+    "Manipulation": ["Psychological", "Social", "Financial"],
+    "Lack of Human Oversight": ["Physical", "Social"],
+    "Unsafe Automation": ["Physical", "Psychological", "Environmental"]
+}
+
+STAKEHOLDERS = [
+    {"name": "AI_Provider", "description": "Entity that develops an AI system or has it developed with a view to placing it on the market."},
+    {"name": "AI_Developer", "description": "Engineers, scientists, and organizations involved in designing and training AI models."},
+    {"name": "AI_Deployer", "description": "User or organization using an AI system under its authority in a professional context."},
+    {"name": "End_User", "description": "The natural person who interacts directly with the AI system or is directly affected by its outputs."},
+    {"name": "Data_Subject", "description": "The identified or identifiable natural person whose personal data is processed by the AI system."},
+    {"name": "Auditor", "description": "Independent third-party evaluating compliance, performance, and ethical alignment of AI systems."},
+    {"name": "Regulator", "description": "Supervisory authority enforcing legal compliance, safety guidelines, and standardizations."},
+    {"name": "Organization", "description": "Enterprise, institution, or group deploying AI to facilitate business processes or public services."}
+]
+
+STAKEHOLDER_REGULATIONS = {
+    "Regulator": ["EU AI Act", "GDPR", "KVKK"],
+    "AI_Provider": ["EU AI Act", "GDPR", "KVKK"],
+    "AI_Developer": ["EU AI Act", "GDPR", "KVKK"],
+    "AI_Deployer": ["EU AI Act", "GDPR", "KVKK"],
+    "Data_Subject": ["GDPR", "KVKK"]
+}
+
+STAKEHOLDER_MECHANISMS = {
+    "Data_Subject": ["Consent Management", "Access Control", "Data Minimization", "Encryption", "Differential Privacy"],
+    "End_User": ["Human Review", "Consent Management", "Bias Monitoring", "Model Documentation"],
+    "AI_Deployer": ["Audit Logging", "Continuous Risk Assessment", "Model Documentation"],
+    "Regulator": ["Audit Logging", "Continuous Risk Assessment"]
+}
+
+CATEGORY_STAKEHOLDERS = {
+    "HiringAI": ["AI_Developer", "End_User", "Organization"],
+    "HealthcareAI": ["AI_Developer", "End_User", "Organization"],
+    "MedicalDiagnosisAI": ["AI_Developer", "End_User", "Organization"],
+    "CreditScoringAI": ["AI_Developer", "End_User", "Organization"],
+    "BiometricSystem": ["AI_Developer", "Data_Subject", "Regulator"],
+    "EmotionRecognitionAI": ["Data_Subject", "Regulator"],
+    "EducationAI": ["End_User", "Organization"],
+    "PredictivePolicingAI": ["Regulator", "Organization"],
+    "RecommendationSystem": ["End_User"],
+    "Chatbot": ["End_User"],
+    "SurveillanceSystem": ["Data_Subject", "Regulator"],
+    "DataProcessingAI": ["Organization", "Data_Subject"],
+    "BiometricAI": ["AI_Developer", "Data_Subject", "Regulator"],
+    "SurveillanceAI": ["Data_Subject", "Regulator"],
+    "EducationalAI": ["End_User", "Organization"],
+    "LawEnforcementAI": ["Regulator", "Organization"],
+    "RecommendationAI": ["End_User"],
+    "GenerativeAI": ["AI_Developer", "End_User", "Organization"],
+    "ProfilingAI": ["Organization", "Data_Subject"],
+    "SocialScoringAI": ["Regulator", "Organization", "Data_Subject"]
+}
+
+RECOMMENDATIONS = [
+    {"name": "TechnicalRecommendation"},
+    {"name": "OrganizationalRecommendation"},
+    {"name": "LegalRecommendation"}
+]
+
+VIOLATION_RECOMMENDATIONS = {
+    "Bias": ["TechnicalRecommendation", "OrganizationalRecommendation"],
+    "Discrimination": ["TechnicalRecommendation", "OrganizationalRecommendation", "LegalRecommendation"],
+    "Lack of Transparency": ["TechnicalRecommendation", "OrganizationalRecommendation"],
+    "Privacy Violation": ["TechnicalRecommendation", "LegalRecommendation"],
+    "Mass Surveillance": ["LegalRecommendation", "OrganizationalRecommendation"],
+    "Biometric Misuse": ["TechnicalRecommendation", "LegalRecommendation"],
+    "Sensitive Data Processing": ["TechnicalRecommendation", "LegalRecommendation"],
+    "Manipulation": ["OrganizationalRecommendation", "LegalRecommendation"],
+    "Lack of Human Oversight": ["OrganizationalRecommendation", "TechnicalRecommendation"],
+    "Unsafe Automation": ["TechnicalRecommendation", "OrganizationalRecommendation"]
+}
+
+RECOMMENDATION_MECHANISMS = {
+    "TechnicalRecommendation": ["Encryption", "Data Minimization", "Differential Privacy", "Access Control", "Bias Monitoring", "Audit Logging"],
+    "OrganizationalRecommendation": ["Human Review", "Continuous Risk Assessment", "Model Documentation", "Audit Logging"],
+    "LegalRecommendation": ["Consent Management", "Data Minimization"]
+}
+
+ASSESSMENTS = [
+    {"name": "InitialAssessment"},
+    {"name": "RiskAssessment"},
+    {"name": "EthicalAssessment"},
+    {"name": "FinalAssessment"}
+]
+
+CATEGORY_ASSESSMENTS = {
+    "HiringAI": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "HealthcareAI": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "MedicalDiagnosisAI": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "CreditScoringAI": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "BiometricSystem": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "EmotionRecognitionAI": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "EducationAI": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "PredictivePolicingAI": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "RecommendationSystem": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "Chatbot": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "SurveillanceSystem": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "DataProcessingAI": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "BiometricAI": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "SurveillanceAI": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "EducationalAI": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "LawEnforcementAI": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "RecommendationAI": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "GenerativeAI": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "ProfilingAI": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"],
+    "SocialScoringAI": ["InitialAssessment", "RiskAssessment", "EthicalAssessment", "FinalAssessment"]
+}
+
+ASSESSMENT_VIOLATIONS = {
+    "RiskAssessment": ["Bias", "Discrimination", "Lack of Human Oversight", "Unsafe Automation"],
+    "EthicalAssessment": ["Lack of Transparency", "Privacy Violation", "Mass Surveillance", "Biometric Misuse", "Sensitive Data Processing", "Manipulation"]
+}
+
+ASSESSMENT_RISK_LEVELS = {
+    "InitialAssessment": ["MinimalRisk", "LimitedRisk", "MediumRisk"],
+    "RiskAssessment": ["HighRisk", "ProhibitedRisk"],
+    "FinalAssessment": ["MinimalRisk", "LimitedRisk", "MediumRisk", "HighRisk", "ProhibitedRisk"]
+}
+
+ASSESSMENT_RECOMMENDATIONS = {
+    "EthicalAssessment": ["TechnicalRecommendation", "OrganizationalRecommendation"],
+    "FinalAssessment": ["TechnicalRecommendation", "OrganizationalRecommendation", "LegalRecommendation"]
 }
 
 
@@ -271,6 +461,94 @@ def seed_ontology():
         for r in REGULATIONS:
             session.run("MERGE (reg:Regulation {name: $name})", name=r["name"])
 
+        print("Seeding Harms...")
+        for h in HARMS:
+            session.run("MERGE (harm:Harm {name: $name}) SET harm.description = $desc", name=h["name"], desc=h["description"])
+
+        print("Linking Violations to Harms...")
+        for vname, harms in VIOLATION_HARMS.items():
+            for hname in harms:
+                session.run("""
+                    MATCH (ev:EthicalViolation {name: $vname})
+                    MATCH (harm:Harm {name: $hname})
+                    MERGE (ev)-[:CAUSES]->(harm)
+                """, vname=vname, hname=hname)
+
+        print("Seeding Stakeholders...")
+        for s in STAKEHOLDERS:
+            session.run("MERGE (stk:Stakeholder {name: $name}) SET stk.description = $desc", name=s["name"], desc=s["description"])
+
+        print("Linking Stakeholders to Regulations (GOVERNED_BY)...")
+        for sname, regulations in STAKEHOLDER_REGULATIONS.items():
+            for rname in regulations:
+                session.run("""
+                    MATCH (stk:Stakeholder {name: $sname})
+                    MATCH (reg:Regulation {name: $rname})
+                    MERGE (stk)-[:GOVERNED_BY]->(reg)
+                """, sname=sname, rname=rname)
+
+        print("Linking Stakeholders to Protection Mechanisms (PROTECTED_BY)...")
+        for sname, mechanisms in STAKEHOLDER_MECHANISMS.items():
+            for mname in mechanisms:
+                session.run("""
+                    MATCH (stk:Stakeholder {name: $sname})
+                    MATCH (pm:ProtectionMechanism {name: $mname})
+                    MERGE (stk)-[:PROTECTED_BY]->(pm)
+                """, sname=sname, mname=mname)
+
+        print("Seeding Recommendations...")
+        for rec in RECOMMENDATIONS:
+            session.run("MERGE (r:Recommendation {name: $name})", name=rec["name"])
+
+        print("Linking Recommendations to Protection Mechanisms...")
+        for rname, mechanisms in RECOMMENDATION_MECHANISMS.items():
+            for mname in mechanisms:
+                session.run("""
+                    MATCH (r:Recommendation {name: $rname})
+                    MATCH (pm:ProtectionMechanism {name: $mname})
+                    MERGE (r)-[:IMPLEMENTS]->(pm)
+                """, rname=rname, mname=mname)
+
+        print("Linking Violations to Recommendations...")
+        for vname, recs in VIOLATION_RECOMMENDATIONS.items():
+            for rname in recs:
+                session.run("""
+                    MATCH (ev:EthicalViolation {name: $vname})
+                    MATCH (r:Recommendation {name: $rname})
+                    MERGE (ev)-[:HAS_RECOMMENDATION]->(r)
+                """, vname=vname, rname=rname)
+
+        print("Seeding Assessments...")
+        for a in ASSESSMENTS:
+            session.run("MERGE (asm:Assessment {name: $name})", name=a["name"])
+
+        print("Linking Assessments to Violations...")
+        for asm_name, violations in ASSESSMENT_VIOLATIONS.items():
+            for vname in violations:
+                session.run("""
+                    MATCH (asm:Assessment {name: $aname})
+                    MATCH (ev:EthicalViolation {name: $vname})
+                    MERGE (asm)-[:IDENTIFIES]->(ev)
+                """, aname=asm_name, vname=vname)
+
+        print("Linking Assessments to Risk Levels...")
+        for asm_name, risk_levels in ASSESSMENT_RISK_LEVELS.items():
+            for rname in risk_levels:
+                session.run("""
+                    MATCH (asm:Assessment {name: $aname})
+                    MATCH (rl:RiskLevel {name: $rname})
+                    MERGE (asm)-[:HAS_RISK_LEVEL]->(rl)
+                """, aname=asm_name, rname=rname)
+
+        print("Linking Assessments to Recommendations...")
+        for asm_name, recommendations in ASSESSMENT_RECOMMENDATIONS.items():
+            for rname in recommendations:
+                session.run("""
+                    MATCH (asm:Assessment {name: $aname})
+                    MATCH (rec:Recommendation {name: $rname})
+                    MERGE (asm)-[:PRODUCES]->(rec)
+                """, aname=asm_name, rname=rname)
+
         print("Seeding AI Categories, Keywords and linking everything...")
         for cat in CATEGORIES:
             # Create Category
@@ -326,6 +604,24 @@ def seed_ontology():
                     MATCH (v:EthicalViolation {name: $vname})
                     MERGE (c)-[:CAUSES]->(v)
                 """, cname=cat["name"], vname=vio)
+
+            # Stakeholders
+            if cat["name"] in CATEGORY_STAKEHOLDERS:
+                for stk in CATEGORY_STAKEHOLDERS[cat["name"]]:
+                    session.run("""
+                        MATCH (c:AI_Category {name: $cname})
+                        MATCH (stk:Stakeholder {name: $sname})
+                        MERGE (c)-[:AFFECTS]->(stk)
+                    """, cname=cat["name"], sname=stk)
+
+            # Assessments
+            if cat["name"] in CATEGORY_ASSESSMENTS:
+                for asm in CATEGORY_ASSESSMENTS[cat["name"]]:
+                    session.run("""
+                        MATCH (c:AI_Category {name: $cname})
+                        MATCH (asm:Assessment {name: $aname})
+                        MERGE (c)-[:UNDERGOES]->(asm)
+                    """, cname=cat["name"], aname=asm)
 
         print("✅ Knowledge Graph successfully seeded and fully linked!")
 

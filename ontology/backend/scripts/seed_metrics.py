@@ -19,21 +19,29 @@ SET m9.formula = "(0.25 * EthicalImpactScore) + (0.25 * LegalComplianceScore) + 
 """
 
 _THRESHOLDS_CYPHER = """
-MERGE (t1:RiskThreshold {name: "MinimalRiskThreshold"}) SET t1.min = 0, t1.max = 25
+MERGE (t1:RiskThreshold {name: "MinimalRiskThreshold"}) SET t1.min = 0, t1.max = 20
 MERGE (r1:RiskLevel {name: "MinimalRisk"})
 MERGE (t1)-[:THRESHOLD_FOR]->(r1)
 
-MERGE (t2:RiskThreshold {name: "LimitedRiskThreshold"}) SET t2.min = 26, t2.max = 50
+MERGE (t2:RiskThreshold {name: "LimitedRiskThreshold"}) SET t2.min = 21, t2.max = 40
 MERGE (r2:RiskLevel {name: "LimitedRisk"})
 MERGE (t2)-[:THRESHOLD_FOR]->(r2)
 
-MERGE (t3:RiskThreshold {name: "HighRiskThreshold"}) SET t3.min = 51, t3.max = 75
-MERGE (r3:RiskLevel {name: "HighRisk"})
+MERGE (t3:RiskThreshold {name: "MediumRiskThreshold"}) SET t3.min = 41, t3.max = 60
+MERGE (r3:RiskLevel {name: "MediumRisk"})
 MERGE (t3)-[:THRESHOLD_FOR]->(r3)
 
-MERGE (t4:RiskThreshold {name: "UnacceptableRiskThreshold"}) SET t4.min = 76, t4.max = 100
-MERGE (r4:RiskLevel {name: "UnacceptableRisk"})
+MERGE (t4:RiskThreshold {name: "HighRiskThreshold"}) SET t4.min = 61, t4.max = 80
+MERGE (r4:RiskLevel {name: "HighRisk"})
 MERGE (t4)-[:THRESHOLD_FOR]->(r4)
+
+MERGE (t5:RiskThreshold {name: "UnacceptableRiskThreshold"}) SET t5.min = 81, t5.max = 100
+MERGE (r5:RiskLevel {name: "UnacceptableRisk"})
+MERGE (t5)-[:THRESHOLD_FOR]->(r5)
+
+MERGE (t6:RiskThreshold {name: "ProhibitedRiskThreshold"}) SET t6.min = 81, t6.max = 100
+MERGE (r6:RiskLevel {name: "ProhibitedRisk"})
+MERGE (t6)-[:THRESHOLD_FOR]->(r6)
 """
 
 def seed_metrics():

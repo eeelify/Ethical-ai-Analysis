@@ -75,7 +75,11 @@ export function OntologyViewerTab() {
       'EthicalViolation': '#ec4899', // pink-500
       'ProtectionMechanism': '#22c55e', // green-500
       'Evidence': '#3b82f6', // blue-500
-      'Keyword': '#94a3b8' // slate-400
+      'Keyword': '#94a3b8', // slate-400
+      'Harm': '#f43f5e', // rose-500
+      'Stakeholder': '#fb923c', // orange-400
+      'Recommendation': '#0d9488', // teal-600
+      'Assessment': '#0284c7' // sky-600
     };
     return colors[group] || '#cbd5e1';
   };

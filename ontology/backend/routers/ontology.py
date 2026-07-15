@@ -15,7 +15,7 @@ def get_ontology_graph():
     """
     nodes_query = """
     MATCH (n)
-    RETURN toString(id(n)) as id, labels(n)[0] as label_type, coalesce(n.name, n.term, n.title, toString(id(n))) as name
+    RETURN toString(id(n)) as id, labels(n)[0] as label_type, coalesce(n.name, n.term, n.title, n.word, toString(id(n))) as name
     """
     edges_query = """
     MATCH (n)-[r]->(m)
