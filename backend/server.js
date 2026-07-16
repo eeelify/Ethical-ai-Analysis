@@ -6086,6 +6086,10 @@ app.use('/api/reports', reportRoutes);
 const ontologyRoutes = require('./routes/ontologyRoutes');
 app.use('/api/ontology', ontologyRoutes);
 
+// Project-scoped ontology chat routes
+const ontologyChatRoutes = require('./routes/ontologyChatRoutes');
+app.use('/api/projects', ontologyChatRoutes);
+
 // Health check endpoint for deployment platforms
 app.get('/api/health', (req, res) => {
   res.json({

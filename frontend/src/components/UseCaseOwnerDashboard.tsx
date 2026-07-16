@@ -8,6 +8,7 @@ import { NotificationDetailPanel } from './NotificationDetailPanel';
 import { NotificationBell } from './NotificationBell';
 import { ProfileModal } from './ProfileModal';
 import { api } from '../api';
+import { OntologyChatBox } from './OntologyChatBox';
 
 interface UseCaseOwnerDashboardProps {
   currentUser: User;
@@ -21,6 +22,7 @@ interface UseCaseOwnerDashboardProps {
   onLogout: () => void;
   onUpdateUser?: (user: User) => void;
   onOpenChat?: (project: Project, otherUser: User) => void;
+  dashboardSection?: 'projects' | 'ontology';
 }
 
 const statusColors = {
@@ -46,7 +48,8 @@ export function UseCaseOwnerDashboard({
   onNavigate,
   onLogout,
   onUpdateUser,
-  onOpenChat
+  onOpenChat,
+  dashboardSection = 'projects'
 }: UseCaseOwnerDashboardProps) {
   const [showNewUseCaseModal, setShowNewUseCaseModal] = useState(false);
   const [chatPanelOpen, setChatPanelOpen] = useState(false);
@@ -163,6 +166,54 @@ export function UseCaseOwnerDashboard({
 
   // Find admin user
   const adminUser = users.find(u => u.role === 'admin');
+
+  const getProjectUseCaseId = (project: any): string | null => {
+    const val = project?.useCase;
+    if (!val) return null;
+    if (typeof val === 'string') return val;
+    return (val.url || val._id || val.id || val.useCaseId || null) as string | null;
+  };
+
+  const ontologyProjects = React.useMemo(() => {
+    const currentUserId = String(currentUser.id || (currentUser as any)._id || '');
+    const ownedUseCaseIds = new Set(
+      myUseCases
+        .map((useCase: any) => String(useCase.id || useCase._id || ''))
+        .filter(Boolean)
+    );
+
+    const realProjects = projects.filter((project: any) => {
+      const title = String(project?.title || '').toLowerCase();
+      const shortDescription = String(project?.shortDescription || '').toLowerCase();
+      const fullDescription = String(project?.fullDescription || '').toLowerCase();
+      const isCommunicationProject =
+        title.includes('admin communication') ||
+        title.startsWith('communication:') ||
+        shortDescription.includes('communication with admin') ||
+        fullDescription.includes('direct communication between use case owners and administrators');
+
+      if (isCommunicationProject) return false;
+
+      const assignedUsers = Array.isArray(project.assignedUsers) ? project.assignedUsers : [];
+      const isAssigned = assignedUsers.some((assignedUser: any) => {
+        const assignedId = String(assignedUser?.id || assignedUser?._id || assignedUser || '');
+        return assignedId === currentUserId;
+      });
+
+      const linkedUseCaseId = getProjectUseCaseId(project);
+      const isLinkedToOwnedUseCase = linkedUseCaseId ? ownedUseCaseIds.has(String(linkedUseCaseId)) : false;
+      return isLinkedToOwnedUseCase || isAssigned;
+    });
+
+    return realProjects.sort((a: any, b: any) => {
+      const aLinked = ownedUseCaseIds.has(String(getProjectUseCaseId(a) || ''));
+      const bLinked = ownedUseCaseIds.has(String(getProjectUseCaseId(b) || ''));
+      if (aLinked !== bLinked) return aLinked ? -1 : 1;
+      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+    });
+  }, [projects, myUseCases, currentUser.id]);
+
+  const selectedOntologyProject = ontologyProjects[0] || null;
 
   // Fetch unread message count
   const fetchUnreadCount = async () => {
@@ -384,19 +435,28 @@ export function UseCaseOwnerDashboard({
         </button>
 
         <nav className="flex-1 overflow-y-auto px-3 py-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <button className="w-full px-4 py-3 mb-2 flex items-center bg-cyan-500/10 text-cyan-400 rounded-lg">
-            <FolderOpen className="h-4 w-4 mr-3 text-cyan-400" />
+          <button
+            onClick={() => onNavigate?.("dashboard")}
+            className={`w-full px-4 py-3 mb-2 flex items-center rounded-lg ${
+              dashboardSection === 'projects'
+                ? 'bg-cyan-500/10 text-cyan-400'
+                : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            <FolderOpen className={`h-4 w-4 mr-3 ${dashboardSection === 'projects' ? 'text-cyan-400' : ''}`} />
             My Projects
           </button>
-          {onNavigate && (
-            <button
-              onClick={() => onNavigate("ontology-assessment")}
-              className="w-full px-4 py-3 mb-2 flex items-center text-gray-700 hover:bg-gray-100 rounded-lg"
-            >
-              <Database className="h-4 w-4 mr-3 text-indigo-600" />
-              Ontology
-            </button>
-          )}
+          <button
+            onClick={() => onNavigate?.("owner-ontology-chat")}
+            className={`w-full px-4 py-3 mb-2 flex items-center rounded-lg ${
+              dashboardSection === 'ontology'
+                ? 'bg-cyan-500/10 text-cyan-400'
+                : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            <Database className={`h-4 w-4 mr-3 ${dashboardSection === 'ontology' ? 'text-cyan-400' : ''}`} />
+            Ontology Chat
+          </button>
           {adminUser && (
             <button
               onClick={handleContactAdmin}
@@ -426,8 +486,14 @@ export function UseCaseOwnerDashboard({
         <div className="bg-[#050b14] border-b border-white/10 px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl text-white mb-2">Use-case Owner Dashboard</h1>
-              <p className="text-slate-400">Upload and monitor your AI system use cases</p>
+              <h1 className="text-2xl text-white mb-2">
+                {dashboardSection === 'ontology' ? 'Ontology Chat' : 'Use-case Owner Dashboard'}
+              </h1>
+              <p className="text-slate-400">
+                {dashboardSection === 'ontology'
+                  ? 'Describe and assess your project with ontology-based reasoning'
+                  : 'Upload and monitor your AI system use cases'}
+              </p>
             </div>
             <div className="flex items-center space-x-4">
               {/* In-app Notifications Bell */}
@@ -518,19 +584,33 @@ export function UseCaseOwnerDashboard({
                   </div>
                 )}
               </div>
-              <button
-                onClick={() => setShowNewUseCaseModal(true)}
-                className="px-6 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-500 flex items-center shadow-[0_0_15px_rgba(8,145,178,0.4)] transition-all"
-              >
-                <Plus className="h-5 w-5 mr-2" />
-                New Use Case
-              </button>
+              {dashboardSection === 'projects' && (
+                <button
+                  onClick={() => setShowNewUseCaseModal(true)}
+                  className="px-6 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-500 flex items-center shadow-[0_0_15px_rgba(8,145,178,0.4)] transition-all"
+                >
+                  <Plus className="h-5 w-5 mr-2" />
+                  New Use Case
+                </button>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Use Cases Grid */}
+        {/* Main Section */}
         <div className="px-8 py-6">
+          {dashboardSection === 'ontology' ? (
+            <div className="space-y-4">
+              {selectedOntologyProject ? (
+                <OntologyChatBox project={selectedOntologyProject} currentUser={currentUser} />
+              ) : (
+                <div className="rounded-lg border border-dashed border-white/10 bg-[#0a1122] p-8 text-center text-sm text-slate-400">
+                  No use case project is available for ontology chat.
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
           {loadingUseCases ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-slate-400">Loading use cases...</div>
@@ -670,6 +750,8 @@ export function UseCaseOwnerDashboard({
                 Create Use Case
               </button>
             </div>
+          )}
+            </>
           )}
         </div>
       </div>

@@ -139,15 +139,52 @@ def get_ontology_cache() -> list[dict]:
 
 
 
+def _as_text(value, fallback: str = "") -> str:
+    text = str(value).strip() if value is not None else ""
+    return text or fallback
+
+
 def _clean_ethical_analysis(raw: list[dict]) -> list[dict]:
     """
     Filter out null/empty entries that Neo4j emits when OPTIONAL MATCH
-    finds no relationships (all fields will be None).
+    finds no relationships, and coerce nullable relationship properties into
+    response-model-safe strings.
     """
-    return [
-        e for e in (raw or [])
-        if e.get("principle")
-    ]
+    cleaned: list[dict] = []
+    for entry in raw or []:
+        if not isinstance(entry, dict) or not entry.get("principle"):
+            continue
+
+        principle = _as_text(entry.get("principle"))
+        cleaned.append({
+            "principle": principle,
+            "reason": _as_text(entry.get("reason"), f"Potential ethical impact related to {principle}."),
+            "impact": _as_text(entry.get("impact"), "Impact details are not specified in the ontology."),
+            "severity": _as_text(entry.get("severity"), "Unknown"),
+            "harm_type": _as_text(entry.get("harm_type"), "Unspecified"),
+        })
+    return cleaned
+
+
+def _clean_ethical_tensions(raw: list[dict]) -> list[dict]:
+    cleaned: list[dict] = []
+    for entry in raw or []:
+        if not isinstance(entry, dict) or not entry.get("name"):
+            continue
+
+        conflicting = [
+            _as_text(principle)
+            for principle in (entry.get("conflicting_principles") or [])
+            if principle
+        ]
+        cleaned.append({
+            "name": _as_text(entry.get("name")),
+            "conflicting_principles": conflicting,
+            "severity": _as_text(entry.get("severity"), "Unknown"),
+            "description": _as_text(entry.get("description"), "No tension description is specified in the ontology."),
+            "recommendation": _as_text(entry.get("recommendation"), "Review this tension with a human reviewer."),
+        })
+    return cleaned
 
 
 def analyze_text(text: str) -> dict:
@@ -211,7 +248,7 @@ def analyze_text(text: str) -> dict:
         risks: list[str] = [r for r in (row.get("risks") or []) if r]
         regs: list[str] = [r for r in (row.get("regulations") or []) if r]
         ea: list[dict] = _clean_ethical_analysis(row.get("ethical_analysis") or [])
-        et: list[dict] = row.get("ethical_tensions") or []
+        et: list[dict] = _clean_ethical_tensions(row.get("ethical_tensions") or [])
 
         matched.append({
             "keyword": kw,

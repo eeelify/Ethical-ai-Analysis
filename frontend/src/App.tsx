@@ -16,7 +16,6 @@ import { SharedArea } from "./components/SharedArea";
 import { OtherMembers } from "./components/OtherMembers";
 import { PreconditionApproval } from "./components/PreconditionApproval";
 import { ReportReview } from "./components/ReportReview";
-import { OntologyAssessment } from "./components/OntologyAssessment";
 import {
   User,
   Project,
@@ -43,12 +42,14 @@ function App() {
   
   const isPopStateRef = React.useRef(false);
   const isInitialMountRef = React.useRef(true);
+  const lastHistoryUrlRef = React.useRef<string | null>(null);
 
   // Global navigation sync with browser history
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
       if (e.state && e.state.appNavState) {
         isPopStateRef.current = true; // Prevent the pushState effect from running
+        lastHistoryUrlRef.current = window.location.pathname + window.location.search;
         const s = e.state.appNavState;
         setCurrentView(s.currentView);
         setSelectedProject(s.selectedProject);
@@ -70,9 +71,11 @@ function App() {
     };
 
     // Replace initial state so we have something to pop back to
+    const initialUrl = constructUrl();
     window.history.replaceState({
       appNavState: { currentView, selectedProject, selectedTension, selectedOwner, selectedUseCase, selectedReportId }
-    }, '', constructUrl());
+    }, '', initialUrl);
+    lastHistoryUrlRef.current = initialUrl;
     
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -95,10 +98,12 @@ function App() {
     if (selectedReportId) params.set('reportId', selectedReportId);
     const query = params.toString();
     const newUrl = window.location.pathname + (query ? '?' + query : '');
+    if (newUrl === lastHistoryUrlRef.current) return;
 
     window.history.pushState({
       appNavState: { currentView, selectedProject, selectedTension, selectedOwner, selectedUseCase, selectedReportId }
     }, '', newUrl);
+    lastHistoryUrlRef.current = newUrl;
   }, [currentView, selectedProject, selectedTension, selectedOwner, selectedUseCase, selectedReportId]);
 
   const [projects, setProjects] = useState<Project[]>([]);
@@ -559,7 +564,7 @@ function App() {
   };
 
   const handleBackToProject = () => {
-    // Clear openTensionsTab flag when going back
+    // Clear one-shot tab flags when going back
     if (selectedProject) {
       const { openTensionsTab, ...projectWithoutFlag } = selectedProject as any;
       setSelectedProject(projectWithoutFlag);
@@ -810,6 +815,22 @@ function App() {
             onCreateTension={handleCreateTension}
             initialTab={(selectedProject as any).openTensionsTab ? 'tensions' : undefined}
             key={(selectedProject as any).openTensionsTab ? 'tensions-tab' : 'default-tab'}
+          />
+        ) : null;
+      case "owner-ontology-chat":
+        return currentUser?.role === "use-case-owner" ? (
+          <UseCaseOwnerDashboard
+            currentUser={currentUser}
+            useCases={useCases}
+            users={users}
+            projects={projects}
+            onCreateUseCase={handleCreateUseCase}
+            onViewUseCase={handleViewUseCase}
+            onDeleteUseCase={handleDeleteUseCase}
+            onNavigate={setCurrentView}
+            onLogout={handleLogout}
+            onUpdateUser={(updatedUser) => setCurrentUser(updatedUser)}
+            dashboardSection="ontology"
           />
         ) : null;
       case "tension-detail":
@@ -1107,13 +1128,6 @@ function App() {
             currentUser={currentUser}
             users={users}
             projects={projects}
-            onBack={handleBackToDashboard}
-          />
-        );
-      case "ontology-assessment":
-        return (
-          <OntologyAssessment
-            currentUser={currentUser}
             onBack={handleBackToDashboard}
           />
         );
