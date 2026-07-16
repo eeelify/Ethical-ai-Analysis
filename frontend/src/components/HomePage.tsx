@@ -51,7 +51,6 @@ export function HomePage({ navigateTo }: { navigateTo?: (path: string) => void }
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center space-x-8">
               <a href="#about" className="text-slate-400 hover:text-cyan-400 text-sm font-medium transition-colors">About</a>
-              <a href="#architecture" className="text-slate-400 hover:text-cyan-400 text-sm font-medium transition-colors">Architecture</a>
               <a href="#features" className="text-slate-400 hover:text-cyan-400 text-sm font-medium transition-colors">Features</a>
               <a href="#scoring" className="text-slate-400 hover:text-cyan-400 text-sm font-medium transition-colors">Scoring</a>
             </div>
@@ -84,7 +83,6 @@ export function HomePage({ navigateTo }: { navigateTo?: (path: string) => void }
         {mobileMenuOpen && (
           <div className="md:hidden absolute top-full left-0 w-full bg-[#050b14]/95 backdrop-blur-xl border-b border-white/5 py-4 px-4 flex flex-col gap-4 shadow-2xl">
             <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-medium p-2 rounded-md hover:bg-white/5">About</a>
-            <a href="#architecture" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-medium p-2 rounded-md hover:bg-white/5">Architecture</a>
             <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-medium p-2 rounded-md hover:bg-white/5">Features</a>
             <a href="#scoring" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-medium p-2 rounded-md hover:bg-white/5">Scoring</a>
             <div className="h-px bg-white/10 my-2"></div>

@@ -189,7 +189,7 @@ function hasOntologySignal(analysis) {
   );
 }
 
-function buildOntologyResult({ analysis, trace, contextText, project }) {
+function buildOntologyResult({ analysis, trace, contextText, project, clarificationQuestions = [] }) {
   const matchedKeywords = analysis?.matched_keywords || [];
   const ethicalAnalysis = analysis?.ethical_analysis || [];
   const ethicalTensions = analysis?.ethical_tensions || [];
@@ -244,9 +244,13 @@ function buildOntologyResult({ analysis, trace, contextText, project }) {
     legalProvisions,
     detectedRiskTriggers: unique(analysis?.detected_risk_triggers || []),
     ontologyRelationsAndReasoning,
-    missingOrUnverifiedInformation: unique(analysis?.missing_safeguards || []),
+    missingOrUnverifiedInformation: unique([
+      ...(analysis?.missing_safeguards || []),
+      ...clarificationQuestions
+    ]),
     recommendedNextSteps: unique([
       ...(analysis?.missing_safeguards || []).map((item) => `Verify safeguard: ${item}`),
+      ...clarificationQuestions.map((question) => `Confirm: ${question}`),
       ethicalTensions.length ? 'Review inferred ethical tensions with assigned experts.' : null,
       legalProvisions.length ? 'Map detected legal provisions to project compliance evidence.' : null
     ]),
@@ -280,20 +284,13 @@ async function runOntologyAssessment(project, conversation) {
     };
   }
 
-  if (questions.length > 0) {
-    return {
-      status: 'needs_more_information',
-      reply: `I need a little more information before completing the ontology assessment:\n\n${questions.map((question) => `- ${question}`).join('\n')}`,
-      ontologyResult: null,
-      raw: { analysis, trace, missingQuestions: questions }
-    };
-  }
-
   return {
     status: 'completed',
-    reply: 'Based on the information provided, the ontology assessment is complete. I structured the ontology-derived results below.',
-    ontologyResult: buildOntologyResult({ analysis, trace, contextText, project }),
-    raw: { analysis, trace }
+    reply: questions.length
+      ? 'Based on the information provided, the ontology assessment is complete. I structured the ontology-derived results below and flagged any unverified safeguards as follow-up items.'
+      : 'Based on the information provided, the ontology assessment is complete. I structured the ontology-derived results below.',
+    ontologyResult: buildOntologyResult({ analysis, trace, contextText, project, clarificationQuestions: questions }),
+    raw: { analysis, trace, missingQuestions: questions }
   };
 }
 
