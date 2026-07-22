@@ -6086,8 +6086,10 @@ app.use('/api/reports', reportRoutes);
 const ontologyRoutes = require('./routes/ontologyRoutes');
 app.use('/api/ontology', ontologyRoutes);
 
-// Project-scoped ontology chat routes
+// Ontology chat routes. Mounted under /api for general chats and under /api/projects
+// for the legacy project-scoped endpoints.
 const ontologyChatRoutes = require('./routes/ontologyChatRoutes');
+app.use('/api', ontologyChatRoutes);
 app.use('/api/projects', ontologyChatRoutes);
 
 // Health check endpoint for deployment platforms

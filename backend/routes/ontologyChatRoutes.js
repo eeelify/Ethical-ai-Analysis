@@ -3,6 +3,13 @@ const mongoose = require('mongoose');
 const ontologyService = require('../services/ontologyService');
 const OntologyChatConversation = require('../models/OntologyChatConversation');
 const ProjectAssignment = require('../models/projectAssignment');
+const {
+  ASSESSMENT_VERSION,
+  FACT_LABELS,
+  assessOntologyChat,
+  buildGraphFactAssertions
+} = require('../services/ontologyChatAssessmentService');
+const { extractOntologyChatFactsWithGemini } = require('../services/ontologyChatGeminiExtractor');
 
 const router = express.Router();
 
@@ -37,14 +44,32 @@ const getRequestUserId = (req) =>
   req.headers?.['x-user-id'] ||
   req.headers?.['x-userid'];
 
-async function assertUseCaseOwnerProjectAccess(req, res) {
-  const projectId = req.params.projectId;
-  const userId = getRequestUserId(req);
+let indexMigrationPromise = null;
 
-  if (!projectId || !isValidObjectId(projectId)) {
-    res.status(400).json({ success: false, error: 'Invalid projectId' });
-    return null;
+async function ensureFlexibleOntologyChatIndexes() {
+  if (!indexMigrationPromise) {
+    indexMigrationPromise = (async () => {
+      try {
+        const indexes = await OntologyChatConversation.collection.indexes();
+        const legacyUnique = indexes.find((index) =>
+          index.name === 'projectId_1_userId_1' &&
+          index.unique === true
+        );
+
+        if (legacyUnique) {
+          await OntologyChatConversation.collection.dropIndex(legacyUnique.name);
+        }
+      } catch (error) {
+        console.warn('Ontology chat index migration skipped:', error.message || error);
+      }
+    })();
   }
+
+  return indexMigrationPromise;
+}
+
+async function assertUseCaseOwnerAccess(req, res) {
+  const userId = getRequestUserId(req);
 
   if (!userId || !isValidObjectId(userId)) {
     res.status(400).json({ success: false, error: 'Invalid or missing userId' });
@@ -52,16 +77,8 @@ async function assertUseCaseOwnerProjectAccess(req, res) {
   }
 
   const User = mongoose.model('User');
-  const Project = mongoose.model('Project');
-  const UseCase = mongoose.model('UseCase');
-
-  const projectIdObj = toObjectId(projectId);
   const userIdObj = toObjectId(userId);
-
-  const [user, project] = await Promise.all([
-    User.findById(userIdObj).select('_id name email role').lean(),
-    Project.findById(projectIdObj).lean()
-  ]);
+  const user = await User.findById(userIdObj).select('_id name email role').lean();
 
   if (!user) {
     res.status(404).json({ success: false, error: 'User not found' });
@@ -72,6 +89,20 @@ async function assertUseCaseOwnerProjectAccess(req, res) {
     res.status(403).json({ success: false, error: 'Only UseCaseOwner users can access ontology chat' });
     return null;
   }
+
+  return { userIdObj, user };
+}
+
+async function assertProjectAccessForUser(projectId, userIdObj, res) {
+  if (!projectId || !isValidObjectId(projectId)) {
+    res.status(400).json({ success: false, error: 'Invalid projectId' });
+    return null;
+  }
+
+  const Project = mongoose.model('Project');
+  const UseCase = mongoose.model('UseCase');
+  const projectIdObj = toObjectId(projectId);
+  const project = await Project.findById(projectIdObj).lean();
 
   if (!project) {
     res.status(404).json({ success: false, error: 'Project not found' });
@@ -101,25 +132,122 @@ async function assertUseCaseOwnerProjectAccess(req, res) {
     return null;
   }
 
-  return { projectIdObj, userIdObj, project, user };
+  return { projectIdObj, project };
 }
 
-function serializeConversation(conversation) {
+async function assertUseCaseOwnerProjectAccess(req, res) {
+  const userContext = await assertUseCaseOwnerAccess(req, res);
+  if (!userContext) return null;
+
+  const projectContext = await assertProjectAccessForUser(req.params.projectId, userContext.userIdObj, res);
+  if (!projectContext) return null;
+
+  return { ...userContext, ...projectContext };
+}
+
+function deriveConversationTitle(conversation, project = null) {
+  const explicitTitle = String(conversation?.title || '').trim();
+  const projectAssessmentTitle = `${project?.title || conversation?.projectTitle || ''} assessment`.trim();
+  const isGeneratedPlaceholder =
+    !explicitTitle ||
+    explicitTitle === 'New ontology chat' ||
+    (projectAssessmentTitle && explicitTitle === projectAssessmentTitle);
+
+  if (explicitTitle && !isGeneratedPlaceholder) return explicitTitle;
+
+  const firstUserMessage = (conversation?.messages || []).find((message) => message.sender === 'user');
+  if (firstUserMessage?.text) {
+    const compact = String(firstUserMessage.text).replace(/\s+/g, ' ').trim();
+    return compact.length > 42 ? `${compact.slice(0, 42)}...` : compact;
+  }
+
+  if (project?.title || conversation?.projectTitle) {
+    return `${project?.title || conversation.projectTitle} assessment`;
+  }
+
+  return 'New ontology chat';
+}
+
+async function getProjectLookupForConversations(conversations) {
+  const projectIds = unique((conversations || []).map((conversation) => toIdString(conversation.projectId)).filter((projectId) => projectId && isValidObjectId(projectId)));
+  if (!projectIds.length) return new Map();
+
+  const Project = mongoose.model('Project');
+  const projects = await Project.find({ _id: { $in: projectIds.map(toObjectId) } }).select('_id title').lean();
+  return new Map(projects.map((project) => [String(project._id), project]));
+}
+
+function hasCurrentAssessmentVersion(conversation) {
+  if (!conversation?.ontologyResult) return true;
+  const conversationVersion = conversation.assessmentVersion || null;
+  const resultVersion = conversation.ontologyResult?.reportVersion || null;
+  return conversationVersion === ASSESSMENT_VERSION && resultVersion === ASSESSMENT_VERSION;
+}
+
+function serializeConversation(conversation, projectLookup = new Map()) {
   if (!conversation) {
     return {
       conversationId: null,
+      title: 'New ontology chat',
+      projectId: null,
+      projectTitle: null,
       status: 'not_started',
       messages: [],
       ontologyResult: null
     };
   }
 
+  const projectId = toIdString(conversation.projectId) || null;
+  const project = projectId ? projectLookup.get(projectId) : null;
+  const assessmentIsCurrent = hasCurrentAssessmentVersion(conversation);
+
   return {
     conversationId: String(conversation._id),
-    status: conversation.status || 'not_started',
+    title: deriveConversationTitle(conversation, project),
+    projectId,
+    projectTitle: project?.title || conversation.projectTitle || null,
+    status: assessmentIsCurrent ? (conversation.status || 'not_started') : 'needs_more_information',
     messages: conversation.messages || [],
-    ontologyResult: conversation.ontologyResult || null,
+    ontologyResult: assessmentIsCurrent ? (conversation.ontologyResult || null) : null,
+    confirmedFacts: conversation.confirmedFacts || {},
+    unknownFacts: conversation.unknownFacts || {},
+    factEvidence: conversation.factEvidence || [],
+    contradictions: conversation.contradictions || [],
+    assessmentVersion: assessmentIsCurrent ? (conversation.assessmentVersion || ASSESSMENT_VERSION) : ASSESSMENT_VERSION,
+    staleAssessmentDiscarded: !assessmentIsCurrent,
     updatedAt: conversation.updatedAt
+  };
+}
+
+function serializeConversationSummary(conversation, projectLookup = new Map()) {
+  const serialized = serializeConversation(conversation, projectLookup);
+  const lastMessage = (conversation?.messages || []).slice(-1)[0];
+  return {
+    conversationId: serialized.conversationId,
+    title: serialized.title,
+    projectId: serialized.projectId,
+    projectTitle: serialized.projectTitle,
+    status: serialized.status,
+    messageCount: (conversation?.messages || []).length,
+    lastMessage: lastMessage?.text || '',
+    updatedAt: serialized.updatedAt
+  };
+}
+
+function emptyConversationPayload() {
+  return {
+    conversationId: null,
+    title: 'New ontology chat',
+    projectId: null,
+    projectTitle: null,
+    status: 'not_started',
+    messages: [],
+    ontologyResult: null,
+    confirmedFacts: {},
+    unknownFacts: {},
+    factEvidence: [],
+    contradictions: [],
+    assessmentVersion: ASSESSMENT_VERSION
   };
 }
 
@@ -254,71 +382,276 @@ function buildOntologyResult({ analysis, trace, contextText, project, clarificat
       ethicalTensions.length ? 'Review inferred ethical tensions with assigned experts.' : null,
       legalProvisions.length ? 'Map detected legal provisions to project compliance evidence.' : null
     ]),
-    scoreComponents: analysis?.score_components || null,
-    compositeScore: analysis?.composite_score ?? null,
     rawOntologyAnalysis: analysis || null
   };
 }
 
-async function runOntologyAssessment(project, conversation) {
-  const contextText = buildAnalysisContext(project, conversation.messages);
-  const [analysisResult, traceResult] = await Promise.allSettled([
-    ontologyService.analyzeText({ text: contextText }),
-    ontologyService.graphTrace({ text: contextText })
-  ]);
-
-  if (analysisResult.status === 'rejected') {
-    throw analysisResult.reason;
-  }
-
-  const analysis = analysisResult.value;
-  const trace = traceResult.status === 'fulfilled' ? traceResult.value : null;
-  const questions = buildClarifyingQuestions(contextText, analysis);
-
-  if (!hasOntologySignal(analysis)) {
-    return {
-      status: 'needs_more_information',
-      reply: 'I could not map the description to the ontology yet. Please add more detail about the system purpose, data, affected people, decision impact, and human oversight.',
-      ontologyResult: null,
-      raw: { analysis, trace }
-    };
-  }
-
+function getConversationFactState(conversation) {
   return {
-    status: 'completed',
-    reply: questions.length
-      ? 'Based on the information provided, the ontology assessment is complete. I structured the ontology-derived results below and flagged any unverified safeguards as follow-up items.'
-      : 'Based on the information provided, the ontology assessment is complete. I structured the ontology-derived results below.',
-    ontologyResult: buildOntologyResult({ analysis, trace, contextText, project, clarificationQuestions: questions }),
-    raw: { analysis, trace, missingQuestions: questions }
+    confirmedFacts: conversation.confirmedFacts || {},
+    unknownFacts: conversation.unknownFacts || {},
+    factEvidence: conversation.factEvidence || [],
+    contradictions: conversation.contradictions || []
   };
 }
 
-router.get('/:projectId/ontology-chat', async (req, res) => {
+async function syncConversationFactsToGraph({ project, userId, state }) {
+  if (!toIdString(project)) {
+    return {
+      status: 'skipped',
+      reason: 'No selected project is attached to this chat.',
+      note: 'General ontology chats are assessed from conversation facts only and are not written to project graph facts.'
+    };
+  }
+
   try {
-    const context = await assertUseCaseOwnerProjectAccess(req, res);
+    const payload = buildGraphFactAssertions({ project, userId, state });
+    const result = await ontologyService.executeQuery(payload, 3000);
+    return {
+      status: 'synced',
+      operation: 'NEO4J_FACT_ASSERTION',
+      factSources: Array.from(new Set((payload.params.facts || []).map((fact) => fact.source))),
+      factCount: payload.params.facts.length,
+      result: result?.results || result
+    };
+  } catch (error) {
+    return {
+      status: 'skipped',
+      reason: error.message || String(error),
+      note: 'Assessment did not use cached reports or raw keyword inference. Graph fact persistence is best-effort when the ontology API is available.'
+    };
+  }
+}
+
+async function runOntologyAssessment(project, conversation, userId) {
+  const previousState = getConversationFactState(conversation);
+  const geminiExtraction = await extractOntologyChatFactsWithGemini({
+    messages: conversation.messages || [],
+    previousState,
+    factLabels: FACT_LABELS
+  });
+
+  const assessment = assessOntologyChat({
+    project,
+    messages: conversation.messages || [],
+    previousState,
+    llmFacts: geminiExtraction.acceptedFacts || [],
+    geminiExtraction
+  });
+
+  const graphSync = await syncConversationFactsToGraph({
+    project,
+    userId,
+    state: assessment.state
+  });
+
+  assessment.ontologyResult.reasoningTrace.graphFactPersistence = graphSync;
+  assessment.raw.graphFactPersistence = graphSync;
+
+  return assessment;
+}
+
+function assertRequestProjectMatchesRoute(req, res, projectIdObj) {
+  const selectedProjectId = req.body?.projectId || req.body?.selectedProjectId;
+
+  if (!selectedProjectId) {
+    res.status(400).json({
+      success: false,
+      error: 'projectId is required for project-scoped ontology chat requests'
+    });
+    return false;
+  }
+
+  if (String(selectedProjectId) !== String(projectIdObj)) {
+    res.status(409).json({
+      success: false,
+      error: 'selected projectId does not match the ontology chat route projectId'
+    });
+    return false;
+  }
+
+  return true;
+}
+
+function logAssessmentState({ conversation, projectIdObj, priorMessagesLoaded, existingFactsLoaded, assessment }) {
+  console.info('[ontology-chat] state merge', {
+    conversationId: String(conversation._id),
+    projectId: String(projectIdObj || conversation.projectId || ''),
+    priorMessagesLoaded,
+    existingFactsLoaded,
+    newFactsExtracted: assessment.raw?.stateMergeStats?.newFactsExtracted ?? null,
+    llmExtractionStatus: assessment.raw?.stateMergeStats?.llmExtractionStatus ?? null,
+    llmFactsAccepted: assessment.raw?.stateMergeStats?.llmFactsAccepted ?? null,
+    llmFactsRejected: assessment.raw?.stateMergeStats?.llmFactsRejected ?? null,
+    semanticCandidatesAccepted: assessment.raw?.stateMergeStats?.semanticCandidatesAccepted ?? null,
+    semanticCandidatesRejected: assessment.raw?.stateMergeStats?.semanticCandidatesRejected ?? null,
+    previousStateReset: assessment.raw?.stateMergeStats?.previousStateReset ?? null,
+    previousStateResetReason: assessment.raw?.stateMergeStats?.previousStateResetReason ?? null,
+    mergedFactsUsed: assessment.raw?.stateMergeStats?.mergedFactsUsed ?? null
+  });
+}
+
+async function applyAssessmentToConversation({ conversation, project, userIdObj, projectIdObj, priorMessagesLoaded, existingFactsLoaded }) {
+  const assessment = await runOntologyAssessment(project, conversation, userIdObj);
+
+  conversation.status = assessment.status;
+  conversation.ontologyResult = assessment.ontologyResult;
+  conversation.confirmedFacts = assessment.state.confirmedFacts;
+  conversation.unknownFacts = assessment.state.unknownFacts;
+  conversation.factEvidence = assessment.state.factEvidence;
+  conversation.contradictions = assessment.state.contradictions;
+  conversation.assessmentVersion = ASSESSMENT_VERSION;
+  conversation.lastOntologyRaw = assessment.raw;
+  conversation.title = deriveConversationTitle(conversation, project);
+  conversation.projectTitle = project?.title || conversation.projectTitle || '';
+  conversation.messages.push({
+    sender: 'system',
+    text: assessment.reply,
+    status: assessment.status,
+    ontologyResult: assessment.ontologyResult
+  });
+
+  logAssessmentState({
+    conversation,
+    projectIdObj,
+    priorMessagesLoaded,
+    existingFactsLoaded,
+    assessment
+  });
+
+  await conversation.save();
+  return assessment;
+}
+
+async function createOntologyConversation({ userIdObj, project = null }) {
+  await ensureFlexibleOntologyChatIndexes();
+
+  return new OntologyChatConversation({
+    projectId: project?._id || null,
+    projectTitle: project?.title || '',
+    title: project?.title ? `${project.title} assessment` : 'New ontology chat',
+    userId: userIdObj,
+    status: 'not_started',
+    messages: [],
+    confirmedFacts: {},
+    unknownFacts: {},
+    factEvidence: [],
+    contradictions: [],
+    assessmentVersion: ASSESSMENT_VERSION
+  });
+}
+
+async function loadConversationForUser(conversationId, userIdObj, res) {
+  if (!conversationId || !isValidObjectId(conversationId)) {
+    res.status(400).json({ success: false, error: 'Invalid conversationId' });
+    return null;
+  }
+
+  const conversation = await OntologyChatConversation.findOne({
+    _id: toObjectId(conversationId),
+    userId: userIdObj
+  });
+
+  if (!conversation) {
+    res.status(404).json({ success: false, error: 'Ontology chat conversation not found' });
+    return null;
+  }
+
+  return conversation;
+}
+
+async function loadProjectForConversation(conversation, userIdObj, res) {
+  const projectId = toIdString(conversation.projectId);
+  if (!projectId) return null;
+
+  const projectContext = await assertProjectAccessForUser(projectId, userIdObj, res);
+  return projectContext?.project || null;
+}
+
+router.get('/ontology-chat', async (req, res) => {
+  try {
+    const context = await assertUseCaseOwnerAccess(req, res);
     if (!context) return;
 
-    const conversation = await OntologyChatConversation.findOne({
-      projectId: context.projectIdObj,
-      userId: context.userIdObj
-    }).lean();
+    await ensureFlexibleOntologyChatIndexes();
 
-    res.json({ success: true, ...serializeConversation(conversation) });
+    const conversations = await OntologyChatConversation.find({
+      userId: context.userIdObj
+    }).sort({ updatedAt: -1 }).limit(50).lean();
+    const projectLookup = await getProjectLookupForConversations(conversations);
+
+    res.json({
+      success: true,
+      conversations: conversations.map((conversation) => serializeConversationSummary(conversation, projectLookup)),
+      activeConversation: conversations[0]
+        ? serializeConversation(conversations[0], projectLookup)
+        : emptyConversationPayload()
+    });
   } catch (error) {
-    console.error('Error loading ontology chat:', error);
-    res.status(500).json({ success: false, error: error.message || 'Failed to load ontology chat' });
+    console.error('Error listing ontology chats:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to list ontology chats' });
   }
 });
 
-router.post('/:projectId/ontology-chat', async (req, res) => {
+router.post('/ontology-chat', async (req, res) => {
   try {
-    const context = await assertUseCaseOwnerProjectAccess(req, res);
+    const context = await assertUseCaseOwnerAccess(req, res);
+    if (!context) return;
+
+    const selectedProjectId = req.body?.projectId || req.body?.selectedProjectId;
+    let project = null;
+
+    if (selectedProjectId) {
+      const projectContext = await assertProjectAccessForUser(selectedProjectId, context.userIdObj, res);
+      if (!projectContext) return;
+      project = projectContext.project;
+    }
+
+    const conversation = await createOntologyConversation({
+      userIdObj: context.userIdObj,
+      project
+    });
+    await conversation.save();
+
+    const projectLookup = await getProjectLookupForConversations([conversation]);
+    res.status(201).json({
+      success: true,
+      ...serializeConversation(conversation.toObject(), projectLookup)
+    });
+  } catch (error) {
+    console.error('Error creating ontology chat:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to create ontology chat' });
+  }
+});
+
+router.get('/ontology-chat/:conversationId', async (req, res) => {
+  try {
+    const context = await assertUseCaseOwnerAccess(req, res);
+    if (!context) return;
+
+    const conversation = await loadConversationForUser(req.params.conversationId, context.userIdObj, res);
+    if (!conversation) return;
+
+    const project = await loadProjectForConversation(conversation, context.userIdObj, res);
+    if (toIdString(conversation.projectId) && !project) return;
+
+    const projectLookup = await getProjectLookupForConversations([conversation]);
+    res.json({
+      success: true,
+      ...serializeConversation(conversation.toObject(), projectLookup)
+    });
+  } catch (error) {
+    console.error('Error loading ontology chat conversation:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to load ontology chat conversation' });
+  }
+});
+
+router.post('/ontology-chat/:conversationId/messages', async (req, res) => {
+  try {
+    const context = await assertUseCaseOwnerAccess(req, res);
     if (!context) return;
 
     const message = String(req.body?.message || '').trim();
-    const conversationId = req.body?.conversationId;
-
     if (!message) {
       return res.status(400).json({ success: false, error: 'message is required' });
     }
@@ -327,49 +660,34 @@ router.post('/:projectId/ontology-chat', async (req, res) => {
       return res.status(413).json({ success: false, error: `message must be ${MAX_MESSAGE_LENGTH} characters or fewer` });
     }
 
-    let conversation = await OntologyChatConversation.findOne({
-      projectId: context.projectIdObj,
-      userId: context.userIdObj
-    });
+    const conversation = await loadConversationForUser(req.params.conversationId, context.userIdObj, res);
+    if (!conversation) return;
 
-    if (!conversation) {
-      conversation = new OntologyChatConversation({
-        projectId: context.projectIdObj,
-        userId: context.userIdObj,
-        status: 'not_started',
-        messages: []
-      });
-    } else if (conversationId && String(conversation._id) !== String(conversationId)) {
-      return res.status(409).json({
-        success: false,
-        error: 'conversationId does not match the active project conversation'
-      });
-    }
+    const project = await loadProjectForConversation(conversation, context.userIdObj, res);
+    if (toIdString(conversation.projectId) && !project) return;
 
+    const priorMessagesLoaded = (conversation.messages || []).length;
+    const existingFactsLoaded = Object.keys(conversation.confirmedFacts || {}).length;
     conversation.messages.push({
       sender: 'user',
       text: message
     });
 
     try {
-      const assessment = await runOntologyAssessment(context.project, conversation);
-
-      conversation.status = assessment.status;
-      conversation.ontologyResult = assessment.ontologyResult;
-      conversation.lastOntologyRaw = assessment.raw;
-      conversation.messages.push({
-        sender: 'system',
-        text: assessment.reply,
-        status: assessment.status,
-        ontologyResult: assessment.ontologyResult
+      const assessment = await applyAssessmentToConversation({
+        conversation,
+        project,
+        userIdObj: context.userIdObj,
+        projectIdObj: toIdString(conversation.projectId) ? conversation.projectId : null,
+        priorMessagesLoaded,
+        existingFactsLoaded
       });
 
-      await conversation.save();
-
+      const projectLookup = await getProjectLookupForConversations([conversation]);
       return res.json({
         success: true,
         reply: assessment.reply,
-        ...serializeConversation(conversation.toObject())
+        ...serializeConversation(conversation.toObject(), projectLookup)
       });
     } catch (ontologyError) {
       const reply = `Ontology service is unavailable or did not return a valid assessment. ${ontologyError.message || ontologyError}`;
@@ -388,11 +706,313 @@ router.post('/:projectId/ontology-chat', async (req, res) => {
 
       await conversation.save();
 
+      const projectLookup = await getProjectLookupForConversations([conversation]);
       return res.status(503).json({
         success: false,
         error: reply,
         reply,
-        ...serializeConversation(conversation.toObject())
+        ...serializeConversation(conversation.toObject(), projectLookup)
+      });
+    }
+  } catch (error) {
+    console.error('Error posting ontology chat message:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to process ontology chat message' });
+  }
+});
+
+router.delete('/ontology-chat/:conversationId', async (req, res) => {
+  try {
+    const context = await assertUseCaseOwnerAccess(req, res);
+    if (!context) return;
+
+    if (!req.params.conversationId || !isValidObjectId(req.params.conversationId)) {
+      return res.status(400).json({ success: false, error: 'Invalid conversationId' });
+    }
+
+    await OntologyChatConversation.findOneAndDelete({
+      _id: toObjectId(req.params.conversationId),
+      userId: context.userIdObj
+    });
+
+    const conversations = await OntologyChatConversation.find({
+      userId: context.userIdObj
+    }).sort({ updatedAt: -1 }).limit(50).lean();
+    const projectLookup = await getProjectLookupForConversations(conversations);
+
+    res.json({
+      success: true,
+      conversations: conversations.map((conversation) => serializeConversationSummary(conversation, projectLookup)),
+      activeConversation: conversations[0]
+        ? serializeConversation(conversations[0], projectLookup)
+        : emptyConversationPayload()
+    });
+  } catch (error) {
+    console.error('Error deleting ontology chat:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to delete ontology chat' });
+  }
+});
+
+router.get('/:projectId/ontology-chat/:conversationId', async (req, res) => {
+  try {
+    const context = await assertUseCaseOwnerProjectAccess(req, res);
+    if (!context) return;
+
+    const conversation = await loadConversationForUser(req.params.conversationId, context.userIdObj, res);
+    if (!conversation) return;
+
+    if (toIdString(conversation.projectId) !== String(context.projectIdObj)) {
+      return res.status(409).json({
+        success: false,
+        error: 'conversationId does not belong to the selected project'
+      });
+    }
+
+    const projectLookup = await getProjectLookupForConversations([conversation]);
+    res.json({
+      success: true,
+      ...serializeConversation(conversation.toObject(), projectLookup)
+    });
+  } catch (error) {
+    console.error('Error loading project ontology chat conversation:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to load ontology chat conversation' });
+  }
+});
+
+router.post('/:projectId/ontology-chat/:conversationId/messages', async (req, res) => {
+  try {
+    const context = await assertUseCaseOwnerProjectAccess(req, res);
+    if (!context) return;
+    if (!assertRequestProjectMatchesRoute(req, res, context.projectIdObj)) return;
+
+    const message = String(req.body?.message || '').trim();
+    if (!message) {
+      return res.status(400).json({ success: false, error: 'message is required' });
+    }
+
+    if (message.length > MAX_MESSAGE_LENGTH) {
+      return res.status(413).json({ success: false, error: `message must be ${MAX_MESSAGE_LENGTH} characters or fewer` });
+    }
+
+    const conversation = await loadConversationForUser(req.params.conversationId, context.userIdObj, res);
+    if (!conversation) return;
+
+    if (toIdString(conversation.projectId) !== String(context.projectIdObj)) {
+      return res.status(409).json({
+        success: false,
+        error: 'conversationId does not belong to the selected project'
+      });
+    }
+
+    const priorMessagesLoaded = (conversation.messages || []).length;
+    const existingFactsLoaded = Object.keys(conversation.confirmedFacts || {}).length;
+    conversation.messages.push({
+      sender: 'user',
+      text: message
+    });
+
+    try {
+      const assessment = await applyAssessmentToConversation({
+        conversation,
+        project: context.project,
+        userIdObj: context.userIdObj,
+        projectIdObj: context.projectIdObj,
+        priorMessagesLoaded,
+        existingFactsLoaded
+      });
+
+      const projectLookup = await getProjectLookupForConversations([conversation]);
+      return res.json({
+        success: true,
+        reply: assessment.reply,
+        ...serializeConversation(conversation.toObject(), projectLookup)
+      });
+    } catch (ontologyError) {
+      const reply = `Ontology service is unavailable or did not return a valid assessment. ${ontologyError.message || ontologyError}`;
+
+      conversation.status = 'error';
+      conversation.ontologyResult = null;
+      conversation.lastOntologyRaw = {
+        error: ontologyError.message || String(ontologyError)
+      };
+      conversation.messages.push({
+        sender: 'system',
+        text: reply,
+        status: 'error',
+        ontologyResult: null
+      });
+
+      await conversation.save();
+
+      const projectLookup = await getProjectLookupForConversations([conversation]);
+      return res.status(503).json({
+        success: false,
+        error: reply,
+        reply,
+        ...serializeConversation(conversation.toObject(), projectLookup)
+      });
+    }
+  } catch (error) {
+    console.error('Error posting project ontology chat message:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to process ontology chat message' });
+  }
+});
+
+router.delete('/:projectId/ontology-chat/:conversationId', async (req, res) => {
+  try {
+    const context = await assertUseCaseOwnerProjectAccess(req, res);
+    if (!context) return;
+
+    if (!req.params.conversationId || !isValidObjectId(req.params.conversationId)) {
+      return res.status(400).json({ success: false, error: 'Invalid conversationId' });
+    }
+
+    await OntologyChatConversation.findOneAndDelete({
+      _id: toObjectId(req.params.conversationId),
+      projectId: context.projectIdObj,
+      userId: context.userIdObj
+    });
+
+    const conversations = await OntologyChatConversation.find({
+      projectId: context.projectIdObj,
+      userId: context.userIdObj
+    }).sort({ updatedAt: -1 }).limit(50).lean();
+    const projectLookup = await getProjectLookupForConversations(conversations);
+
+    res.json({
+      success: true,
+      conversations: conversations.map((conversation) => serializeConversationSummary(conversation, projectLookup)),
+      activeConversation: conversations[0]
+        ? serializeConversation(conversations[0], projectLookup)
+        : emptyConversationPayload()
+    });
+  } catch (error) {
+    console.error('Error deleting project ontology chat:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to delete ontology chat' });
+  }
+});
+
+router.get('/:projectId/ontology-chat', async (req, res) => {
+  try {
+    const context = await assertUseCaseOwnerProjectAccess(req, res);
+    if (!context) return;
+
+    const conversations = await OntologyChatConversation.find({
+      projectId: context.projectIdObj,
+      userId: context.userIdObj
+    }).sort({ updatedAt: -1 }).limit(50).lean();
+
+    const projectLookup = await getProjectLookupForConversations(conversations);
+    res.json({
+      success: true,
+      conversations: conversations.map((conversation) => serializeConversationSummary(conversation, projectLookup)),
+      activeConversation: conversations[0]
+        ? serializeConversation(conversations[0], projectLookup)
+        : emptyConversationPayload()
+    });
+  } catch (error) {
+    console.error('Error loading ontology chat:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to load ontology chat' });
+  }
+});
+
+router.post('/:projectId/ontology-chat', async (req, res) => {
+  try {
+    const context = await assertUseCaseOwnerProjectAccess(req, res);
+    if (!context) return;
+    if (!assertRequestProjectMatchesRoute(req, res, context.projectIdObj)) return;
+
+    const message = String(req.body?.message || '').trim();
+    const conversationId = req.body?.conversationId;
+
+    if (!message) {
+      const conversation = await createOntologyConversation({
+        userIdObj: context.userIdObj,
+        project: context.project
+      });
+      await conversation.save();
+
+      const projectLookup = await getProjectLookupForConversations([conversation]);
+      return res.status(201).json({
+        success: true,
+        ...serializeConversation(conversation.toObject(), projectLookup)
+      });
+    }
+
+    if (message.length > MAX_MESSAGE_LENGTH) {
+      return res.status(413).json({ success: false, error: `message must be ${MAX_MESSAGE_LENGTH} characters or fewer` });
+    }
+
+    let conversation = null;
+    if (conversationId) {
+      conversation = await loadConversationForUser(conversationId, context.userIdObj, res);
+      if (!conversation) return;
+
+      if (toIdString(conversation.projectId) !== String(context.projectIdObj)) {
+        return res.status(409).json({
+          success: false,
+          error: 'conversationId does not belong to the selected project'
+        });
+      }
+    } else {
+      conversation = await OntologyChatConversation.findOne({
+        projectId: context.projectIdObj,
+        userId: context.userIdObj
+      }).sort({ updatedAt: -1 });
+    }
+
+    if (!conversation) {
+      conversation = await createOntologyConversation({
+        userIdObj: context.userIdObj,
+        project: context.project
+      });
+    }
+
+    const priorMessagesLoaded = (conversation.messages || []).length;
+    const existingFactsLoaded = Object.keys(conversation.confirmedFacts || {}).length;
+    conversation.messages.push({
+      sender: 'user',
+      text: message
+    });
+
+    try {
+      const assessment = await applyAssessmentToConversation({
+        conversation,
+        project: context.project,
+        userIdObj: context.userIdObj,
+        projectIdObj: context.projectIdObj,
+        priorMessagesLoaded,
+        existingFactsLoaded
+      });
+
+      const projectLookup = await getProjectLookupForConversations([conversation]);
+      return res.json({
+        success: true,
+        reply: assessment.reply,
+        ...serializeConversation(conversation.toObject(), projectLookup)
+      });
+    } catch (ontologyError) {
+      const reply = `Ontology service is unavailable or did not return a valid assessment. ${ontologyError.message || ontologyError}`;
+
+      conversation.status = 'error';
+      conversation.ontologyResult = null;
+      conversation.lastOntologyRaw = {
+        error: ontologyError.message || String(ontologyError)
+      };
+      conversation.messages.push({
+        sender: 'system',
+        text: reply,
+        status: 'error',
+        ontologyResult: null
+      });
+
+      await conversation.save();
+
+      const projectLookup = await getProjectLookupForConversations([conversation]);
+      return res.status(503).json({
+        success: false,
+        error: reply,
+        reply,
+        ...serializeConversation(conversation.toObject(), projectLookup)
       });
     }
   } catch (error) {
@@ -406,17 +1026,14 @@ router.delete('/:projectId/ontology-chat', async (req, res) => {
     const context = await assertUseCaseOwnerProjectAccess(req, res);
     if (!context) return;
 
-    await OntologyChatConversation.findOneAndDelete({
+    await OntologyChatConversation.deleteMany({
       projectId: context.projectIdObj,
       userId: context.userIdObj
     });
 
     res.json({
       success: true,
-      conversationId: null,
-      status: 'not_started',
-      messages: [],
-      ontologyResult: null
+      ...emptyConversationPayload()
     });
   } catch (error) {
     console.error('Error clearing ontology chat:', error);

@@ -64,6 +64,7 @@ export function UseCaseOwnerDashboard({
   const [myUseCases, setMyUseCases] = useState<UseCase[]>([]);
   const [loadingUseCases, setLoadingUseCases] = useState(true);
   const [useCaseProgresses, setUseCaseProgresses] = useState<Record<string, number>>({});
+  const [selectedOntologyProjectId, setSelectedOntologyProjectId] = useState('');
 
   // Fetch only this owner's use cases directly from backend (much faster)
   const fetchMyUseCases = React.useCallback(async () => {
@@ -213,7 +214,19 @@ export function UseCaseOwnerDashboard({
     });
   }, [projects, myUseCases, currentUser.id]);
 
-  const selectedOntologyProject = ontologyProjects[0] || null;
+  const getOntologyProjectId = (project: any) => String(project?.id || project?._id || '');
+
+  useEffect(() => {
+    if (!selectedOntologyProjectId) return;
+    const stillAvailable = ontologyProjects.some((project: any) => getOntologyProjectId(project) === selectedOntologyProjectId);
+    if (!stillAvailable) {
+      setSelectedOntologyProjectId('');
+    }
+  }, [ontologyProjects, selectedOntologyProjectId]);
+
+  const selectedOntologyProject = selectedOntologyProjectId
+    ? ontologyProjects.find((project: any) => getOntologyProjectId(project) === selectedOntologyProjectId) || null
+    : null;
 
   // Fetch unread message count
   const fetchUnreadCount = async () => {
@@ -601,13 +614,34 @@ export function UseCaseOwnerDashboard({
         <div className="px-8 py-6">
           {dashboardSection === 'ontology' ? (
             <div className="space-y-4">
-              {selectedOntologyProject ? (
-                <OntologyChatBox project={selectedOntologyProject} currentUser={currentUser} />
-              ) : (
-                <div className="rounded-lg border border-dashed border-white/10 bg-[#0a1122] p-8 text-center text-sm text-slate-400">
-                  No use case project is available for ontology chat.
+              {ontologyProjects.length > 0 && (
+                <div className="rounded-lg border border-white/10 bg-[#0a1122] p-4">
+                  <label htmlFor="ontology-project-select" className="mb-2 block text-sm font-medium text-slate-300">
+                    Project context
+                  </label>
+                  <select
+                    id="ontology-project-select"
+                    value={selectedOntologyProjectId}
+                    onChange={(event) => setSelectedOntologyProjectId(event.target.value)}
+                    className="w-full rounded-lg border border-white/10 bg-[#050b14] px-4 py-3 text-sm text-white outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                  >
+                    <option value="">General ontology chat</option>
+                    {ontologyProjects.map((project: any) => {
+                      const optionProjectId = getOntologyProjectId(project);
+                      return (
+                        <option key={optionProjectId} value={optionProjectId}>
+                          {project.title || optionProjectId}
+                        </option>
+                      );
+                    })}
+                  </select>
                 </div>
               )}
+              <OntologyChatBox
+                key={selectedOntologyProject ? getOntologyProjectId(selectedOntologyProject) : 'general'}
+                project={selectedOntologyProject}
+                currentUser={currentUser}
+              />
             </div>
           ) : (
             <>

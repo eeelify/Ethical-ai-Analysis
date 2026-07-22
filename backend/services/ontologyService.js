@@ -4,10 +4,10 @@ const ontologyConfig = require('../config/ontologyConfig');
 /**
  * Creates an Axios instance with configured base URL and timeout
  */
-const createClient = () => {
+const createClient = (timeoutMs = ontologyConfig.timeoutMs) => {
   return axios.create({
     baseURL: ontologyConfig.baseUrl,
-    timeout: ontologyConfig.timeoutMs,
+    timeout: timeoutMs,
     headers: {
       'Content-Type': 'application/json'
     }
@@ -103,6 +103,25 @@ const graphTrace = async (payload) => {
 };
 
 /**
+ * Execute a Cypher query through the Python Ontology API.
+ * Used only for explicit graph facts, never for raw keyword final decisions.
+ */
+const executeQuery = async (payload, timeoutMs = 3000) => {
+  if (!ontologyConfig.enabled) throw new Error('Ontology service is disabled.');
+  try {
+    const client = createClient(timeoutMs);
+    const response = await client.post('/query', payload);
+    return response.data;
+  } catch (error) {
+    console.error('Ontology API Query Failed:', error.message);
+    if (error.response) {
+      throw new Error(`Ontology service error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
+    }
+    throw new Error('Could not execute ontology graph query: ' + error.message);
+  }
+};
+
+/**
  * Get ethical violations for a specific system
  */
 const getViolations = async (systemName) => {
@@ -153,6 +172,7 @@ module.exports = {
   generateReport,
   analyzeText,
   graphTrace,
+  executeQuery,
   getViolations,
   getTensions,
   getGraph

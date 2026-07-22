@@ -29,8 +29,16 @@ const OntologyChatConversationSchema = new mongoose.Schema({
   projectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',
-    required: true,
+    default: null,
     index: true
+  },
+  title: {
+    type: String,
+    default: 'New ontology chat'
+  },
+  projectTitle: {
+    type: String,
+    default: ''
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -52,13 +60,34 @@ const OntologyChatConversationSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Mixed,
     default: null
   },
+  confirmedFacts: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
+  },
+  unknownFacts: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
+  },
+  factEvidence: {
+    type: [mongoose.Schema.Types.Mixed],
+    default: []
+  },
+  contradictions: {
+    type: [mongoose.Schema.Types.Mixed],
+    default: []
+  },
+  assessmentVersion: {
+    type: String,
+    default: 'ontology-chat-semantic-facts-v2'
+  },
   lastOntologyRaw: {
     type: mongoose.Schema.Types.Mixed,
     default: null
   }
 }, { timestamps: true });
 
-OntologyChatConversationSchema.index({ projectId: 1, userId: 1 }, { unique: true });
+OntologyChatConversationSchema.index({ userId: 1, updatedAt: -1 });
+OntologyChatConversationSchema.index({ userId: 1, projectId: 1, updatedAt: -1 });
 
 module.exports = mongoose.models.OntologyChatConversation ||
   mongoose.model('OntologyChatConversation', OntologyChatConversationSchema);
