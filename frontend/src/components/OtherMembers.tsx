@@ -29,7 +29,7 @@ export function OtherMembers({ currentUser, users, projects, onBack }: OtherMemb
   const currentUserId = getId(currentUser);
 
 
-  // Conversation list: API + selected (even if panel kapalı)
+  // Conversation list: API + selected (even if panel is closed)
   const conversationList = useMemo(() => {
     let list = [...conversationStore];
     const appendIfMissing = (conv: any) => {
@@ -40,10 +40,10 @@ export function OtherMembers({ currentUser, users, projects, onBack }: OtherMemb
       if (!exists) list = [...list, conv];
     };
 
-    // Seçili konuşma
+    // Selected conversation
     if (selectedConversation) appendIfMissing(selectedConversation);
 
-    // Açık chat (yeni başlatılmış) listede yoksa ekle
+    // Add open chat (newly started) if not in the list
     if (chatOtherUser && chatProject) {
       appendIfMissing({
         projectId: chatProject.id,
@@ -60,13 +60,13 @@ export function OtherMembers({ currentUser, users, projects, onBack }: OtherMemb
     return list;
   }, [conversationStore, selectedConversation, chatOtherUser, chatProject]);
 
-  // Kendim hariç diğer kullanıcılar
-  // Admin hariç diğer uzmanlar use-case-owner'ı göremez
+  // Other users excluding myself
+  // Experts other than admin cannot see use-case-owner
   const otherUsers = users.filter((user) => {
     if (getId(user) === currentUserId) return false;
-    // Admin herkesi görebilir
+    // Admin can see everyone
     if (currentUser.role === 'admin') return true;
-    // Diğer uzmanlar use-case-owner'ı göremez
+    // Other experts cannot see use-case-owner
     if (user.role === 'use-case-owner') return false;
     return true;
   });
@@ -87,7 +87,7 @@ export function OtherMembers({ currentUser, users, projects, onBack }: OtherMemb
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  // Find or create a project for communication with a user (UseCaseOwner-Admin mantığı)
+  // Find or create a project for communication with a user (UseCaseOwner-Admin logic)
   const getCommunicationProject = async (otherUser: User): Promise<Project> => {
     // Try to find an existing project where both users are assigned
     let commProject = projects.find(p => 
@@ -206,7 +206,7 @@ const fetchConversations = async () => {
     if (response.ok) {
       const data = await response.json();
 
-      // Güvenli normalize (bazı durumlarda id/_id obje gelebilir diye)
+      // Safe normalization (in case id/_id comes as an object)
       const fresh = (data || []).map((c: any) => ({
         ...c,
         projectId: c.projectId?.id || c.projectId?._id || c.projectId,
@@ -398,7 +398,7 @@ const fetchConversations = async () => {
             const userColor =
               roleColors[user.role as keyof typeof roleColors] || '#1F2937';
 
-            // Backend tarafında projeler id üzerinden atanıyorsa helper'ı kullan
+            // If projects are assigned by id on backend, use helper
             const userProjects = getUserProjects(user.id, projects);
 
             return (

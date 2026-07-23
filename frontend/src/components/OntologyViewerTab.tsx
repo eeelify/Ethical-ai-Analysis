@@ -140,13 +140,13 @@ export function OntologyViewerTab() {
               nodeRelSize={6}
               nodeCanvasObject={(node: any, ctx, globalScale) => {
                 const size = 5;
-                // Düğümü çiz (yuvarlak)
+                // Draw node (circle)
                 ctx.beginPath();
                 ctx.arc(node.x, node.y, size, 0, 2 * Math.PI, false);
                 ctx.fillStyle = getNodeColor(node.group);
                 ctx.fill();
 
-                // Sadece belirli bir yakınlaştırma seviyesinden sonra yazıları göster
+                // Only show text labels after a certain zoom level
                 if (globalScale >= 1.5) {
                   const label = node.name;
                   const fontSize = 12 / globalScale;
@@ -155,7 +155,7 @@ export function OntologyViewerTab() {
                   const textWidth = ctx.measureText(label).width;
                   const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2);
                   
-                  // Yazı arka planı
+                  // Text background
                   ctx.fillStyle = 'rgba(10, 17, 34, 0.8)';
                   ctx.fillRect(
                     node.x - bckgDimensions[0] / 2, 
@@ -164,7 +164,7 @@ export function OntologyViewerTab() {
                     bckgDimensions[1]
                   );
                   
-                  // Yazı
+                  // Text
                   ctx.textAlign = 'center';
                   ctx.textBaseline = 'top';
                   ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
@@ -177,7 +177,7 @@ export function OntologyViewerTab() {
               linkDirectionalArrowRelPos={1}
               linkCanvasObjectMode={() => 'after'}
               linkCanvasObject={(link: any, ctx, globalScale) => {
-                if (globalScale >= 2.0) { // İlişki yazıları daha da yaklaşıldığında görünsün
+                if (globalScale >= 2.0) { // Show relationship labels when zoomed in further
                   const start = link.source;
                   const end = link.target;
                   if (typeof start !== 'object' || typeof end !== 'object') return;

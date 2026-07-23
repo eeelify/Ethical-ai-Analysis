@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   ArrowLeft, Calendar, Users as UsersIcon, Target, BarChart3, Plus,
-  FileText, Shield, MessageSquare, User as UserIconLucide, GitBranch, Download
+  FileText, Shield, MessageSquare, User as UserIconLucide, GitBranch, Download, Cpu
 } from 'lucide-react';
-import { Project, User, Tension, UseCase } from '../types'; // UseCase import etmeyi unutmayın
+import { Project, User, Tension, UseCase } from '../types'; // Don't forget to import UseCase
 import { UseCaseOwners } from './UseCaseOwners';
 import { TensionCard } from './TensionCard';
 import { AddTensionModal } from './AddTensionModal';
@@ -12,6 +12,7 @@ import { fetchUserProgress } from '../utils/userProgress';
 import { api } from '../api';
 import { Spinner } from './Spinner';
 import { OntologyReportViewer } from './OntologyReportViewer';
+import { UnifiedReportViewer } from './UnifiedReportViewer';
 
 interface ProjectDetailProps {
   project: Project;
@@ -24,8 +25,10 @@ interface ProjectDetailProps {
   onViewTension?: (tension: Tension) => void;
   onViewOwner?: (owner: User) => void;
   onCreateTension?: (data: any) => void;
+  onViewReport?: (reportId: string) => void;
+  onOpenAdminReview?: () => void;
   initialChatUserId?: string; // Optional: open chat with this user on mount
-  initialTab?: 'evaluation' | 'tensions' | 'usecase' | 'owners'; // Optional: set initial tab
+  initialTab?: 'evaluation' | 'tensions' | 'usecase' | 'owners' | 'reports' | 'dashboard'; // Optional: set initial tab
 }
 
 const roleColors = {
@@ -48,10 +51,12 @@ export function ProjectDetail({
   onFinishEvolution,
   onViewTension,
   onViewOwner,
+  onViewReport,
+  onOpenAdminReview,
   initialChatUserId,
   initialTab = 'evaluation',
 }: ProjectDetailProps) {
-  const [activeTab, setActiveTab] = useState<'evaluation' | 'tensions' | 'usecase' | 'owners' | 'dashboard'>(initialTab as any);
+  const [activeTab, setActiveTab] = useState<'evaluation' | 'tensions' | 'usecase' | 'owners' | 'dashboard' | 'reports'>(initialTab as any);
   const [showAddTension, setShowAddTension] = useState(false);
   const [tensions, setTensions] = useState<Tension[]>(() => {
     // Load from localStorage if present for this project
@@ -62,7 +67,7 @@ export function ProjectDetail({
       return [];
     }
   });
-  // Yeni: Bağlı Use Case verisini tutacak state
+  // State to hold linked Use Case data
   const [linkedUseCase, setLinkedUseCase] = useState<UseCase | null>(null);
   const [useCaseQuestions, setUseCaseQuestions] = useState<any[]>([]);
   // Chat panel state
@@ -73,6 +78,8 @@ export function ProjectDetail({
   const [chatProject, setChatProject] = useState<Project | null>(null);
   const [userProgress, setUserProgress] = useState<number>(project.progress || 0);
   const [generating, setGenerating] = useState(false);
+  const [generatingExpert, setGeneratingExpert] = useState(false);
+  const [reportRefreshTrigger, setReportRefreshTrigger] = useState(0);
   const previousProgressRef = useRef<number>(project.progress || 0);
   const [memberProgresses, setMemberProgresses] = useState<Record<string, number>>({});
   const [evolutionCompletedAt, setEvolutionCompletedAt] = useState<string | null>(null);
@@ -81,10 +88,10 @@ export function ProjectDetail({
   // Calculate assignedUserDetails early to avoid "before initialization" error
   const assignedUserDetails = users
     .filter((user) => project.assignedUsers.includes(user.id))
-    // View Details ekranında use-case-owner'ın bir değerlendirme aksiyonu yok; burada göstermiyoruz
+    // use-case-owner has no evaluation action in View Details screen; not showing here
     .filter((user) => user.role !== 'use-case-owner');
 
-  // Find or create a project for communication with a user (UseCaseOwner-Admin mantığı)
+  // Find or create a project for communication with a user (UseCaseOwner-Admin logic)
   const getCommunicationProject = async (otherUser: User): Promise<Project> => {
     // Use projects list if available, otherwise use current project
     const allProjects = projects.length > 0 ? projects : [project];
@@ -216,7 +223,7 @@ export function ProjectDetail({
 
   const hasEditPermission = true;
 
-  // Tensionları Getir
+  // Fetch tensions
   const fetchTensions = async () => {
     try {
       const response = await fetch(api(`/api/tensions/${project.id}?userId=${currentUser.id}`));
@@ -237,7 +244,7 @@ export function ProjectDetail({
     }
   };
 
-  // Use Case Verisini Getir (Eğer projeye bağlıysa)
+  // Fetch Use Case Data (if linked to project)
   const fetchUseCase = async () => {
     if (!project.useCase) return;
     try {
@@ -246,7 +253,7 @@ export function ProjectDetail({
         ? project.useCase
         : (project.useCase as any).url || project.useCase;
 
-      // Paralel olarak use case ve questions'ı çek
+      // Fetch use case and questions in parallel
       const [useCaseResponse, questionsResponse] = await Promise.all([
         fetch(api(`/api/use-cases/${useCaseId}`)),
         fetch(api('/api/use-case-questions'))
@@ -286,7 +293,7 @@ export function ProjectDetail({
           if (reportResponse.report) {
             setLatestReport({
               id: reportResponse.report._id,
-              fileUrl: reportResponse.report.fileUrl || `/api/reports/${reportResponse.report._id}/file`,
+              fileUrl: reportResponse.report.fileUrl || `/api/reports/${reportResponse.report._id}/pdf`,
               title: reportResponse.report.title || 'Analysis Report'
             });
           } else {
@@ -327,7 +334,7 @@ export function ProjectDetail({
     if (currentUser.id && project.id) loadEvolutionCompletion();
   }, [currentUser.id, project.id]);
 
-  // Tüm assigned members için progress yükle
+  // Load progress for all assigned members
   useEffect(() => {
     const loadAllMemberProgresses = async () => {
       const progresses: Record<string, number> = {};
@@ -347,13 +354,13 @@ export function ProjectDetail({
 
     if (assignedUserDetails.length > 0) {
       loadAllMemberProgresses();
-      // Progress'i periyodik olarak güncelle (her 5 saniyede bir)
+      // Periodically update progress (every 60 seconds)
       const interval = setInterval(loadAllMemberProgresses, 60000); // Changed from 5000 to 60000 for performance
       return () => clearInterval(interval);
     }
   }, [project, assignedUserDetails]);
 
-  // Kullanıcıya özel ilerleme
+  // User-specific progress
   useEffect(() => {
     const loadUserProgress = async () => {
       const previousProgress = previousProgressRef.current;
@@ -367,7 +374,7 @@ export function ProjectDetail({
       // Backend notificationService.notifyEvaluationCompleted handles this automatically
     };
     loadUserProgress();
-    // Progress'i periyodik olarak güncelle (her 3 saniyede bir)
+    // Periodically update progress (every 30 seconds)
     const interval = setInterval(loadUserProgress, 30000); // Changed from 3000 to 30000 for performance
     return () => clearInterval(interval);
   }, [project, currentUser, users]);
@@ -448,7 +455,7 @@ export function ProjectDetail({
   };
 
   const handleVote = async (tensionId: string, voteType: 'agree' | 'disagree') => {
-    // Optimistic update: Anında state'i güncelle
+    // Optimistic update: Update state immediately
     setTensions(prevTensions =>
       prevTensions.map(t => {
         if ((t.id || (t as any)._id) === tensionId) {
@@ -456,13 +463,13 @@ export function ProjectDetail({
           const currentDisagree = t.consensus?.disagree || 0;
           const oldVote = t.userVote;
 
-          // Eski oyu çıkar
+          // Remove old vote
           let newAgree = currentAgree;
           let newDisagree = currentDisagree;
           if (oldVote === 'agree') newAgree = Math.max(0, newAgree - 1);
           if (oldVote === 'disagree') newDisagree = Math.max(0, newDisagree - 1);
 
-          // Yeni oyu ekle (eğer aynı butona basıldıysa oyu kaldır)
+          // Add new vote (remove vote if same button pressed)
           const newVote = oldVote === voteType ? null : voteType;
           if (newVote === 'agree') newAgree += 1;
           if (newVote === 'disagree') newDisagree += 1;
@@ -487,15 +494,15 @@ export function ProjectDetail({
         body: JSON.stringify({ userId: currentUser.id, voteType }),
       });
       if (response.ok) {
-        // Backend'den güncel veriyi al
+        // Fetch updated data from backend
         fetchTensions();
       } else {
-        // Hata durumunda geri al
+        // Rollback on error
         fetchTensions();
       }
     } catch (error) {
       console.error("Vote error:", error);
-      // Hata durumunda geri al
+      // Rollback on error
       fetchTensions();
     }
   };
@@ -565,7 +572,7 @@ export function ProjectDetail({
     }
   };
 
-  // Generate report for a project (Ontology Backend)
+  // Generate Ontology report for a project
   const handleGenerateReport = async () => {
     try {
       setGenerating(true);
@@ -582,6 +589,7 @@ export function ProjectDetail({
       if (response.ok) {
         const result = await response.json();
         alert('✅ Ontology Report generated successfully!');
+        setReportRefreshTrigger(prev => prev + 1);
         if (result.report) {
           setOntologyReportData(result.report);
         }
@@ -594,6 +602,35 @@ export function ProjectDetail({
       alert('Could not connect to the server.');
     } finally {
       setGenerating(false);
+    }
+  };
+
+  // Generate Expert (Z-Inspection) report for a project
+  const handleGenerateExpertReport = async () => {
+    try {
+      setGeneratingExpert(true);
+      const projectId = project.id || (project as any)._id;
+      const userId = currentUser?.id || (currentUser as any)?._id;
+      const response = await fetch(api('/api/reports/generate-atomic'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
+        body: JSON.stringify({ projectId, questionnaireKey: null })
+      });
+      if (response.ok) {
+        const result = await response.json();
+        alert('✅ Expert Report generated successfully!');
+        setReportRefreshTrigger(prev => prev + 1);
+        // Switch to reports tab
+        setActiveTab('reports');
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        alert(`❌ Failed to generate expert report: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error generating expert report:', error);
+      alert('Could not connect to the server.');
+    } finally {
+      setGeneratingExpert(false);
     }
   };
 
@@ -688,117 +725,66 @@ export function ProjectDetail({
           </div>
           <div className="flex items-center space-x-3">
             {currentUser.role === 'admin' && (() => {
-              // Calculate team average progress for admin
-              const calculateTeamAverageProgress = () => {
-                const progressValues = getContributorProgressValues();
-                if (progressValues.length === 0) return 0;
-                const sum = progressValues.reduce((acc, val) => acc + val, 0);
-                return sum / progressValues.length;
-              };
-              const teamAverageProgress = calculateTeamAverageProgress();
-              const isComplete = teamAverageProgress >= 100;
-              const canGenerate = isComplete && !generating;
+              const teamAverageProgress2 = calculateTeamAverageProgress();
+              const isComplete2 = teamAverageProgress2 >= 100;
               return (
-                <button
-                  onClick={handleGenerateReport}
-                  disabled={!canGenerate}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${!canGenerate
-                      ? 'bg-gray-300 text-slate-400 cursor-not-allowed'
-                      : 'bg-green-600 text-white hover:bg-green-700'
+                <div className="flex items-center gap-2">
+                  {/* Generate Expert Report */}
+                  <button
+                    onClick={handleGenerateExpertReport}
+                    disabled={!isComplete2 || generatingExpert}
+                    className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
+                      !isComplete2 || generatingExpert
+                        ? 'bg-gray-300 text-slate-400 cursor-not-allowed'
+                        : 'bg-green-600 text-white hover:bg-green-700'
                     }`}
-                  title={!isComplete ? 'Project must be 100% complete to generate report' : ''}
-                >
-                  {generating ? 'Generating...' : 'Generate Report'}
-                </button>
+                    title={!isComplete2 ? 'Project must be 100% complete' : 'Generate Expert Evaluation Report'}
+                  >
+                    <FileText className="w-4 h-4" />
+                    {generatingExpert ? 'Generating...' : 'Generate Expert Report'}
+                  </button>
+
+                  {/* Generate Ontology Report */}
+                  <button
+                    onClick={handleGenerateReport}
+                    disabled={!isComplete2 || generating}
+                    className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
+                      !isComplete2 || generating
+                        ? 'bg-gray-300 text-slate-400 cursor-not-allowed'
+                        : 'bg-purple-600 text-white hover:bg-purple-700'
+                    }`}
+                    title={!isComplete2 ? 'Project must be 100% complete' : 'Generate AI Ontology Report'}
+                  >
+                    <Cpu className="w-4 h-4" />
+                    {generating ? 'Generating...' : 'Generate Ontology Report'}
+                  </button>
+
+                  {/* Show Reports */}
+                  {currentUser.role !== 'admin' && !project.reportsPublished ? (
+                    <button
+                      disabled
+                      className="px-3 py-2 text-sm font-medium rounded-lg flex items-center gap-1.5 bg-gray-800 text-slate-500 cursor-not-allowed border border-gray-700"
+                      title="Waiting for Admin Approval"
+                    >
+                      <BarChart3 className="w-4 h-4" />
+                      Pending Approval
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setActiveTab('reports');
+                        setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
+                      }}
+                      className="px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 bg-blue-600 text-white hover:bg-blue-700"
+                      title="View Assessment Reports"
+                    >
+                      <BarChart3 className="w-4 h-4" />
+                      Show Reports
+                    </button>
+                  )}
+                </div>
               );
             })()}
-            <button
-              onClick={async () => {
-                if (!latestReport) {
-                  // If no report exists, button is disabled
-                  return;
-                }
-
-                try {
-                  // Always fetch the latest report before opening to ensure we have the most recent one
-                  const projectId = project.id || (project as any)._id;
-                  const userId = currentUser?.id || (currentUser as any)?._id;
-
-                  // Fetch latest report to ensure we have the most recent one
-                  const response = await fetch(api(`/api/projects/${projectId}/reports/latest?userId=${userId}`));
-                  if (response.ok) {
-                    const reportResponse = await response.json();
-                    if (reportResponse.report) {
-                      // Use the latest report ID
-                      const reportId = reportResponse.report._id || reportResponse.report.id;
-                      let reportUrl = reportResponse.report.fileUrl || `/api/reports/${reportId}/file`;
-
-                      // Ensure URL is absolute
-                      if (!reportUrl.startsWith('http')) {
-                        reportUrl = api(reportUrl);
-                      }
-
-                      // Add userId as query parameter if not already present
-                      if (userId && !reportUrl.includes('userId=')) {
-                        const separator = reportUrl.includes('?') ? '&' : '?';
-                        reportUrl = `${reportUrl}${separator}userId=${userId}`;
-                      }
-
-                      // Update latestReport state
-                      setLatestReport({
-                        id: reportId,
-                        fileUrl: reportUrl,
-                        title: reportResponse.report.title || 'Analysis Report'
-                      });
-
-                      // Open report in new tab
-                      window.open(reportUrl, '_blank', 'noopener,noreferrer');
-                    } else {
-                      alert('No report found for this project.');
-                    }
-                  } else {
-                    // Fallback to existing latestReport if fetch fails
-                    if (latestReport) {
-                      let reportUrl = latestReport.fileUrl.startsWith('http')
-                        ? latestReport.fileUrl
-                        : api(latestReport.fileUrl);
-
-                      const userId = currentUser?.id || (currentUser as any)?._id;
-                      if (userId && !reportUrl.includes('userId=')) {
-                        const separator = reportUrl.includes('?') ? '&' : '?';
-                        reportUrl = `${reportUrl}${separator}userId=${userId}`;
-                      }
-
-                      window.open(reportUrl, '_blank', 'noopener,noreferrer');
-                    }
-                  }
-                } catch (err) {
-                  console.error('Error fetching latest report:', err);
-                  // Fallback to existing latestReport
-                  if (latestReport) {
-                    let reportUrl = latestReport.fileUrl.startsWith('http')
-                      ? latestReport.fileUrl
-                      : api(latestReport.fileUrl);
-
-                    const userId = currentUser?.id || (currentUser as any)?._id;
-                    if (userId && !reportUrl.includes('userId=')) {
-                      const separator = reportUrl.includes('?') ? '&' : '?';
-                      reportUrl = `${reportUrl}${separator}userId=${userId}`;
-                    }
-
-                    window.open(reportUrl, '_blank', 'noopener,noreferrer');
-                  }
-                }
-              }}
-              disabled={!latestReport}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ml-2 ${latestReport
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
-                  : 'bg-gray-300 text-slate-400 cursor-not-allowed'
-                }`}
-              title={latestReport ? `View latest report: ${latestReport.title || 'Analysis Report'}` : 'No report available yet'}
-            >
-              Show Report
-            </button>
             {isAssigned && progressDisplay === 0 && (
               <button onClick={onStartEvaluation} className="px-4 py-2 text-white rounded-lg hover:opacity-90" style={{ backgroundColor: roleColor }}>
                 Start Evaluation
@@ -945,7 +931,7 @@ export function ProjectDetail({
 
         <div className="bg-[#050b14] rounded-lg shadow-sm border">
           <div className="border-b border-white/10 flex">
-            {['evaluation', 'tensions', 'usecase', 'owners'].map((tab) => {
+            {['evaluation', 'tensions', 'usecase', 'reports', 'owners'].map((tab) => {
               if (tab === 'owners' && !canViewOwners) return null;
               return (
                 <button
@@ -1067,7 +1053,7 @@ export function ProjectDetail({
               </div>
             )}
 
-            {/* USE CASE SEKMESİ (GÜNCELLENDİ) */}
+            {/* USE CASE TAB (UPDATED) */}
             {activeTab === 'usecase' && (
               <div className="bg-[#050b14] rounded-lg">
                 {linkedUseCase ? (
@@ -1194,11 +1180,17 @@ export function ProjectDetail({
               </div>
             )}
 
-            {activeTab === 'dashboard' && (
-              <AnalyticsDashboard
-                projectId={project.id}
-                questionnaireKey="general-v1"
-                currentUser={currentUser}
+            {activeTab === 'reports' && (
+              <UnifiedReportViewer
+                projectId={project.id || (project as any)._id}
+                userId={currentUser.id || (currentUser as any)._id}
+                onGenerateOntology={handleGenerateReport}
+                generating={generating}
+                refreshTrigger={reportRefreshTrigger}
+                onViewExpertReport={onViewReport}
+                onViewOntologyReport={() => setActiveTab('ontologyReport')}
+                currentUserRole={currentUser.role}
+                onReviewReports={onOpenAdminReview}
               />
             )}
 

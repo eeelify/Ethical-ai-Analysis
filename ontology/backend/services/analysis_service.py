@@ -325,7 +325,10 @@ def analyze_text(text: str) -> dict:
                     continue
                 try:
                     model = genai.GenerativeModel(m_name)
-                    response = model.generate_content(prompt)
+                    response = model.generate_content(
+                        prompt,
+                        generation_config=genai.types.GenerationConfig(temperature=0.0)
+                    )
                     if response and response.text:
                         break
                 except Exception as ex:
@@ -457,7 +460,7 @@ def analyze_text(text: str) -> dict:
         
         trace_str = " | ".join(reasoning_trace)
         top_ethical.insert(0, {
-            "principle": "Deterministik Çıkarım (SWRL)",
+            "principle": "Deterministic Inference (SWRL)",
             "reason": trace_str,
             "impact": f"Initial Risk: {initial_risk_level} -> Final Risk: {final_risk_level} (Score: {composite_score})",
             "severity": "Critical" if final_risk_level in ["HighRisk", "ProhibitedRisk"] else "Low",

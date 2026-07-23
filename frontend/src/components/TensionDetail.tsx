@@ -43,7 +43,7 @@ export function TensionDetail({ tension: initialTension, currentUser, users, onB
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tension.id, (tension as any)._id]);
 
-  // --- YORUM GÖNDERME ---
+  // --- SUBMIT COMMENT ---
   const handlePostComment = async () => {
     if (!commentText.trim()) return;
     
@@ -322,12 +322,12 @@ export function TensionDetail({ tension: initialTension, currentUser, users, onB
   );
 }
 
-// --- ADD EVIDENCE MODAL (İNGİLİZCE VE ÖZEL TASARIM) ---
+// --- ADD EVIDENCE MODAL ---
 function AddEvidenceModal({ onClose, onAdd }: any) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   
-  // Dosya yönetimi için state ve ref
+  // State and ref for file management
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -394,7 +394,7 @@ function AddEvidenceModal({ onClose, onAdd }: any) {
             />
           </div>
           
-          {/* ÖZEL DOSYA YÜKLEME ALANI (İNGİLİZCE) */}
+          {/* CUSTOM FILE UPLOAD AREA */}
           <div>
             <label className="block text-sm font-semibold mb-1 text-gray-700">Upload File</label>
             

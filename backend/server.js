@@ -141,6 +141,8 @@ const ProjectSchema = new mongoose.Schema({
     resultsUsage: String,
     resultsSharing: String,
   },
+  adminReviewComment: { type: String, default: null }, // Admin's final review on reports
+  reportsPublished: { type: Boolean, default: false }, // Whether reports are visible to experts/owner
   createdAt: { type: Date, default: Date.now }
 });
 const Project = mongoose.model('Project', ProjectSchema);
@@ -4956,6 +4958,213 @@ app.get('/api/projects/:projectId/reports/latest', async (req, res) => {
   }
 });
 
+// GET /api/projects/:projectId/unified-reports - Fetch both Expert and Ontology reports for a project
+app.get('/api/projects/:projectId/unified-reports', async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const mongoose = require('mongoose');
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ success: false, error: 'Invalid projectId' });
+    }
+
+    const Project = mongoose.model('Project');
+    const project = await Project.findById(projectId).lean();
+    if (!project) {
+      return res.status(404).json({ success: false, error: 'Project not found' });
+    }
+
+    const userId = req.headers['x-user-id'] || req.query.userId;
+    if (userId) {
+      const User = mongoose.model('User');
+      const user = await User.findById(userId).lean();
+      if (user && user.role !== 'admin' && !project.reportsPublished) {
+        return res.status(403).json({ success: false, error: 'Reports are pending admin approval', pendingApproval: true });
+      }
+    }
+
+    const Report = mongoose.model('Report');
+    const expertReport = await Report.findOne({ projectId })
+      .sort({ createdAt: -1, generatedAt: -1 })
+      .lean();
+
+    const OntologyChatConversation = mongoose.model('OntologyChatConversation');
+    const ontologyReport = await OntologyChatConversation.findOne({ projectId })
+      .sort({ updatedAt: -1, createdAt: -1 })
+      .lean();
+
+    res.json({
+      success: true,
+      expertReport,
+      ontologyReport,
+      projectDetails: {
+        title: project.title,
+        reportsPublished: project.reportsPublished || false,
+        adminReviewComment: project.adminReviewComment || ''
+      }
+    });
+  } catch (err) {
+    console.error('Error in /api/projects/:projectId/unified-reports:', err);
+    res.status(500).json({ error: err.message || 'Failed to fetch unified reports' });
+  }
+});
+
+// GET /api/ontology-reports/:ontologyId/view-pdf - View Ontology report as inline PDF
+app.get('/api/ontology-reports/:ontologyId/view-pdf', async (req, res) => {
+  try {
+    const { ontologyId } = req.params;
+    const mongoose = require('mongoose');
+    if (!mongoose.Types.ObjectId.isValid(ontologyId)) {
+      return res.status(400).json({ error: 'Invalid ontologyId' });
+    }
+
+    const OntologyChatConversation = mongoose.model('OntologyChatConversation');
+    const ontologyDoc = await OntologyChatConversation.findById(ontologyId).lean();
+    if (!ontologyDoc) {
+      return res.status(404).json({ error: 'Ontology report not found' });
+    }
+
+    const result = ontologyDoc.ontologyResult || ontologyDoc.report || {};
+    const projectName = ontologyDoc.systemName || ontologyDoc.projectName || 'AI System';
+
+    // Build a clean HTML page from ontology data
+    const score = result.composite_risk_score ?? result.scoreBreakdown?.overallRiskScore ?? result.overallRiskScore ?? 'N/A';
+    const riskScoreVal = typeof score === 'number' ? Math.round(score) : 'N/A';
+    let riskLevel = result.risk_level || 'Unknown';
+    if (riskLevel === 'Unknown' && typeof score === 'number') {
+      if (score < 25) riskLevel = 'Minimal Risk';
+      else if (score < 50) riskLevel = 'Limited Risk';
+      else if (score < 75) riskLevel = 'High Risk';
+      else riskLevel = 'Unacceptable Risk';
+    }
+    const execSummary = result.executive_summary ?? result.executiveSummary ?? '';
+    const riskAssessment = result.risk_assessment ?? '';
+    const ethicalAnalysis = result.ethical_analysis ?? '';
+    const legalCompliance = result.legal_compliance ?? '';
+    const riskThreshold = result.risk_threshold_explanation ?? '';
+    const tensions = Array.isArray(result.ethical_tensions) ? result.ethical_tensions : (Array.isArray(result.ethicalTensions) ? result.ethicalTensions : []);
+    const recommendations = Array.isArray(result.recommendations) ? result.recommendations : (Array.isArray(result.recommendedActions) ? result.recommendedActions : []);
+    const components = result.score_components ?? result.scoreBreakdown?.components ?? {};
+
+    const riskColor = riskLevel.toLowerCase().includes('minimal') ? '#10b981'
+      : riskLevel.toLowerCase().includes('limited') ? '#f59e0b'
+      : riskLevel.toLowerCase().includes('high') ? '#f97316' : '#ef4444';
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Ontology AI Report – ${projectName}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; color: #1e293b; padding: 40px; }
+    h1 { font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+    .subtitle { font-size: 13px; color: #64748b; margin-bottom: 32px; }
+    .section { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+    .section h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 12px; font-weight: 600; }
+    .score-box { display: flex; align-items: center; justify-content: space-between; }
+    .score-number { font-size: 56px; font-weight: 900; color: ${riskColor}; }
+    .score-label { font-size: 13px; color: #64748b; }
+    .risk-badge { display: inline-block; padding: 6px 14px; border-radius: 999px; background: ${riskColor}20; border: 1px solid ${riskColor}50; color: ${riskColor}; font-size: 13px; font-weight: 700; }
+    .bar-wrap { margin-bottom: 10px; }
+    .bar-label { display: flex; justify-content: space-between; font-size: 12px; color: #475569; margin-bottom: 4px; }
+    .bar-track { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; background: #6366f1; }
+    .tension { border-left: 3px solid #a855f7; padding-left: 12px; margin-bottom: 12px; }
+    .tension strong { font-size: 13px; color: #7c3aed; }
+    .tension p { font-size: 12px; color: #475569; margin-top: 3px; }
+    .rec-item { display: flex; gap: 8px; font-size: 13px; color: #334155; margin-bottom: 8px; }
+    .rec-item::before { content: '→'; color: #6366f1; flex-shrink: 0; }
+    p.body-text { font-size: 13px; color: #475569; line-height: 1.7; }
+    .meter { margin-top: 12px; }
+    .meter-track { height: 12px; background: #e2e8f0; border-radius: 6px; overflow: hidden; }
+    .meter-fill { height: 100%; border-radius: 6px; background: ${riskColor}; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media print { body { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <h1>Ontology AI Ethical Assessment</h1>
+  <div class="subtitle">Project: ${projectName} &nbsp;·&nbsp; Generated: ${new Date().toLocaleDateString()}</div>
+
+  <div class="section">
+    <h2>Risk Score</h2>
+    <div class="score-box">
+      <div>
+        <div class="score-number">${riskScoreVal}<span style="font-size:22px;color:#94a3b8">/100</span></div>
+        <div class="score-label">Higher = riskier</div>
+        <div class="meter" style="width:300px;margin-top:12px">
+          <div class="meter-track"><div class="meter-fill" style="width:${riskScoreVal === 'N/A' ? 50 : riskScoreVal}%"></div></div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="risk-badge">${riskLevel.replace(/([A-Z])/g, ' $1').trim()}</div>
+        ${riskThreshold ? `<p style="font-size:12px;color:#64748b;margin-top:8px;max-width:260px">${riskThreshold}</p>` : ''}
+      </div>
+    </div>
+  </div>
+
+  ${Object.keys(components).length > 0 ? `
+  <div class="section">
+    <h2>Dimension Breakdown</h2>
+    ${Object.entries(components).map(([k, v]) => {
+      const riskV = typeof v === 'number' ? Math.round(v) : (v && typeof v.score === 'number' ? Math.round(v.score) : 50);
+      const label = (v && v.name) ? v.name : k.replace(/_/g, ' ').replace(/score/gi, '').trim();
+      return `<div class="bar-wrap">
+        <div class="bar-label"><span>${label}</span><span>${riskV}/100</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${riskV}%;background:${riskV >= 75 ? '#ef4444' : riskV >= 50 ? '#f97316' : riskV >= 25 ? '#f59e0b' : '#10b981'}"></div></div>
+      </div>`;
+    }).join('')}
+  </div>` : ''}
+
+  ${execSummary ? `<div class="section"><h2>Executive Summary</h2><p class="body-text">${execSummary}</p></div>` : ''}
+  ${riskAssessment ? `<div class="section"><h2>Risk Assessment</h2><p class="body-text">${riskAssessment}</p></div>` : ''}
+
+  <div class="row2">
+    ${ethicalAnalysis ? `<div class="section"><h2>Ethical Analysis</h2><p class="body-text">${typeof ethicalAnalysis === 'string' ? ethicalAnalysis : JSON.stringify(ethicalAnalysis)}</p></div>` : ''}
+    ${legalCompliance ? `<div class="section"><h2>Legal Compliance</h2><p class="body-text">${legalCompliance}</p></div>` : ''}
+  </div>
+
+  ${tensions.length > 0 ? `
+  <div class="section">
+    <h2>Ethical Tensions</h2>
+    ${tensions.map((t) => `<div class="tension"><strong>${t.tension || ''}</strong><p>${t.description || ''}</p></div>`).join('')}
+  </div>` : ''}
+
+  ${recommendations.length > 0 ? `
+  <div class="section">
+    <h2>Recommendations</h2>
+    ${recommendations.map((r) => `<div class="rec-item">${r}</div>`).join('')}
+  </div>` : ''}
+</body>
+</html>`;
+
+    // Use puppeteer to convert to PDF
+    const puppeteer = require('puppeteer');
+    let browser = null;
+    try {
+      browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+      const page = await browser.newPage();
+      await page.setViewport({ width: 1200, height: 900 });
+      await page.setContent(html, { waitUntil: ['domcontentloaded', 'networkidle0'] });
+      const pdfBuffer = await page.pdf({ format: 'A4', margin: { top: '1.5cm', right: '1.5cm', bottom: '1.5cm', left: '1.5cm' }, printBackground: true });
+      await browser.close();
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="ontology-report-${ontologyId}.pdf"`);
+      res.setHeader('Content-Length', pdfBuffer.length);
+      res.send(pdfBuffer);
+    } catch (pdfErr) {
+      if (browser) await browser.close();
+      // Fallback: serve as HTML
+      res.setHeader('Content-Type', 'text/html');
+      res.send(html);
+    }
+  } catch (err) {
+    console.error('Error generating ontology PDF:', err);
+    res.status(500).json({ error: err.message || 'Failed to generate ontology report PDF' });
+  }
+});
+
 // ============================================================
 // NEW ATOMIC REPORT ENDPOINTS
 // ============================================================
@@ -6091,6 +6300,10 @@ app.use('/api/ontology', ontologyRoutes);
 const ontologyChatRoutes = require('./routes/ontologyChatRoutes');
 app.use('/api', ontologyChatRoutes);
 app.use('/api/projects', ontologyChatRoutes);
+
+// --- Admin Report Routes ---
+const adminReportRoutes = require('./routes/adminReportRoutes');
+app.use('/api/projects', adminReportRoutes);
 
 // Health check endpoint for deployment platforms
 app.get('/api/health', (req, res) => {

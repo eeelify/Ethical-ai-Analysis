@@ -7,6 +7,7 @@ const mapToOntologyPayload = (project, expertAnswers = [], tensions = [], system
   return {
     system_name: project?.title || 'Unknown System',
     description: systemDescription || project?.shortDescription || 'No description provided.',
+    text: `System Name: ${project?.title || 'Unknown'}\nDescription: ${systemDescription || project?.shortDescription || 'None'}\n\nExpert Answers:\n${mapExpertAnswers(expertAnswers).map(a => `- Q${a.question_id}: ${a.text} (Risk: ${a.risk_score})`).join('\n')}\n\nEthical Tensions:\n${mapTensions(tensions).map(t => `- ${t.title} (${t.severity}): ${t.description}`).join('\n')}`,
     expert_answers: mapExpertAnswers(expertAnswers),
     ethical_tensions: mapTensions(tensions),
     safeguards: extractSafeguards(expertAnswers, tensions),

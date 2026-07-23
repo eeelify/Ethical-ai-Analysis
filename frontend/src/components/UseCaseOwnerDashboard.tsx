@@ -1062,7 +1062,7 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
       contentType: f.contentType,
     }));
 
-    // Prepare answers array - sadece questionId ve answer
+    // Prepare answers array - only questionId and answer
     const answers = questions.map(q => ({
       questionId: q.id,
       answer: questionAnswers[q.id] || ''

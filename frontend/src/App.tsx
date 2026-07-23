@@ -16,6 +16,7 @@ import { SharedArea } from "./components/SharedArea";
 import { OtherMembers } from "./components/OtherMembers";
 import { PreconditionApproval } from "./components/PreconditionApproval";
 import { ReportReview } from "./components/ReportReview";
+import { AdminReportReview } from "./components/AdminReportReview";
 import {
   User,
   Project,
@@ -114,12 +115,12 @@ function App() {
   const [dashboardPreferredTab, setDashboardPreferredTab] = useState<"assigned" | "finished" | null>(null);
   const [assignmentsRefreshToken, setAssignmentsRefreshToken] = useState(0);
 
-  // --- VERİ ÇEKME (FETCH) ---
+  // --- DATA FETCHING ---
   // Only fetch heavy dashboard data AFTER login to avoid stressing the backend while on the login screen.
   useEffect(() => {
     if (!currentUser) return;
 
-    // Paralel olarak tüm verileri çek - daha hızlı, timeout ile
+    // Fetch all data in parallel - faster, with timeout
     const fetchAllData = async () => {
       try {
         const controller = new AbortController();
@@ -175,7 +176,7 @@ function App() {
         }
       } catch (error: any) {
         if (error.name !== 'AbortError') {
-          console.error("Veri yükleme hatası:", error);
+          console.error("Data loading error:", error);
         }
       }
     };
@@ -400,7 +401,11 @@ function App() {
   // --- NAVIGATION ---
   const handleViewProject = (project: Project) => {
     setSelectedProject(project);
-    setCurrentView("project-detail");
+    if ((project as any).openAdminReview) {
+      setCurrentView("admin-report-review");
+    } else {
+      setCurrentView("project-detail");
+    }
   };
 
   const handleStartEvaluation = async (project: Project) => {
@@ -584,6 +589,11 @@ function App() {
     setCurrentView("usecase-detail");
   };
 
+  const handleViewReport = (reportId: string) => {
+    setSelectedReportId(reportId);
+    setCurrentView("report-review");
+  };
+
   // --- CREATION HANDLERS (BACKEND'E KAYIT) ---
   const handleCreateProject = async (projectData: Partial<Project>): Promise<Project | null> => {
     try {
@@ -619,7 +629,7 @@ function App() {
         return null;
       }
     } catch (error) {
-      console.error("Proje oluşturma hatası:", error);
+      console.error("Project creation error:", error);
       alert("Could not connect to the server.");
       return null;
     }
@@ -666,16 +676,16 @@ function App() {
           ...newUseCaseDB,
           id: newUseCaseDB._id
         };
-        // Listeyi güncelle ki anında görebilelim
+        // Update list so we can see it immediately
         setUseCases([newUseCaseFrontend, ...useCases]);
         alert("Use Case created successfully!");
       } else {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error("Use Case oluşturma hatası:", errorData);
+        console.error("Use Case creation error:", errorData);
         alert(`Failed to create Use Case: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error("Use Case oluşturma hatası:", error);
+      console.error("Use Case creation error:", error);
       alert("Could not connect to the server.");
     }
   };
@@ -782,6 +792,20 @@ function App() {
   }
 
   const renderContent = () => {
+    if (currentView === "admin-report-review" && currentUser && selectedProject) {
+      return (
+        <AdminReportReview
+          projectId={(selectedProject as any).id || (selectedProject as any)._id}
+          currentUser={currentUser}
+          onViewReport={handleViewReport}
+          onBack={() => {
+            try { window.history.pushState({}, "", "/"); } catch {}
+            setCurrentView("dashboard");
+          }}
+        />
+      );
+    }
+
     if (currentView === "report-review" && currentUser && selectedReportId) {
       return (
         <ReportReview
@@ -813,8 +837,13 @@ function App() {
             onViewTension={handleViewTension}
             onViewOwner={handleViewOwner}
             onCreateTension={handleCreateTension}
-            initialTab={(selectedProject as any).openTensionsTab ? 'tensions' : undefined}
-            key={(selectedProject as any).openTensionsTab ? 'tensions-tab' : 'default-tab'}
+            onViewReport={(reportId) => {
+              setSelectedReportId(reportId);
+              setCurrentView("report-review");
+            }}
+            onOpenAdminReview={() => setCurrentView("admin-report-review")}
+            initialTab={(selectedProject as any).openOntologyTab ? 'ontologyReport' : ((selectedProject as any).openReportsTab ? 'reports' : ((selectedProject as any).openTensionsTab ? 'tensions' : undefined))}
+            key={(selectedProject as any).openOntologyTab ? 'ontology-tab' : ((selectedProject as any).openReportsTab ? 'reports-tab' : ((selectedProject as any).openTensionsTab ? 'tensions-tab' : 'default-tab'))}
           />
         ) : null;
       case "owner-ontology-chat":
@@ -880,6 +909,7 @@ function App() {
               onNavigate={setCurrentView}
               onLogout={handleLogout}
               onUpdateUser={(updatedUser) => setCurrentUser(updatedUser)}
+              onViewReport={handleViewReport}
             />
           ) : (
             <UserDashboard
@@ -1162,7 +1192,7 @@ function App() {
               currentUser={currentUser}
               projects={projects}
               users={users}
-              useCases={useCases} // <-- Bu prop Admin panelinin Use Case'leri görmesini sağlar
+              useCases={useCases} // <-- This prop enables the Admin panel to see Use Cases
               onViewProject={handleViewProject}
               onStartEvaluation={handleStartEvaluation}
               onCreateProject={handleCreateProject}

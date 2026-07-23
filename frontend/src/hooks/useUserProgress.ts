@@ -10,16 +10,16 @@ interface ProgressState {
 }
 
 /**
- * Kullanıcıya özel ilerleme hesaplar:
- * totalSteps = 1 (set-up) + soru sayısı + 1 (tension oylama) + 1 (rapor onayı placeholder)
- * completedSteps = set-up tamam? + cevaplanan soru sayısı + tüm tension'lara oy verildiyse 1 + rapor onayı (şimdilik 0)
+ * Calculates user-specific progress:
+ * totalSteps = 1 (set-up) + question count + 1 (tension voting) + 1 (report approval placeholder)
+ * completedSteps = set-up completed? + answered question count + 1 if all tensions voted + report approval (0 for now)
  */
 export function useUserProgress(project: Project, currentUser: User): ProgressState {
   const [progress, setProgress] = useState<ProgressState>({ value: project.progress ?? 0, loading: true });
 
   const roleKey = useMemo(() => currentUser.role.toLowerCase().replace(' ', '-') || 'admin', [currentUser.role]);
 
-  // Toplam soru sayısını rol bazlı sorulardan hesapla (set-up + assess)
+  // Calculate total question count from role-based questions (set-up + assess)
   const totalQuestions = useMemo(() => {
     const roleQuestions = getQuestionsByRole(roleKey) || [];
     return roleQuestions.filter(q => q.stage === 'set-up' || q.stage === 'assess').length;
@@ -30,7 +30,7 @@ export function useUserProgress(project: Project, currentUser: User): ProgressSt
 
     const fetchData = async () => {
       try {
-        // set-up ve assess evaluation'larını çek
+        // Fetch set-up and assess evaluations
         const [setupRes, assessRes] = await Promise.all([
           fetch(api(`/api/evaluations?projectId=${project.id || (project as any)._id}&userId=${currentUser.id || (currentUser as any)._id}&stage=set-up`)),
           fetch(api(`/api/evaluations?projectId=${project.id || (project as any)._id}&userId=${currentUser.id || (currentUser as any)._id}&stage=assess`)),
@@ -41,7 +41,7 @@ export function useUserProgress(project: Project, currentUser: User): ProgressSt
           assessRes.ok ? assessRes.json() : null,
         ]);
 
-        // Tension'ları çek
+        // Fetch tensions
         const tensionRes = await fetch(api(`/api/tensions/${project.id || (project as any)._id}?userId=${currentUser.id || (currentUser as any)._id}`));
         const tensions: any[] = tensionRes.ok ? await tensionRes.json() : [];
 
@@ -55,7 +55,7 @@ export function useUserProgress(project: Project, currentUser: User): ProgressSt
 
         const tensionDone = tensions.every(t => t.userVote !== null && t.userVote !== undefined);
 
-        // Rapor onayı henüz yok; tamamlanmadı
+        // Report approval not yet available; incomplete
         const reportApproved = false;
 
         const totalSteps = 1 /* set-up */ + totalQuestions + 1 /* tension */ + 1 /* report */;
@@ -72,7 +72,7 @@ export function useUserProgress(project: Project, currentUser: User): ProgressSt
         }
       } catch (error: any) {
         if (mounted) {
-          setProgress({ value: project.progress ?? 0, loading: false, error: error?.message || 'Progress hesaplanamadı' });
+          setProgress({ value: project.progress ?? 0, loading: false, error: error?.message || 'Could not calculate progress' });
         }
       }
     };

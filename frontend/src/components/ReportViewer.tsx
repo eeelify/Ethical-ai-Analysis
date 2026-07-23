@@ -23,7 +23,7 @@ export function ReportViewer({ reportId, currentUser, onBack }: ReportViewerProp
       try {
         setLoading(true);
         // Get report file URL
-        const fileUrl = api(`/api/reports/${reportId}/file`);
+        const fileUrl = api(`/api/reports/${reportId}/pdf`);
         setReportUrl(fileUrl);
         setError(null);
       } catch (err: any) {

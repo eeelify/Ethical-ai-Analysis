@@ -72,7 +72,7 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
     );
   };
 
-  // Dosyayı Base64'e çeviren yardımcı fonksiyon
+  // Helper function to convert file to Base64
   const convertBase64 = (file: File): Promise<string | ArrayBuffer | null> => {
     return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
@@ -94,7 +94,7 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
 
       let fileData: string | ArrayBuffer | null = null;
       
-      // Dosya varsa dönüştür
+      // Convert file if present
       if (selectedFile) {
         try {
             fileData = await convertBase64(selectedFile);

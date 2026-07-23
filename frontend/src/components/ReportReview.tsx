@@ -200,33 +200,33 @@ export function ReportReview({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-20">
+    <div className="min-h-screen bg-[#050b14]">
+      <div className="bg-[#0b1221] border-b border-white/10 sticky top-0 z-20">
         <div className="px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
 
             <div>
-              <div className="text-sm text-gray-500">Report Review</div>
-              <div className="text-lg font-semibold text-gray-900">{report?.title || "Report"}</div>
+              <div className="text-sm text-gray-400">Report Review</div>
+              <div className="text-lg font-semibold text-white">{report?.title || "Report"}</div>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             {isLocked && (
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-900 text-white text-xs font-semibold">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0b1221] text-white text-xs font-semibold">
                 <Lock className="h-3.5 w-3.5" />
                 Final & Locked
               </span>
             )}
             {!isLocked && (
-              <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold">
+              <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-yellow-500/20 text-yellow-400 text-xs font-semibold">
                 Draft
               </span>
             )}
 
             <button
               onClick={handleDownloadPdf}
-              className="px-3 py-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 text-sm font-medium text-gray-700 flex items-center gap-2"
+              className="px-3 py-2 rounded-lg bg-[#0b1221] border border-white/10 hover:bg-[#050b14] text-sm font-medium text-gray-300 flex items-center gap-2"
               disabled={loading}
             >
               <Download className="h-4 w-4" />
@@ -237,7 +237,7 @@ export function ReportReview({
               <button
                 onClick={handleFinalize}
                 disabled={finalizing || loading}
-                className="px-4 py-2 rounded-lg bg-gray-900 hover:bg-black text-white text-sm font-semibold flex items-center gap-2 disabled:opacity-60"
+                className="px-4 py-2 rounded-lg bg-[#0b1221] hover:bg-white/10 text-white text-sm font-semibold flex items-center gap-2 disabled:opacity-60"
               >
                 {finalizing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
                 Finalize & Lock
@@ -249,7 +249,7 @@ export function ReportReview({
 
       <div className="px-6 py-6 max-w-6xl mx-auto">
         {loading ? (
-          <div className="bg-white border border-gray-200 rounded-2xl p-8 flex items-center justify-center text-gray-600">
+          <div className="bg-[#0b1221] border border-white/10 rounded-2xl p-8 flex items-center justify-center text-gray-400">
             <Loader2 className="h-5 w-5 animate-spin mr-2" />
             Loading report...
           </div>
@@ -257,14 +257,14 @@ export function ReportReview({
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Sections list */}
             <div className="lg:col-span-1">
-              <div className="bg-white border border-gray-200 rounded-2xl p-4">
-                <div className="text-sm font-semibold text-gray-900 mb-3">Sections</div>
+              <div className="bg-[#0b1221] border border-white/10 rounded-2xl p-4">
+                <div className="text-sm font-semibold text-white mb-3">Sections</div>
                 <div className="space-y-2">
                   <button
                     onClick={() => setActivePrinciple("SUMMARY")}
                     className={`w-full text-left px-3 py-2 rounded-lg border text-sm transition-colors ${activePrinciple === "SUMMARY"
-                      ? "border-purple-600 bg-purple-50 text-purple-900 font-medium"
-                      : "border-gray-200 hover:bg-gray-50 text-gray-700"
+                      ? "border-purple-500 bg-purple-500/20 text-purple-300 font-medium"
+                      : "border-white/10 hover:bg-[#050b14] text-gray-300"
                       }`}
                   >
                     Report Summary
@@ -273,9 +273,7 @@ export function ReportReview({
                   <div className="h-px bg-gray-100 my-2" />
 
                   {(() => {
-                    const sections = Array.isArray(report?.sections) && report!.sections!.length > 0
-                      ? report!.sections!
-                      : [{ principle: "FULL_REPORT" } as ReportSection];
+                    const sections = Array.isArray(report?.sections) ? report!.sections!.filter(s => s.principle !== "FULL_REPORT") : [];
 
                     return sections.map((s) => {
                       const p = s.principle || "Section";
@@ -285,8 +283,8 @@ export function ReportReview({
                           key={p}
                           onClick={() => setActivePrinciple(p)}
                           className={`w-full text-left px-3 py-2 rounded-lg border text-sm transition-colors ${active
-                            ? "border-blue-600 bg-blue-50 text-blue-900"
-                            : "border-gray-200 hover:bg-gray-50 text-gray-700"
+                            ? "border-blue-500 bg-blue-500/20 text-blue-300"
+                            : "border-white/10 hover:bg-white/5 text-gray-300"
                             }`}
                         >
                           {p}
@@ -302,49 +300,78 @@ export function ReportReview({
             <div className="lg:col-span-3 space-y-6">
               {activePrinciple === "SUMMARY" ? (
                 <>
-
+                  {/* REPORT CONTENT / SUMMARY */}
+                  <div className="bg-[#0b1221] border border-white/10 rounded-2xl overflow-hidden mb-6">
+                    <div className="px-5 py-4 border-b border-white/10 bg-[#050b14] flex items-center justify-between">
+                      <div className="text-sm font-semibold text-white">Report Content</div>
+                    </div>
+                    <div className="p-5">
+                      <div className="whitespace-pre-wrap text-sm text-gray-200 leading-relaxed">
+                        {(() => {
+                          if (report?.summary) return report.summary;
+                          if (report?.content) {
+                            try {
+                              const parsed = JSON.parse(report.content);
+                              if (parsed.executiveSummary) {
+                                return Array.isArray(parsed.executiveSummary) ? parsed.executiveSummary.join('\n\n') : parsed.executiveSummary;
+                              }
+                            } catch (e) {
+                              // Not JSON, fall through
+                            }
+                            // Fallback if not JSON or no executiveSummary
+                            // Truncate if it's very long and likely raw JSON
+                            if (report.content.startsWith('{') && report.content.length > 500) {
+                               return "No summary available for this format.";
+                            }
+                            return report.content;
+                          }
+                          return "No report content available.";
+                        })()}
+                      </div>
+                    </div>
+                  </div>
 
                   {/* GENERAL COMMENTS */}
-                  <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-                    <div className="px-5 py-4 border-b border-gray-200 bg-white flex items-center justify-between">
+                  <div className="bg-[#0b1221] border border-white/10 rounded-2xl overflow-hidden">
+                    <div className="px-5 py-4 border-b border-white/10 bg-[#0b1221] flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <MessageSquare className="h-4 w-4 text-gray-600" />
-                        <div className="text-sm font-semibold text-gray-900">General Feedback</div>
+                        <MessageSquare className="h-4 w-4 text-gray-400" />
+                        <div className="text-sm font-semibold text-white">General Feedback</div>
                       </div>
                     </div>
                     <div className="p-5 space-y-4">
-                      <div className="text-xs text-gray-500 mb-2">
+                      <div className="text-xs text-gray-400 mb-2">
                         Use this section to provide general feedback on the entire report. Your comments will be notified to the Admin.
                       </div>
 
                       {Array.isArray(report?.expertComments) && report!.expertComments!.length > 0 ? (
                         <div className="space-y-3">
                           {report!.expertComments!.map((c, idx) => (
-                            <div key={idx} className="border border-gray-200 rounded-xl p-4 bg-gray-50">
+                            <div key={idx} className="border border-white/10 rounded-xl p-4 bg-[#050b14]">
                               <div className="flex items-center justify-between mb-1">
-                                <div className="text-sm font-semibold text-gray-900">
+                                <div className="text-sm font-semibold text-white">
                                   {c.userName || "User"}
                                 </div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-gray-400">
                                   {c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}
                                 </div>
                               </div>
-                              <div className="text-sm text-gray-800 whitespace-pre-wrap">{c.text}</div>
+                              <div className="text-sm text-gray-200 whitespace-pre-wrap">{c.text}</div>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <div className="text-sm text-gray-500 italic">No general comments yet.</div>
+                        <div className="text-sm text-gray-400 italic">No general comments yet.</div>
                       )}
 
-                      <div className="border-t border-gray-200 pt-4">
+                      <div className="border-t border-white/10 pt-4">
                         <div className="flex flex-col gap-3">
                           <textarea
                             value={commentText}
                             onChange={(e) => setCommentText(e.target.value)}
                             disabled={!canComment || commenting}
                             rows={3}
-                            className="w-full border border-gray-200 rounded-xl p-3 text-sm text-gray-800 focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 disabled:bg-gray-50"
+                            className="w-full border border-white/10 rounded-xl p-3 text-sm text-gray-200 focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 disabled:bg-[#050b14]"
                             placeholder={canComment ? "Add a general comment..." : "Commenting is restricted."}
                           />
                           <div className="flex justify-end">
@@ -369,57 +396,57 @@ export function ReportReview({
               ) : (
                 <>
                   {/* AI Draft (Section specific) */}
-                  <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-                    <div className="px-5 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
-                      <div className="text-sm font-semibold text-gray-900">AI Draft (read-only)</div>
-                      <div className="text-xs text-gray-500">
+                  <div className="bg-[#0b1221] border border-white/10 rounded-2xl overflow-hidden">
+                    <div className="px-5 py-4 border-b border-white/10 bg-[#050b14] flex items-center justify-between">
+                      <div className="text-sm font-semibold text-white">AI Draft (read-only)</div>
+                      <div className="text-xs text-gray-400">
                         Section: <span className="font-medium">{activeSection?.principle}</span>
                       </div>
                     </div>
                     <div className="p-5">
-                      <div className="whitespace-pre-wrap text-sm text-gray-800 leading-relaxed">
+                      <div className="whitespace-pre-wrap text-sm text-gray-200 leading-relaxed">
                         {String(activeSection?.aiDraft || report?.content || "").trim() || "No AI draft content."}
                       </div>
                     </div>
                   </div>
 
                   {/* Section Comments */}
-                  <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-                    <div className="px-5 py-4 border-b border-gray-200 bg-white flex items-center justify-between">
+                  <div className="bg-[#0b1221] border border-white/10 rounded-2xl overflow-hidden">
+                    <div className="px-5 py-4 border-b border-white/10 bg-[#0b1221] flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <MessageSquare className="h-4 w-4 text-gray-600" />
-                        <div className="text-sm font-semibold text-gray-900">Section Comments</div>
+                        <MessageSquare className="h-4 w-4 text-gray-400" />
+                        <div className="text-sm font-semibold text-white">Section Comments</div>
                       </div>
                     </div>
                     <div className="p-5 space-y-4">
                       {Array.isArray(activeSection?.comments) && activeSection!.comments!.length > 0 ? (
                         <div className="space-y-3">
                           {activeSection!.comments!.map((c, idx) => (
-                            <div key={idx} className="border border-gray-200 rounded-xl p-4">
+                            <div key={idx} className="border border-white/10 rounded-xl p-4">
                               <div className="flex items-center justify-between mb-1">
-                                <div className="text-sm font-semibold text-gray-900">
+                                <div className="text-sm font-semibold text-white">
                                   {c.userName || "User"}
                                 </div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-gray-400">
                                   {c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}
                                 </div>
                               </div>
-                              <div className="text-sm text-gray-800 whitespace-pre-wrap">{c.text}</div>
+                              <div className="text-sm text-gray-200 whitespace-pre-wrap">{c.text}</div>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <div className="text-sm text-gray-500">No comments yet.</div>
+                        <div className="text-sm text-gray-400">No comments yet.</div>
                       )}
 
-                      <div className="border-t border-gray-200 pt-4">
+                      <div className="border-t border-white/10 pt-4">
                         <div className="flex flex-col gap-3">
                           <textarea
                             value={commentText}
                             onChange={(e) => setCommentText(e.target.value)}
                             disabled={!canComment || commenting}
                             rows={3}
-                            className="w-full border border-gray-200 rounded-xl p-3 text-sm text-gray-800 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 disabled:bg-gray-50"
+                            className="w-full border border-white/10 rounded-xl p-3 text-sm text-gray-200 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 disabled:bg-[#050b14]"
                             placeholder={canComment ? "Add a specific comment..." : "Commenting is restricted."}
                           />
                           <div className="flex justify-end">

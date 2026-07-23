@@ -1,24 +1,23 @@
 // src/data/questions/index.ts
 
-import { Question } from '../../types'; // Question tipinin olduğu yeri doğru gösterdiğinden emin ol
+import { Question } from '../../types';
 
-// Diğer dosyalardan soruları çağırıyoruz
-// index.ts içinde:
-import { technicalQuestions } from './technical'; // Artık hata vermez
-import { medicalQuestions } from './medical';     // Artık hata vermez
-import { legalQuestions } from './legal';         // Artık hata vermez
+// Import question sets from other files
+import { technicalQuestions } from './technical';
+import { medicalQuestions } from './medical';
+import { legalQuestions } from './legal';
 import { ownerQuestions } from './owner';  
-import { ethicalQuestions } from './ethical'       // Artık hata vermez
+import { ethicalQuestions } from './ethical';
 
-// Hangi rolün hangi soru listesini göreceğini eşleştiriyoruz
+// Map which role sees which question list
 const questionsMap: Record<string, Question[]> = {
   'ethical-expert': ethicalQuestions,
   'technical-expert': technicalQuestions,
   'medical-expert': medicalQuestions,
   'legal-expert': legalQuestions,
   'use-case-owner': ownerQuestions,
-  'education-expert': [], // Dosyası yoksa boş dizi
-  'admin': [ // Admin hepsini görsün
+  'education-expert': [], // Empty array if file does not exist
+  'admin': [ // Admin sees all questions
     ...ethicalQuestions, 
     ...technicalQuestions, 
     ...medicalQuestions, 
@@ -27,7 +26,7 @@ const questionsMap: Record<string, Question[]> = {
   ]
 };
 
-// React tarafında çağırdığımız fonksiyon BU:
+// THIS is the function called from React:
 export const getQuestionsByRole = (role: string): Question[] => {
   return questionsMap[role] || [];
 };

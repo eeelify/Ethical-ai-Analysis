@@ -73,21 +73,21 @@ const getScoreClasses = (value: number, selected: number | null | undefined) => 
 };
 
 export function EvaluationForm({ project, currentUser, onBack, onSubmit }: EvaluationFormProps) {
-  // Projenin mevcut stage'ini başlangıç değeri olarak alabiliriz veya 'set-up' ile başlatabiliriz.
-  // Ancak kullanıcının kaldığı yerden devam etmesi için 'set-up' ile başlatıp veriyi çekmek daha güvenli.
+  // We can use the project's current stage as the initial value or start with 'set-up'.
+  // However, it's safer to start with 'set-up' and fetch data so the user can continue from where they left off.
   const [currentStage, setCurrentStage] = useState<StageKey>('set-up');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   const [answers, setAnswers] = useState<Record<string, any>>({});
-  const [questionPriorities, setQuestionPriorities] = useState<Record<string, RiskLevel>>({}); // Her soru için önem derecesi
-  const [riskScores, setRiskScores] = useState<Record<string, 0 | 1 | 2 | 3 | 4>>({}); // Her soru için risk skoru (0-4)
+  const [questionPriorities, setQuestionPriorities] = useState<Record<string, RiskLevel>>({}); // Importance level per question
+  const [riskScores, setRiskScores] = useState<Record<string, 0 | 1 | 2 | 3 | 4>>({}); // Risk score per question (0-4)
   const [riskLevel, setRiskLevel] = useState<RiskLevel>('medium');
   const [customQuestions, setCustomQuestions] = useState<Question[]>([]);
   const [loadedQuestions, setLoadedQuestions] = useState<Question[]>([]); // Questions loaded from MongoDB
   const [showAddQuestion, setShowAddQuestion] = useState(false);
   const [isDraft, setIsDraft] = useState(true);
-  const [loading, setLoading] = useState(false); // Yükleniyor durumu
-  const [saving, setSaving] = useState(false);   // Kaydediliyor durumu
+  const [loading, setLoading] = useState(false); // Loading state
+  const [saving, setSaving] = useState(false);   // Saving state
   const [pendingFocusQuestionId, setPendingFocusQuestionId] = useState<string | null>(null);
   const [linkedUseCase, setLinkedUseCase] = useState<UseCase | null>(null);
   const [generalRisks, setGeneralRisks] = useState<Array<{ id: string; title: string; description: string; severity?: 'low' | 'medium' | 'high' | 'critical'; relatedQuestions?: string[] }>>([]);
@@ -97,8 +97,8 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
   const [tensions, setTensions] = useState<Tension[]>([]);
   const [editingTensionId, setEditingTensionId] = useState<string | null>(null);
   const [votingTensionId, setVotingTensionId] = useState<string | null>(null);
-  const [userProgress, setUserProgress] = useState<number>(0); // Backend'den gelen progress
-  const [hasFetchedProgress, setHasFetchedProgress] = useState<boolean>(false); // Backend'den progress fetch edildi mi?
+  const [userProgress, setUserProgress] = useState<number>(0); // Progress coming from backend
+  const [hasFetchedProgress, setHasFetchedProgress] = useState<boolean>(false); // Has progress been fetched from backend?
   const [hasLoadedResponses, setHasLoadedResponses] = useState<boolean>(false); // MongoDB responses loaded flag
   const [isInitialLoad, setIsInitialLoad] = useState<boolean>(true); // Track initial load to prevent state reset
   const resumeInitializedRef = useRef<boolean>(false); // Prevent resume logic from running multiple times
@@ -173,7 +173,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
     return allQuestions.filter(q => q.stage === currentStage);
   }, [roleKey, currentStage, customQuestions, loadedQuestions]);
 
-  // Assess stage'indeki tüm soruları almak için
+  // To get all questions in the assess stage
   const assessQuestions = useMemo(() => {
     const roleQuestions = getQuestionsByRole(roleKey);
     const allQuestions = [...roleQuestions, ...customQuestions];
@@ -708,7 +708,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
     resumeEvaluation();
   }, [project, currentUser]); // Use full objects to ensure useEffect runs when component mounts
 
-  // --- 1. VERİ ÇEKME (FETCH DATA) ---
+  // --- 1. DATA FETCHING ---
   useEffect(() => {
     // Skip if we've already loaded from MongoDB responses
     if (hasLoadedResponses) {
@@ -789,7 +789,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
               return mergedArray;
             });
           }
-          // Genel riskleri yükle - eğer veritabanında varsa yükle
+          // Load general risks - load if present in database
           if (data.generalRisks && Array.isArray(data.generalRisks)) {
             setGeneralRisks(data.generalRisks.map((r: any) => ({
               ...r,
@@ -802,13 +802,13 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
           if (data.status === 'completed') setIsDraft(false);
         }
       } catch (error) {
-        console.error("Veri çekme hatası:", error);
+        console.error("Data fetch error:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    // Review screen açıldığında veya assess stage'inde set-up risklerini de yükle
+    // Load set-up risks when review screen opens or when in assess stage
     const fetchSetUpRisks = async () => {
       if (showReviewScreen || (currentStage === 'assess' && !showReviewScreen)) {
         try {
@@ -832,7 +832,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
     };
 
     const fetchUseCase = async () => {
-      // Project.useCase bir string ID olabilir veya object olabilir
+      // Project.useCase can be a string ID or an object
       const useCaseId = typeof project.useCase === 'string' ? project.useCase : (project.useCase as any)?.id;
       if (useCaseId) {
         try {
@@ -842,7 +842,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
             setLinkedUseCase(data);
           }
         } catch (error) {
-          console.error("Use Case çekme hatası:", error);
+          console.error("Error fetching Use Case:", error);
         }
       }
     };
@@ -906,7 +906,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
     }
   };
 
-  // Cevaplar ve sorular yüklendikten sonra cevaplanmamış ilk soruyu bul
+  // Find the first unanswered question after answers and questions are loaded
   useEffect(() => {
     if (!resumeComplete || !hasLoadedResponses || loadedQuestions.length === 0 || !resumeQuestionCode) {
       if (!resumeComplete) console.log('⏳ Waiting for resume to complete...');
@@ -945,7 +945,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
     }
   }, [resumeComplete, hasLoadedResponses, loadedQuestions, currentQuestions, currentStage, resumeQuestionCode]);
 
-  // Cevaplar ve sorular yüklendikten sonra cevaplanmamış ilk soruyu bul
+  // Find the first unanswered question after answers and questions are loaded
   // NOTE: This is fallback logic only. Resume logic sets the index directly.
   useEffect(() => {
     // Wait for initial load and resume to complete, and questions to be loaded
@@ -959,23 +959,23 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
       return;
     }
 
-    // Eğer hiç cevap yoksa ilk sorudan başla (fallback only)
+    // If there are no answers, start from the first question (fallback only)
     if (Object.keys(answers).length === 0) {
       console.log('📝 No answers found, starting at first question (fallback)');
       setCurrentQuestionIndex(0);
       return;
     }
 
-    // Debug: Soru ID'lerini ve cevapları kontrol et
+    // Debug: Check question IDs and answers
     console.log('Current Questions:', currentQuestions.map(q => ({ id: q.id, code: q.code || undefined, _id: q._id || undefined })));
     console.log('Answers keys:', Object.keys(answers));
     console.log('Question Priorities keys:', Object.keys(questionPriorities));
 
-    // Cevaplanmamış ilk soruyu bul
+    // Find the first unanswered question
     let firstUnansweredIndex = -1;
     for (let i = 0; i < currentQuestions.length; i++) {
       const question = currentQuestions[i];
-      // Tüm olası ID formatlarını kontrol et
+      // Check all possible ID formats
       const possibleIds = [
         question.id,
         question.code,
@@ -990,10 +990,10 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
       let hasPriority = false;
       let hasRiskScore = false;
 
-      // Her olası ID formatını kontrol et
+      // Check each possible ID format
       for (const id of possibleIds) {
         const answerKey = String(id);
-        // Answers objesindeki tüm key'leri kontrol et (case-insensitive)
+        // Check all keys in the answers object (case-insensitive)
         const matchingKey = Object.keys(answers).find(key =>
           String(key).toLowerCase() === answerKey.toLowerCase() ||
           String(key) === answerKey
@@ -1024,7 +1024,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
       console.log(`Question ${i} (${question.id || question.code || question._id}): hasAnswer=${hasAnswer}, hasPriority=${hasPriority}, hasRiskScore=${hasRiskScore}`);
 
-      // Set-up stage'inde sadece answer yeterli, assess'te hem answer, hem priority, hem risk score gerekli
+      // In set-up stage only answer is required; in assess stage answer, priority, and risk score are all required
       if (currentStage === 'set-up') {
         if (!hasAnswer) {
           firstUnansweredIndex = i;
@@ -1040,7 +1040,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
       }
     }
 
-    // Eğer cevaplanmamış soru bulunamadıysa (tüm sorular cevaplanmış) son soruya git
+    // If no unanswered question is found (all questions answered), go to the last question
     if (firstUnansweredIndex === -1) {
       firstUnansweredIndex = currentQuestions.length > 0 ? currentQuestions.length - 1 : 0;
       console.log('All questions answered, going to last question');
@@ -1051,7 +1051,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
   }, [isInitialLoad, loading, answers, questionPriorities, riskScores, currentQuestions, currentStage, resumeQuestionCode, resumeComplete, hasLoadedResponses, loadedQuestions]);
 
 
-  // Review screen açıldığında tensionları yükle
+  // Load tensions when review screen is opened
   useEffect(() => {
     if (showReviewScreen) {
       const fetchTensions = async () => {
@@ -1062,7 +1062,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
             setTensions(data.map((t: any) => ({
               ...t,
               id: t._id || t.id,
-              userVote: t.userVote || null // userVote'u açıkça set et
+              userVote: t.userVote || null // explicitly set userVote
             })));
           }
         } catch (error) {
@@ -1073,7 +1073,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
     }
   }, [showReviewScreen, project.id, currentUser.id]);
 
-  // Backend'den progress çek
+  // Fetch progress from backend
   useEffect(() => {
     let mounted = true;
 
@@ -1082,12 +1082,12 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
         const progress = await fetchUserProgress(project, currentUser);
         if (mounted) {
           setUserProgress(progress);
-          setHasFetchedProgress(true); // İlk fetch tamamlandı
+          setHasFetchedProgress(true); // Initial fetch completed
         }
       } catch (error) {
         console.error('Error fetching user progress:', error);
         if (mounted) {
-          setHasFetchedProgress(true); // Hata olsa bile fetch denendi olarak işaretle
+          setHasFetchedProgress(true); // Mark fetch as attempted even if an error occurred
         }
       }
     };
@@ -1095,7 +1095,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
     // Initial fetch
     fetchProgress();
 
-    // Cevaplar değiştiğinde veya kaydetme işlemi sonrasında progress'i güncelle
+    // Update progress when answers change or after saving
     const interval = setInterval(fetchProgress, 30000); // Changed for performance
 
     return () => {
@@ -1108,7 +1108,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
   const isLastQuestion = currentQuestions.length > 0 && currentQuestionIndex === currentQuestions.length - 1;
   const isFirstQuestion = currentQuestionIndex === 0;
 
-  // --- 2. VERİ KAYDETME (SAVE DATA) ---
+  // --- 2. SAVE DATA ---
   const saveEvaluation = useCallback(async (status: 'draft' | 'completed' = 'draft', silent: boolean = false) => {
     setSaving(true);
     try {
@@ -1274,7 +1274,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
         alert("Please ensure all risks have a title.");
         return;
       }
-      // Set-up stage'ini kaydet ve sonra assess stage'ine geç
+      // Save set-up stage and then move to assess stage
       const success = await saveEvaluation('completed');
       if (success) {
         handleStageChange('next');
@@ -1282,25 +1282,25 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
       return;
     }
 
-    // Zorunluluk Kontrolü
+    // Requirement Check
     if (activeQuestion && activeQuestion.required && !getAnswerValue(activeQuestion)) {
       alert("Please answer this required question before proceeding.");
       return;
     }
 
-    // Assess stage'inde Importance Level zorunlu kontrolü
+    // Required check for Importance Level in assess stage
     if (currentStage === 'assess' && activeQuestion && !questionPriorities[activeQuestion.id]) {
       alert("Please select an importance level for this question before proceeding.");
       return;
     }
 
-    // 1. Sonraki Soru
+    // 1. Next Question
     if (currentQuestions.length > 0 && !isLastQuestion) {
       setCurrentQuestionIndex(prev => prev + 1);
     }
-    // 2. Assess stage'inde son soruysa review screen'i göster
+    // 2. If last question in assess stage, show review screen
     else if (currentStage === 'assess' && isLastQuestion) {
-      // Review screen açılmadan önce set-up risklerini yükle
+      // Load set-up risks before opening review screen
       const fetchSetUpRisksForReview = async () => {
         try {
           const response = await fetch(api(`/api/evaluations?projectId=${project.id || (project as any)._id}&userId=${currentUser.id || (currentUser as any)._id}&stage=set-up`));
@@ -1352,7 +1352,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
     setIsDraft(true);
   };
 
-  // Tension ekleme fonksiyonu
+  // Function to create tension
   const handleCreateTension = async (tensionData: any) => {
     try {
       const response = await fetch(api('/api/tensions'), {
@@ -1368,7 +1368,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
       if (response.ok) {
         alert('Tension created successfully!');
-        // Tensionları yeniden yükle
+        // Reload tensions
         const tensionsResponse = await fetch(api(`/api/tensions/${project.id || (project as any)._id}?userId=${currentUser.id || (currentUser as any)._id}`));
         if (tensionsResponse.ok) {
           const data = await tensionsResponse.json();
@@ -1377,7 +1377,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
             id: t._id || t.id
           })));
         }
-        // Form'u temizle
+        // Reset form
         setPrinciple1(undefined);
         setPrinciple2(undefined);
         setClaim('');
@@ -1398,7 +1398,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
     setVotingTensionId(tensionId);
     const userId = currentUser.id || (currentUser as any)._id;
 
-    // Mevcut tension'ı bul ve state'i kaydet (hata durumunda geri almak için)
+    // Find current tension and save state (to revert in case of error)
     const currentTension = tensions.find(t => t.id === tensionId);
     if (!currentTension) {
       setVotingTensionId(null);
@@ -1410,7 +1410,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
     let newDisagree = currentTension.consensus?.disagree || 0;
     let newUserVote: 'agree' | 'disagree' | null = voteType;
 
-    // Eğer aynı oya tekrar tıklanırsa, oyu kaldır
+    // If the same vote is clicked again, remove the vote
     if (currentVote === voteType) {
       newUserVote = null;
       if (voteType === 'agree') {
@@ -1419,7 +1419,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
         newDisagree = Math.max(0, newDisagree - 1);
       }
     } else {
-      // Yeni oy veriliyor veya oy değiştiriliyor
+      // New vote is being cast or vote is being changed
       if (currentVote === 'agree') {
         newAgree = Math.max(0, newAgree - 1);
       } else if (currentVote === 'disagree') {
@@ -1433,7 +1433,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
       }
     }
 
-    // Optimistic update - önce state'i güncelle
+    // Optimistic update - update state first
     setTensions(prevTensions => {
       return prevTensions.map(tension => {
         if (tension.id === tensionId) {
@@ -1461,24 +1461,24 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
       });
 
       if (!response.ok) {
-        // Hata durumunda state'i geri al - sadece bu tension'ı güncelle
+        // In case of error revert state - update only this tension
         setTensions(prevTensions => {
           return prevTensions.map(tension => {
             if (tension.id === tensionId) {
-              return currentTension; // Orijinal state'e geri dön
+              return currentTension; // Revert to original state
             }
             return tension;
           });
         });
         alert('Failed to vote. Please try again.');
       } else {
-        // Başarılı olduğunda backend'den güncel veriyi al ve sadece bu tension'ı güncelle
+        // On success get updated data from backend and update only this tension
         const tensionsResponse = await fetch(api(`/api/tensions/${project.id || (project as any)._id}?userId=${userId}`));
         if (tensionsResponse.ok) {
           const data = await tensionsResponse.json();
           const updatedTension = data.find((t: any) => (t._id || t.id) === tensionId);
           if (updatedTension) {
-            // Sadece bu tension'ı güncelle, diğerlerini koru
+            // Update only this tension, preserve others
             setTensions(prevTensions => {
               return prevTensions.map(tension => {
                 if (tension.id === tensionId) {
@@ -1496,11 +1496,11 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
       }
     } catch (error) {
       console.error('Vote error:', error);
-      // Hata durumunda state'i geri al - sadece bu tension'ı güncelle
+      // In case of error revert state - update only this tension
       setTensions(prevTensions => {
         return prevTensions.map(tension => {
           if (tension.id === tensionId) {
-            return currentTension; // Orijinal state'e geri dön
+            return currentTension; // Revert to original state
           }
           return tension;
         });
@@ -1577,7 +1577,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
     setEditSeverity(2);
   };
 
-  // Dosyayı Base64'e çeviren yardımcı fonksiyon
+  // Helper function to convert file to Base64
   const convertBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
@@ -1620,7 +1620,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
     }
   };
 
-  // Review screen'den resolve stage'ine geçiş
+  // Transition from review screen to resolve stage
   const handleFinishAssess = async () => {
     // Enforce same validation as normal flow: all required answers + importance must be set
     const missingRequired = assessQuestions.filter((q) => {
@@ -1664,7 +1664,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
       return;
     }
 
-    // Son kez kaydet ve status'u completed yap
+    // Save one last time and set status to completed
     const success = await saveEvaluation('completed');
     if (success) {
       alert('Evaluation submitted successfully and Project Status updated!');
@@ -1676,7 +1676,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
     // Calculate local progress for immediate feedback
     // This provides instant visual feedback while user is answering
     const roleQuestions = getQuestionsByRole(roleKey);
-    const allRoleQuestions = [...roleQuestions, ...customQuestions]; // Tüm stage'lerdeki sorular
+    const allRoleQuestions = [...roleQuestions, ...customQuestions]; // Questions across all stages
 
     let localProgress = 0;
     if (allRoleQuestions.length > 0) {
@@ -1753,7 +1753,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                 <h1 className="text-xl text-white font-bold tracking-tight">
                   {currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1)} Evaluation
                 </h1>
-                {/* PROJE DURUMUNU GÖSTERME DÜZELTMESİ */}
+                {/* PROJECT STATUS DISPLAY FIX */}
                 <div className="flex items-center gap-2 text-xs text-slate-400 font-medium uppercase tracking-wide">
                   <span>Project: {project.title}</span>
                   <span className="text-gray-300">|</span>
@@ -1811,7 +1811,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
               <div className="bg-[#050b14] rounded-3xl shadow-xl shadow-gray-200/50 border border-white/5 p-6">
                 <h2 className="text-2xl font-bold text-white mb-6">Review</h2>
                 <div className="space-y-6">
-                  {/* Assess Cevapları */}
+                  {/* Assess Answers */}
                   <div className="bg-cyan-500/10/50 border border-blue-100 rounded-xl p-5">
                     <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
                       <Info className="w-5 h-5 mr-2 text-cyan-400" />
@@ -2019,7 +2019,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
               </div>
             </div>
           ) : currentStage === 'set-up' ? (
-            // Set-up Stage: Admin'in girdiği Project Context bilgilerini göster
+            // Set-up Stage: Show Project Context info entered by Admin
             <div className="bg-[#050b14] rounded-3xl shadow-xl shadow-gray-200/50 border border-white/5 overflow-hidden flex flex-col flex-1 animate-in fade-in slide-in-from-bottom-4 duration-300 mb-24">
               <div className="p-8 border-b border-white/5 bg-[#050b14]">
                 <div className="flex items-center gap-3 mb-4">
@@ -2034,7 +2034,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
               </div>
 
               <div className="p-8 flex-1 bg-[#0a1122]/30 space-y-6 overflow-y-auto pb-24">
-                {/* Project Context and Scope - Admin'in girdiği bilgiler */}
+                {/* Project Context and Scope - Information entered by Admin */}
                 {project.inspectionContext ? (
                   <div className="space-y-6">
                     <div className="bg-cyan-500/10/50 border border-blue-100 rounded-2xl p-6">
@@ -2080,7 +2080,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                   </div>
                 )}
 
-                {/* Use Case Owner Information - Sadece başlık olarak */}
+                {/* Use Case Owner Information - Header only */}
                 {linkedUseCase && (
                   <div className="bg-green-50/50 border border-green-100 rounded-2xl p-6">
                     <h3 className="text-lg font-semibold text-white mb-2 flex items-center">
@@ -2417,7 +2417,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                     </div>
                   )}
 
-                  {/* Önem Derecesi Belirleme - Her Soru İçin */}
+                  {/* Importance Level Selection - Per Question */}
                   <div className="mt-8 pt-6 border-t border-white/10">
                     <div className="flex items-center gap-2 mb-4">
                       <AlertTriangle className="w-5 h-5 text-orange-500" />
@@ -2717,8 +2717,8 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 }
 
 // ... AddQuestionModal kodunu aynen buraya yapıştır ...
-// Not: AddQuestionModal kodunda değişiklik yapmadık, önceki dosyadaki gibi kalabilir.
-// Sadece EvaluationForm içindeki AddQuestionModal componentini çağırmak için gerekli.
+// Note: No changes were made to the AddQuestionModal code, it can remain as in the previous file.
+// Only needed to call the AddQuestionModal component inside EvaluationForm.
 interface AddQuestionModalProps {
   currentStage: StageKey;
   onClose: () => void;
@@ -2795,7 +2795,7 @@ function AddQuestionModal({ currentStage, onClose, onAdd }: AddQuestionModalProp
           </div>
           <div>
             <label className="block text-sm font-semibold text-white mb-2">
-              Principle (İlke) <span className="text-red-500">*</span>
+              Principle <span className="text-red-500">*</span>
             </label>
             <select
               value={principle}

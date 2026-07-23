@@ -2,7 +2,7 @@ import { api } from '../api';
 import { Project, User } from '../types';
 
 /**
- * Kullanıcıya özel ilerlemeyi hesaplar (Sadece yüzde döndürür - Geriye dönük uyumluluk için).
+ * Calculates user-specific progress (Returns percentage only - for backward compatibility).
  */
 export async function fetchUserProgress(project: Project, currentUser: User): Promise<number> {
   const { progress } = await fetchUserDetailedProgress(project, currentUser);
@@ -10,9 +10,9 @@ export async function fetchUserProgress(project: Project, currentUser: User): Pr
 }
 
 /**
- * Kullanıcıya özel detaylı ilerlemeyi hesaplar.
- * Yeni sistem: MongoDB responses collection'ından cevaplanan soruları sayar.
- * Hem general-v1 hem de role-specific questionnaire'ları (ethical-expert-v1, medical-expert-v1, etc.) kontrol eder.
+ * Calculates user-specific detailed progress.
+ * New system: Counts answered questions from MongoDB responses collection.
+ * Checks both general-v1 and role-specific questionnaires (ethical-expert-v1, medical-expert-v1, etc.).
  */
 export async function fetchUserDetailedProgress(project: Project, currentUser: User): Promise<{ 
   progress: number, 
@@ -28,7 +28,7 @@ export async function fetchUserDetailedProgress(project: Project, currentUser: U
       return { progress: 0, answeredQuestionnaireKeys: [], questionnaireStats: {} };
     }
 
-    // API endpoint'ini kullan
+    // Use API endpoint
     const response = await fetch(api(`/api/user-progress?projectId=${projectId}&userId=${userId}`));
     
     if (!response.ok) {

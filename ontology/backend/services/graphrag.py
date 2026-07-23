@@ -95,7 +95,10 @@ def _generate_report_with_model_fallback(prompt: str) -> Tuple[dict, str]:
     for model_name in candidates:
         try:
             model = genai.GenerativeModel(model_name)
-            response = model.generate_content(prompt)
+            response = model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(temperature=0.0)
+            )
             report = _parse_report_from_response(response)
             return report, model_name
         except (json.JSONDecodeError, ValueError):
@@ -147,7 +150,9 @@ def generate_zinspection_report(
     raw_text_section = f"\nDOCUMENT CONTENTS (from user upload):\n{raw_text}\n" if raw_text.strip() else ""
 
     prompt = f"""You are a Z-Inspection AI ethics auditor.
-Generate a structured audit report based ONLY on the provided ontology data, legal context, and the document contents.
+Generate a structured, user-friendly audit report based ONLY on the provided ontology data, legal context, and the document contents. 
+IMPORTANT: Use clear, non-technical language. Keep all text sections extremely concise (1-2 short sentences max per section) so non-expert users can quickly read and understand the report.
+CRITICAL: YOU MUST OUTPUT STRICTLY IN ENGLISH. DO NOT USE ANY TURKISH WORDS.
 
 ONTOLOGY DATA (Dynamic Graph Profile):
 System: {system_name}
@@ -162,8 +167,8 @@ LEGAL CONTEXT (from ChromaDB):
 {raw_text_section}
 Generate a JSON report with these exact fields:
 {{
-  "executive_summary": "2-3 sentence summary citing ontology data and document details",
-  "risk_assessment": "Risk level explanation with legal article reference",
+  "executive_summary": "1-2 sentence simple summary citing ontology data and document details",
+  "risk_assessment": "Short, clear risk level explanation with legal article reference",
   "composite_risk_score": 75,
   "risk_level": "MinimalRisk | LimitedRisk | HighRisk | UnacceptableRisk",
   "score_components": {{
@@ -173,17 +178,17 @@ Generate a JSON report with these exact fields:
     "technical_score": 60,
     "oversight_score": 80
   }},
-  "risk_threshold_explanation": "Explanation of why the risk level was assigned based on the composite score",
-  "risk_trigger_safeguard_analysis": "Detailed narrative explaining which risk triggers were found, which safeguards were detected, what safeguards are missing, what the initial risk level was, and why the final risk level changed or remained the same based on the INFERRED DATA.",
-  "ethical_analysis": "Analysis of violated principles and overall ethical impact",
+  "risk_threshold_explanation": "1-2 sentence simple explanation of why the risk level was assigned based on the composite score",
+  "risk_trigger_safeguard_analysis": "Short, user-friendly summary explaining risk triggers, safeguards, and why risk changed based on inferred data.",
+  "ethical_analysis": "Concise (1-2 sentences) analysis of violated principles and overall ethical impact, easy to understand",
   "ethical_tensions": [
     {{
       "tension": "Name of the tension (e.g. Privacy vs Transparency)",
-      "description": "A detailed, contextual explanation of how this specific trade-off manifests in this exact AI system's use case, rather than just a generic definition."
+      "description": "Short (1 sentence), clear explanation of how this trade-off manifests in this use case."
     }}
   ],
-  "legal_compliance": "Specific legal obligations with article numbers",
-  "recommendations": ["recommendation 1", "recommendation 2", "recommendation 3"],
+  "legal_compliance": "Short, simple explanation of specific legal obligations with article numbers",
+  "recommendations": ["short, actionable recommendation 1", "short, actionable recommendation 2"],
   "citation_sources": ["source1", "source2"]
 }}
 
@@ -216,7 +221,7 @@ def build_fallback_report(system_name: str, dynamic_profile: dict, inferred_data
     return {
         "status": "partial_success",
         "source": "ontology_fallback",
-        "executive_summary": f"Sistem, ontoloji tabanlı akıl yürütme sonucunda {risk_level} olarak değerlendirilmiştir. Gemini API servisine erişilemediği için ayrıntılı doğal dil raporu üretilememiştir. Ancak ontoloji ve bilgi grafı çıktıları aşağıda özetlenmiştir.",
+        "executive_summary": f"Based on ontology reasoning, the system has been evaluated as {risk_level}. The Gemini API service was unavailable, so a detailed natural language report could not be generated. However, the raw ontology and knowledge graph outputs are summarized below.",
         "risk_assessment": f"Risk Level: {risk_level}. This was determined by ontology reasoning.",
         "composite_risk_score": composite_score,
         "risk_level": risk_level,

@@ -176,7 +176,7 @@ export function EthicalTensionMap({ tensions }: EthicalTensionMapProps) {
                   {selectedTensionData.tensions.map((tension) => {
                     const colors = getSeverityColor(tension.severity);
                     
-                    // Consensus yüzdesi hesaplama
+                    // Calculate consensus percentage
                     const agreeCount = tension.consensus?.agree || 0;
                     const disagreeCount = tension.consensus?.disagree || 0;
                     const totalVotes = agreeCount + disagreeCount;
@@ -184,7 +184,7 @@ export function EthicalTensionMap({ tensions }: EthicalTensionMapProps) {
                       ? (agreeCount === totalVotes ? 100 : Math.round((agreeCount / totalVotes) * 100))
                       : 0;
                     
-                    // Yüzdeye göre yeşil renk hesaplama
+                    // Calculate green color based on percentage
                     const getGreenColor = (percentage: number) => {
                       if (percentage === 0) return '#e5f7e5';
                       if (percentage <= 25) return '#86efac';

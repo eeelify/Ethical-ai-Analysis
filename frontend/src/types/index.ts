@@ -203,7 +203,7 @@ export interface UseCase {
     timestamp: string;
   }[];
   extendedInfo?: Record<string, any>;
-  answers?: Array<{ // Sadece cevaplar - questionId ve answer
+  answers?: Array<{ // Answers only - questionId and answer
     questionId: string;
     answer: string;
   }>;

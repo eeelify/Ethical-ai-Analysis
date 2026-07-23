@@ -8,6 +8,7 @@ import { ProfileModal } from './ProfileModal';
 import { ExpertQuestionManager } from './ExpertQuestionManager';
 import { OntologyViewerTab } from './OntologyViewerTab';
 import { api } from '../api';
+import { UnifiedReportViewer } from './UnifiedReportViewer';
 
 interface AdminDashboardEnhancedProps {
   currentUser: User;
@@ -21,6 +22,8 @@ interface AdminDashboardEnhancedProps {
   onNavigate: (view: string) => void;
   onLogout: () => void;
   onUpdateUser?: (user: User) => void;
+  onReviewAdminReports?: (project: Project) => void;
+  onViewReport?: (reportId: string) => void;
 }
 
 const statusColors = {
@@ -48,7 +51,8 @@ const ProjectCard: React.FC<{
   onViewProject: (p: Project) => void;
   onStartEvaluation: (p: Project) => void;
   onDeleteProject: (id: string) => void;
-}> = ({ project, currentUser, onViewProject, onStartEvaluation, onDeleteProject }) => {
+  onReviewAdminReports?: (p: Project) => void;
+}> = ({ project, currentUser, onViewProject, onStartEvaluation, onDeleteProject, onReviewAdminReports }) => {
   const [userProgress, setUserProgress] = useState<number>(project.progress ?? 0);
 
   useEffect(() => {
@@ -73,7 +77,7 @@ const ProjectCard: React.FC<{
     };
 
     fetchProgress();
-    // Progress'i periyodik olarak güncelle (her 3 saniyede bir)
+    // Periodically update progress (every 30 seconds)
     const interval = setInterval(fetchProgress, 30000); // Changed for performance
     return () => {
       mounted = false;
@@ -171,7 +175,9 @@ export function AdminDashboardEnhanced({
   onDeleteProject,
   onNavigate,
   onLogout,
-  onUpdateUser
+  onUpdateUser,
+  onReviewAdminReports,
+  onViewReport
 }: AdminDashboardEnhancedProps) {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'use-case-assignments' | 'project-creation' | 'reports' | 'chats' | 'created-reports' | 'expert-questions' | 'ontology' | 'platform-info'>(() =>
     loadAdminDashboardTab('dashboard') as 'dashboard' | 'use-case-assignments' | 'project-creation' | 'reports' | 'chats' | 'created-reports' | 'expert-questions' | 'ontology' | 'platform-info'
@@ -240,7 +246,7 @@ export function AdminDashboardEnhanced({
     }
   };
 
-  // Find or create a project for communication with a user (UseCaseOwner-Admin mantığı)
+  // Find or create a project for communication with a user (UseCaseOwner-Admin logic)
   const getCommunicationProject = async (otherUser: User): Promise<Project> => {
     // Try to find an existing project where both users are assigned
     let commProject = projects.find(p =>
@@ -1041,6 +1047,7 @@ export function AdminDashboardEnhanced({
               onViewProject={onViewProject}
               onCreateNew={() => setActiveTab('project-creation')}
               onDeleteProject={onDeleteProject}
+              onReviewAdminReports={onReviewAdminReports}
             />
           )}
 
@@ -1094,6 +1101,7 @@ export function AdminDashboardEnhanced({
             <CreatedReportsTab
               projects={projects}
               currentUser={currentUser}
+              onViewProject={onViewProject}
             />
           )}
 
@@ -1213,9 +1221,9 @@ export function AdminDashboardEnhanced({
 
 // --- SUB COMPONENTS ---
 
-// Project Progress Component - Admin için proje ilerlemesini gösterir
-// NOT: Hesaplama kaynağı olarak backend'in sağladığı `project.progress` alanını kullanır.
-// Böylece Admin Dashboard'daki progress, Project Detail ve diğer admin ekranlarıyla tutarlı olur.
+// Project Progress Component - Shows project progress for Admin
+// NOTE: Uses the `project.progress` field provided by the backend as calculation source.
+// Thus, progress in Admin Dashboard stays consistent with Project Detail and other admin screens.
 
 function isProgressContributorForAdminDashboard(role?: string) {
   const r = String(role || '').toLowerCase();
@@ -1226,7 +1234,7 @@ function isProgressContributorForAdminDashboard(role?: string) {
   if (r.includes('use-case-owner')) return false;
   return true;
 }
-function ProjectProgressCard({ project, users, onViewProject, onDeleteProject }: { project: Project; users: User[]; onViewProject: (p: Project) => void; onDeleteProject: (id: string) => void }) {
+function ProjectProgressCard({ project, users, onViewProject, onDeleteProject, onReviewAdminReports }: { project: Project; users: User[]; onViewProject: (p: Project) => void; onDeleteProject: (id: string) => void; onReviewAdminReports?: (p: Project) => void; }) {
   const [averageProgress, setAverageProgress] = useState<number>(project.progress ?? 0);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -1245,7 +1253,7 @@ function ProjectProgressCard({ project, users, onViewProject, onDeleteProject }:
       try {
         const assignedUserIds = project.assignedUsers;
 
-        // Sadece katkı sağlayan uzman rollerini (admin / use-case-owner hariç) dahil et
+        // Include only contributing expert roles (excluding admin / use-case-owner)
         const contributorIds = assignedUserIds.filter((userId: string) => {
           const user = users.find(u => (u.id || (u as any)._id) === userId);
           if (!user) return false;
@@ -1292,7 +1300,7 @@ function ProjectProgressCard({ project, users, onViewProject, onDeleteProject }:
 
     calculateAverageProgress();
 
-    // Progress'i periyodik olarak güncelle (her 5 saniyede bir)
+    // Periodically update progress (every 5 seconds)
     const interval = setInterval(calculateAverageProgress, 5000);
 
     return () => {
@@ -1360,6 +1368,16 @@ function ProjectProgressCard({ project, users, onViewProject, onDeleteProject }:
             );
           }
         })()}
+
+        {project.derivedStatus?.toLowerCase() === 'resolve' && onReviewAdminReports && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onReviewAdminReports(project); }}
+            className="ml-auto inline-flex items-center px-2.5 py-1 text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg hover:bg-blue-500/20 transition-colors"
+          >
+            <FileText className="w-3.5 h-3.5 mr-1.5" />
+            Review Reports
+          </button>
+        )}
       </div>
 
       <div className="mb-4">
@@ -1385,7 +1403,7 @@ function ProjectProgressCard({ project, users, onViewProject, onDeleteProject }:
   );
 }
 
-function DashboardTab({ projects, users, searchQuery, setSearchQuery, onViewProject, onCreateNew, onDeleteProject }: any) {
+function DashboardTab({ projects, users, searchQuery, setSearchQuery, onViewProject, onCreateNew, onDeleteProject, onReviewAdminReports }: any) {
   return (
     <>
       <div className="bg-[#050b14] border-b border-white/10 px-8 py-6 flex-shrink-0">
@@ -1423,6 +1441,7 @@ function DashboardTab({ projects, users, searchQuery, setSearchQuery, onViewProj
               users={users}
               onViewProject={onViewProject}
               onDeleteProject={onDeleteProject}
+              onReviewAdminReports={onReviewAdminReports}
             />
           ))}
         </div>
@@ -1562,7 +1581,7 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
   const [selectedTeam, setSelectedTeam] = useState<string[]>([]);
   const [autoUseCaseOwnerId, setAutoUseCaseOwnerId] = useState<string>('');
 
-  // ⚠️ YENİ STATE'LER: 7 Temel Soru İçin Eklenmiştir
+  // ⚠️ NEW STATES: Added for 7 Core Questions
   const [requester, setRequester] = useState('');
   const [inspectionReason, setInspectionReason] = useState('');
   const [relevantFor, setRelevantFor] = useState('');
@@ -1584,7 +1603,7 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
       return;
     }
 
-    // ⚠️ GÜNCELLENMİŞ onCreateProject çağrısı: inspectionContext eklendi
+    // ⚠️ UPDATED onCreateProject call: inspectionContext added
     onCreateProject({
       title,
       shortDescription: description.substring(0, 100),
@@ -1603,7 +1622,7 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
       }
     });
 
-    // Alanları temizle
+    // Clear fields
     setTitle('');
     setDescription('');
     setTags('');
@@ -1628,8 +1647,8 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
     }
   };
 
-  // Admin Create Project ekranında use-case-owner listede görünmesin.
-  // UseCase seçilirse owner otomatik atanır (autoUseCaseOwnerId).
+  // Hide use-case-owner in Admin Create Project screen.
+  // If UseCase is selected, owner is automatically assigned (autoUseCaseOwnerId).
   const experts = users.filter((u: User) => u.role !== 'admin' && u.role !== 'use-case-owner');
 
   return (
@@ -1670,7 +1689,7 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
                       if (uc) {
                         setTitle(uc.title);
                         setDescription(uc.description);
-                        // Use case owner'ını otomatik ata (listede göstermeden)
+                        // Automatically assign use case owner (without showing in list)
                         setAutoUseCaseOwnerId((uc as any).ownerId || '');
                       }
                     } else {
@@ -1838,7 +1857,7 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
             {/* End of Project Context Section */}
 
 
-            {/* 3. Assignment Section (Ekip Atama) - Düzeltilmiş Görünüm */}
+            {/* 3. Assignment Section (Team Assignment) - Updated View */}
             <div className="bg-[#050b14]/50 p-6 rounded-xl border border-white/10 shadow-sm space-y-6">
               <div>
                 <label className="block text-sm font-medium mb-3 text-slate-300">
@@ -1895,7 +1914,7 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
   );
 }
 
-function CreatedReportsTab({ projects, currentUser }: any) {
+function CreatedReportsTab({ projects, currentUser, onViewProject }: any) {
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedReport, setSelectedReport] = useState<any | null>(null);
@@ -1933,6 +1952,12 @@ function CreatedReportsTab({ projects, currentUser }: any) {
 
   // View report
   const handleViewReport = async (reportId: string) => {
+    if (onViewReport) {
+      onViewReport(reportId);
+      return;
+    }
+    
+    // Fallback: show inline modal if onViewReport not provided
     try {
       const userId = currentUser.id || (currentUser as any)._id;
       const response = await fetch(api(`/api/reports/${reportId}?userId=${userId}`));
@@ -1978,11 +2003,11 @@ function CreatedReportsTab({ projects, currentUser }: any) {
         window.URL.revokeObjectURL(url);
       } else {
         const error = await response.json();
-        alert('PDF indirilemedi: ' + (error.error || 'Bilinmeyen hata'));
+        alert('PDF download failed: ' + (error.error || 'Unknown error'));
       }
     } catch (error: any) {
       console.error('Error downloading PDF:', error);
-      alert('PDF indirilemedi: ' + (error.message || 'Bilinmeyen hata'));
+      alert('PDF download failed: ' + (error.message || 'Unknown error'));
     } finally {
       if (button) {
         button.disabled = false;
@@ -2078,7 +2103,20 @@ function CreatedReportsTab({ projects, currentUser }: any) {
                     <div className="flex items-start justify-between">
                       <div
                         className="flex-1 cursor-pointer"
-                        onClick={() => handleViewReport(reportId)}
+                        onClick={() => {
+                          if (onViewProject && report.projectId) {
+                            const rawId = report.projectId?._id || report.projectId?.id || report.projectId;
+                            const projectId = rawId?.toString();
+                            const fullProject = projects.find((p: any) => p.id?.toString() === projectId || p._id?.toString() === projectId);
+                            if (fullProject) {
+                              onViewProject({ ...fullProject, openReportsTab: true } as any);
+                            } else {
+                              handleViewReport(reportId);
+                            }
+                          } else {
+                            handleViewReport(reportId);
+                          }
+                        }}
                       >
                         <h3 className="font-medium text-white mb-1">{report.title}</h3>
                         <p className="text-sm text-slate-400 mb-2">{projectTitle}</p>
@@ -2095,13 +2133,77 @@ function CreatedReportsTab({ projects, currentUser }: any) {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
+                        {(() => {
+                          const rawId = report.projectId?._id || report.projectId?.id || report.projectId;
+                          const projectId = rawId?.toString();
+                          const fullProject = projects.find((p: any) => p.id?.toString() === projectId || p._id?.toString() === projectId);
+                          return (
+                            <>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (onViewProject && fullProject) {
+                                    onViewProject({ ...fullProject, openReportsTab: true } as any);
+                                  }
+                                }}
+                                className="px-3 py-1.5 text-sm text-purple-600 hover:bg-purple-900/20 rounded-lg transition-colors flex items-center gap-2"
+                                title="View Unified Reports"
+                              >
+                                <Database className="h-4 w-4" />
+                                Unified View
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (onViewProject && fullProject) {
+                                    // Switch to admin-report-review
+                                    onViewProject({ ...fullProject, openAdminReview: true } as any);
+                                  }
+                                }}
+                                className="px-3 py-1.5 text-sm text-amber-500 hover:bg-amber-900/20 rounded-lg transition-colors flex items-center gap-2 font-medium"
+                                title="Review and Publish Reports"
+                              >
+                                <Database className="h-4 w-4" />
+                                Review & Publish
+                              </button>
+                            </>
+                          );
+                        })()}
                         <button
                           onClick={(e) => handleDownloadPDF(reportId, report.title, e)}
                           className="px-3 py-1.5 text-sm text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors flex items-center gap-2"
-                          title="Download PDF"
+                          title="Download Expert PDF"
                         >
                           <Download className="h-4 w-4" />
-                          PDF
+                          Expert PDF
+                        </button>
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            const btn = e.currentTarget;
+                            const originalText = btn.innerHTML;
+                            btn.innerHTML = '<span class="flex items-center gap-2">Downloading...</span>';
+                            try {
+                              const projId = report.projectId._id || report.projectId?.id || report.projectId;
+                              const res = await fetch(api(`/api/projects/${projId}/unified-reports`));
+                              const data = await res.json();
+                              const ontologyId = data.ontologyReport?._id || data.ontologyReport?.id;
+                              if (ontologyId) {
+                                window.open(api(`/api/ontology-reports/${ontologyId}/view-pdf?userId=${currentUser.id || (currentUser as any)._id}`), '_blank');
+                              } else {
+                                alert("Ontology report not generated yet.");
+                              }
+                            } catch (err) {
+                              alert("Failed to download ontology PDF.");
+                            } finally {
+                              btn.innerHTML = originalText;
+                            }
+                          }}
+                          className="px-3 py-1.5 text-sm text-purple-400 hover:bg-purple-900/20 rounded-lg transition-colors flex items-center gap-2"
+                          title="Download Ontology PDF"
+                        >
+                          <Download className="h-4 w-4" />
+                          Ontology PDF
                         </button>
 
                         <button
@@ -2206,10 +2308,12 @@ function ReportsTab({ projects, currentUser, users }: any) {
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState<string | null>(null);
+  const [generatingOntology, setGeneratingOntology] = useState<string | null>(null);
   const [showGeneratingMessage, setShowGeneratingMessage] = useState(false);
   const [selectedReport, setSelectedReport] = useState<any | null>(null);
   const [filterProjectId, setFilterProjectId] = useState<string>('');
   const [projectProgresses, setProjectProgresses] = useState<Record<string, number>>({});
+  const [selectedProjectForReports, setSelectedProjectForReports] = useState<string | null>(null);
 
   // Fetch all reports
   const fetchReports = async () => {
@@ -2241,32 +2345,29 @@ function ReportsTab({ projects, currentUser, users }: any) {
     }
   };
 
-  // Generate report for a project
+  // Generate Expert report for a project
   const handleGenerateReport = async (projectId: string) => {
     try {
       setGenerating(projectId);
       setShowGeneratingMessage(true);
-      const response = await fetch(api('/api/reports/generate'), {
+      const userId = currentUser?.id || currentUser?._id;
+      const response = await fetch(api('/api/reports/generate-atomic'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          projectId: projectId,
-          userId: currentUser?.id || currentUser?._id
-        })
+        headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
+        body: JSON.stringify({ projectId, questionnaireKey: null })
       });
 
       if (response.ok) {
-        const result = await response.json();
         setShowGeneratingMessage(false);
-        alert('✅ Report generated successfully!');
-        fetchReports(); // Refresh reports list
+        alert('✅ Expert Report generated successfully!');
+        fetchReports();
       } else {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({}));
         setShowGeneratingMessage(false);
-        alert('❌ Error: ' + (error.error || 'Failed to generate report'));
+        alert('❌ Error: ' + (error.error || 'Failed to generate expert report'));
       }
     } catch (error: any) {
-      console.error('Error generating report:', error);
+      console.error('Error generating expert report:', error);
       setShowGeneratingMessage(false);
       alert('❌ Error: ' + (error.message || 'Failed to generate report'));
     } finally {
@@ -2274,98 +2375,32 @@ function ReportsTab({ projects, currentUser, users }: any) {
     }
   };
 
-  // View report
-  const handleViewReport = async (reportId: string) => {
+  // Generate Ontology report for a project
+  const handleGenerateOntologyReport = async (projectId: string) => {
     try {
-      const response = await fetch(api(`/api/reports/${reportId}`));
-      if (response.ok) {
-        const data = await response.json();
-        setSelectedReport(data);
-      } else {
-        alert('Report could not be loaded');
-      }
-    } catch (error) {
-      console.error('Error fetching report:', error);
-      alert('Report could not be loaded');
-    }
-  };
-
-  // Download report as PDF
-  const handleDownloadPDF = async (reportId: string, reportTitle: string, e?: React.MouseEvent) => {
-    if (e) {
-      e.stopPropagation(); // Prevent card click event
-    }
-
-    const button = e?.currentTarget as HTMLButtonElement;
-    const originalText = button?.textContent;
-    if (button) {
-      button.disabled = true;
-      button.textContent = 'Downloading...';
-    }
-
-    try {
-      const userId = currentUser?.id || (currentUser as any)?._id;
-      // Use /download-pdf endpoint which always uses latest data
-      const response = await fetch(api(`/api/reports/${reportId}/download-pdf?userId=${userId}`));
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        const fileName = `${reportTitle.replace(/[^a-z0-9]/gi, '_')}_${reportId}.pdf`;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      } else {
-        const error = await response.json();
-        alert('PDF indirilemedi: ' + (error.error || 'Bilinmeyen hata'));
-      }
-    } catch (error: any) {
-      console.error('Error downloading PDF:', error);
-      alert('PDF indirilemedi: ' + (error.message || 'Bilinmeyen hata'));
-    } finally {
-      if (button) {
-        button.disabled = false;
-        if (originalText) {
-          button.textContent = originalText;
-        }
-      }
-    }
-  };
-
-
-
-
-  // Delete report
-  const handleDeleteReport = async (reportId: string, reportTitle: string, e?: React.MouseEvent) => {
-    if (e) {
-      e.stopPropagation(); // Prevent card click event
-    }
-    const confirmDelete = window.confirm(`Are you sure you want to delete the report "${reportTitle}"? This action cannot be undone.`);
-    if (!confirmDelete) return;
-
-    try {
-      const userId = currentUser.id || (currentUser as any)._id;
-      const response = await fetch(api(`/api/reports/${reportId}?userId=${userId}`), {
-        method: 'DELETE'
+      setGeneratingOntology(projectId);
+      const userId = currentUser?.id || currentUser?._id;
+      const response = await fetch(api('/api/ontology/report'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectId, userId })
       });
+
       if (response.ok) {
-        alert('✅ Report deleted successfully');
-        fetchReports(); // Refresh reports list
-        if (selectedReport && (selectedReport._id === reportId || selectedReport.id === reportId)) {
-          setSelectedReport(null); // Close modal if deleted report is being viewed
-        }
+        alert('✅ Ontology Report generated successfully!');
       } else {
-        const error = await response.json();
-        alert('❌ Error: ' + (error.error || 'Failed to delete report'));
+        const error = await response.json().catch(() => ({}));
+        alert('❌ Error: ' + (error.error || 'Failed to generate ontology report'));
       }
     } catch (error: any) {
-      console.error('Error deleting report:', error);
-      alert('❌ Error: ' + (error.message || 'Failed to delete report'));
+      console.error('Error generating ontology report:', error);
+      alert('❌ Error: ' + (error.message || 'Failed to generate ontology report'));
+    } finally {
+      setGeneratingOntology(null);
     }
   };
+
+
 
   // Fetch progress for all projects (admin view) - same team-average logic as Project Detail
   useEffect(() => {
@@ -2498,7 +2533,11 @@ function ReportsTab({ projects, currentUser, users }: any) {
               return (
                 <div
                   key={projectId}
-                  className="bg-[#050b14]/50 border border-white/10 rounded-lg p-4 hover:shadow-[0_0_15px_rgba(34,211,238,0.1)] hover:border-cyan-500/30 transition-shadow"
+                  className={`bg-[#050b14]/50 border rounded-lg p-4 hover:shadow-[0_0_15px_rgba(34,211,238,0.1)] transition-shadow ${
+                    selectedProjectForReports === projectId
+                      ? 'border-blue-500/60 ring-1 ring-blue-500/30'
+                      : 'border-white/10 hover:border-cyan-500/30'
+                  }`}
                 >
                   <h3 className="font-medium text-white mb-2 truncate">{project.title}</h3>
                   <p className="text-sm text-slate-400 mb-3 line-clamp-2">
@@ -2511,26 +2550,53 @@ function ReportsTab({ projects, currentUser, users }: any) {
                     </div>
                     <div className="w-full bg-gray-800 rounded-full h-1.5">
                       <div
-                        className={`h-1.5 rounded-full transition-all ${isComplete ? 'bg-green-500' : 'bg-gray-600'
-                          }`}
+                        className={`h-1.5 rounded-full transition-all ${isComplete ? 'bg-green-500' : 'bg-gray-600'}`}
                         style={{ width: `${Math.min(100, projectProgress)}%`, minWidth: projectProgress > 0 ? '8px' : '0' }}
                       />
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-slate-400">
-                      {projectReports.length} rapor
-                    </span>
-                    <button
-                      onClick={() => handleGenerateReport(projectId)}
-                      disabled={!canGenerate}
-                      className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${!canGenerate
-                        ? 'bg-gray-800 text-slate-500 cursor-not-allowed'
-                        : 'bg-green-600 text-white hover:bg-green-700'
+                  <div className="text-xs text-slate-400 mb-3">{projectReports.length} report(s)</div>
+
+                  {/* Buttons row */}
+                  <div className="flex flex-col gap-2">
+                    {/* Generate buttons */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleGenerateReport(projectId)}
+                        disabled={!canGenerate || generating === projectId}
+                        className={`flex-1 px-2 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${
+                          !canGenerate || generating === projectId
+                            ? 'bg-gray-800 text-slate-500 cursor-not-allowed'
+                            : 'bg-green-700 text-white hover:bg-green-600'
                         }`}
-                      title={!isComplete ? 'Project must be 100% complete to generate report' : ''}
+                        title={!isComplete ? 'Complete the project first' : 'Generate Expert Evaluation Report'}
+                      >
+                        <FileText className="w-3 h-3" />
+                        {generating === projectId ? 'Generating...' : 'Expert Report'}
+                      </button>
+
+                      <button
+                        onClick={() => handleGenerateOntologyReport(projectId)}
+                        disabled={generatingOntology === projectId}
+                        className={`flex-1 px-2 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${
+                          generatingOntology === projectId
+                            ? 'bg-gray-800 text-slate-500 cursor-not-allowed'
+                            : 'bg-purple-700 text-white hover:bg-purple-600'
+                        }`}
+                        title="Generate AI Ontology Report"
+                      >
+                        <Database className="w-3 h-3" />
+                        {generatingOntology === projectId ? 'Generating...' : 'Ontology Report'}
+                      </button>
+                    </div>
+
+                    {/* Show Reports button */}
+                    <button
+                      onClick={() => setSelectedProjectForReports(selectedProjectForReports === projectId ? null : projectId)}
+                      className="w-full px-2 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1 bg-blue-700/50 text-blue-300 hover:bg-blue-700 border border-blue-600/30"
                     >
-                      {isGenerating ? 'Generating...' : 'Generate Report'}
+                      <BarChart3 className="w-3 h-3" />
+                      {selectedProjectForReports === projectId ? 'Hide Reports' : 'Show Reports'}
                     </button>
                   </div>
                 </div>
@@ -2538,6 +2604,46 @@ function ReportsTab({ projects, currentUser, users }: any) {
             })}
           </div>
         </div>
+
+        {/* Unified Reports Panel - shown when a project is selected */}
+        {selectedProjectForReports && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white">
+                Reports — {projects.find((p: any) => (p.id || p._id) === selectedProjectForReports)?.title}
+              </h2>
+              <button
+                onClick={() => setSelectedProjectForReports(null)}
+                className="text-gray-500 hover:text-slate-300 text-sm flex items-center gap-1"
+              >
+                <X className="w-4 h-4" /> Close
+              </button>
+            </div>
+            <UnifiedReportViewer
+              projectId={selectedProjectForReports}
+              userId={currentUser.id || (currentUser as any)._id}
+              onGenerateOntology={() => handleGenerateOntologyReport(selectedProjectForReports)}
+              generating={generatingOntology === selectedProjectForReports}
+              onViewExpertReport={(reportId) => {
+                // Fetch the full report and open the modal
+                handleViewReport(reportId);
+              }}
+              onViewOntologyReport={() => {
+                const project = projects.find((p: any) => p.id === selectedProjectForReports || p._id === selectedProjectForReports);
+                if (project) {
+                  onViewProject({ ...project, openOntologyTab: true } as any);
+                }
+              }}
+              currentUserRole={currentUser.role}
+              onReviewReports={() => {
+                const project = projects.find((p: any) => p.id === selectedProjectForReports || p._id === selectedProjectForReports);
+                if (project && onViewProject) {
+                  onViewProject({ ...project, openAdminReview: true } as any);
+                }
+              }}
+            />
+          </div>
+        )}
 
         {/* Reports List */}
         <div>
@@ -2565,7 +2671,15 @@ function ReportsTab({ projects, currentUser, users }: any) {
                     <div className="flex items-start justify-between">
                       <div
                         className="flex-1 cursor-pointer"
-                        onClick={() => handleViewReport(reportId)}
+                        onClick={() => {
+                          const projectId = report.projectId?._id || report.projectId?.id || report.projectId;
+                          if (projectId) {
+                            setSelectedProjectForReports(projectId);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          } else {
+                            handleViewReport(reportId);
+                          }
+                        }}
                       >
                         <h3 className="font-medium text-white mb-1">{report.title}</h3>
                         <p className="text-sm text-slate-400 mb-2">{projectTitle}</p>

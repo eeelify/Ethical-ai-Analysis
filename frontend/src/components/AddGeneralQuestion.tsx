@@ -11,13 +11,13 @@ interface AddGeneralQuestionProps {
 }
 
 const QUESTION_PRINCIPLES: Array<{ value: string; label: string }> = [
-  { value: 'TRANSPARENCY', label: 'Transparency (Şeffaflık)' },
-  { value: 'HUMAN AGENCY & OVERSIGHT', label: 'Human Agency & Oversight (İnsan Özerkliği ve Gözetimi)' },
-  { value: 'TECHNICAL ROBUSTNESS & SAFETY', label: 'Technical Robustness & Safety (Teknik Sağlamlık ve Güvenlik)' },
-  { value: 'PRIVACY & DATA GOVERNANCE', label: 'Privacy & Data Governance (Gizlilik ve Veri Yönetişimi)' },
-  { value: 'DIVERSITY, NON-DISCRIMINATION & FAIRNESS', label: 'Diversity, Non-Discrimination & Fairness (Adalet)' },
-  { value: 'SOCIETAL & INTERPERSONAL WELL-BEING', label: 'Societal & Interpersonal Well-Being (Toplumsal İyi Oluş)' },
-  { value: 'ACCOUNTABILITY', label: 'Accountability (Hesap Verebilirlik)' },
+  { value: 'TRANSPARENCY', label: 'Transparency' },
+  { value: 'HUMAN AGENCY & OVERSIGHT', label: 'Human Agency & Oversight' },
+  { value: 'TECHNICAL ROBUSTNESS & SAFETY', label: 'Technical Robustness & Safety' },
+  { value: 'PRIVACY & DATA GOVERNANCE', label: 'Privacy & Data Governance' },
+  { value: 'DIVERSITY, NON-DISCRIMINATION & FAIRNESS', label: 'Diversity, Non-Discrimination & Fairness' },
+  { value: 'SOCIETAL & INTERPERSONAL WELL-BEING', label: 'Societal & Interpersonal Well-Being' },
+  { value: 'ACCOUNTABILITY', label: 'Accountability' },
 ];
 
 export function AddGeneralQuestion({ project, currentUser, onBack, onComplete }: AddGeneralQuestionProps) {
@@ -241,7 +241,7 @@ export function AddGeneralQuestion({ project, currentUser, onBack, onComplete }:
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-white mb-2">
-                      Principle (İlke) <span className="text-red-500">*</span>
+                      Principle <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={principle}

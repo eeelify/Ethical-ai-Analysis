@@ -28,7 +28,7 @@ export const API_BASE_URL = (() => {
       const normalized = normalizeBaseUrl(rawDevApiUrl);
       if (!isHttpUrl(normalized)) {
         throw new Error(
-          `❌ VITE_DEV_API_URL geçersiz: "${rawDevApiUrl}". "http://..." veya "https://..." ile başlamalı.`
+          `❌ VITE_DEV_API_URL is invalid: "${rawDevApiUrl}". Must start with "http://" or "https://".`
         );
       }
       return normalized;
@@ -41,7 +41,7 @@ export const API_BASE_URL = (() => {
     const normalized = normalizeBaseUrl(rawProdApiUrl);
     if (!isHttpUrl(normalized)) {
       throw new Error(
-        `❌ VITE_API_URL geçersiz: "${rawProdApiUrl}". "http://..." veya "https://..." ile başlamalı.`
+        `❌ VITE_API_URL is invalid: "${rawProdApiUrl}". Must start with "http://" or "https://".`
       );
     }
     return normalized;

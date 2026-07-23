@@ -23,21 +23,21 @@ interface GeneralQuestion {
 
 // Principle Turkish translations
 const principleTranslations: Record<string, string> = {
-  'TRANSPARENCY': 'Şeffaflık',
-  'TRANSPARENCY & EXPLAINABILITY': 'Şeffaflık ve Açıklanabilirlik',
-  'HUMAN AGENCY & OVERSIGHT': 'İnsan Özerkliği ve Gözetimi',
-  'HUMAN OVERSIGHT & CONTROL': 'İnsan Gözetimi ve Kontrolü',
-  'TECHNICAL ROBUSTNESS & SAFETY': 'Teknik Sağlamlık ve Güvenlik',
-  'PRIVACY & DATA GOVERNANCE': 'Gizlilik ve Veri Yönetişimi',
-  'PRIVACY & DATA PROTECTION': 'Gizlilik ve Veri Koruma',
-  'DIVERSITY, NON-DISCRIMINATION & FAIRNESS': 'Çeşitlilik, Ayrımcılık Yapmama ve Adalet',
-  'SOCIETAL & INTERPERSONAL WELL-BEING': 'Toplumsal ve Çevresel İyi Oluş',
-  'ACCOUNTABILITY': 'Hesap Verebilirlik',
-  'ACCOUNTABILITY & RESPONSIBILITY': 'Hesap Verebilirlik ve Sorumluluk',
-  'LAWFULNESS & COMPLIANCE': 'Hukukilik ve Uyumluluk',
-  'RISK MANAGEMENT & HARM PREVENTION': 'Risk Yönetimi ve Zarar Önleme',
-  'PURPOSE LIMITATION & DATA MINIMIZATION': 'Amaç Sınırlaması ve Veri Minimizasyonu',
-  'USER RIGHTS & AUTONOMY': 'Kullanıcı Hakları ve Özerklik'
+  'TRANSPARENCY': 'Transparency',
+  'TRANSPARENCY & EXPLAINABILITY': 'Transparency & Explainability',
+  'HUMAN AGENCY & OVERSIGHT': 'Human Agency & Oversight',
+  'HUMAN OVERSIGHT & CONTROL': 'Human Oversight & Control',
+  'TECHNICAL ROBUSTNESS & SAFETY': 'Technical Robustness & Safety',
+  'PRIVACY & DATA GOVERNANCE': 'Privacy & Data Governance',
+  'PRIVACY & DATA PROTECTION': 'Privacy & Data Protection',
+  'DIVERSITY, NON-DISCRIMINATION & FAIRNESS': 'Diversity, Non-Discrimination & Fairness',
+  'SOCIETAL & INTERPERSONAL WELL-BEING': 'Societal & Interpersonal Well-Being',
+  'ACCOUNTABILITY': 'Accountability',
+  'ACCOUNTABILITY & RESPONSIBILITY': 'Accountability & Responsibility',
+  'LAWFULNESS & COMPLIANCE': 'Lawfulness & Compliance',
+  'RISK MANAGEMENT & HARM PREVENTION': 'Risk Management & Harm Prevention',
+  'PURPOSE LIMITATION & DATA MINIMIZATION': 'Purpose Limitation & Data Minimization',
+  'USER RIGHTS & AUTONOMY': 'User Rights & Autonomy'
 };
 
 export function GeneralQuestions({ project, currentUser, onBack, onComplete }: GeneralQuestionsProps) {
@@ -157,10 +157,10 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
       } catch (error: any) {
         if (error.name === 'AbortError') {
           console.error('Request timeout - server is slow or not responding');
-          alert('Sorular yüklenirken zaman aşımı oluştu. Lütfen sayfayı yenileyin.');
+          alert('Timed out while loading questions. Please refresh the page.');
         } else {
           console.error('Error loading questions:', error);
-          alert('Sorular yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.');
+          alert('An error occurred while loading questions. Please refresh the page.');
         }
         setLoading(false);
       }

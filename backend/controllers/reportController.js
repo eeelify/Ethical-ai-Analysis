@@ -1605,11 +1605,17 @@ exports.getMyReports = async (req, res) => {
     }
 
     // Discover visible projects
-    const projects = await Project.find(projectQuery).select('_id title').lean();
+    const projects = await Project.find(projectQuery).select('_id title reportsPublished').lean();
     projectIds = Array.from(new Set([
       ...projectIds.map(String),
       ...projects.map(p => String(p._id))
     ])).map(id => new mongoose.Types.ObjectId(id));
+
+    // For non-admins, strictly filter out project IDs where reportsPublished is false
+    if (roleCategory !== 'admin') {
+      const validProjects = await Project.find({ _id: { $in: projectIds }, reportsPublished: true }).select('_id').lean();
+      projectIds = validProjects.map(p => p._id);
+    }
 
     if (projectIds.length === 0) {
       return res.json([]);

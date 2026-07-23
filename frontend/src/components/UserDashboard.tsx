@@ -78,17 +78,17 @@ const stageLabels = {
   resolve: "Resolve",
 };
 
-// Progress'e göre stage belirle (rapor kontrolü ile)
-// 0% → Set-up (henüz sorular çözülmeye başlanmamış)
-// 1-99% → Assess (sorular çözülmeye başlanmış, değerlendirme aşamasında)
-// 100% + rapor varsa → Resolve (tüm sorular çözülmüş ve rapor oluşturulmuş)
-// 100% ama rapor yok → Assess (devam ediyor)
+// Determine stage based on progress (with report check)
+// 0% → Set-up (questions not started yet)
+// 1-99% → Assess (questions started, evaluation in progress)
+// 100% + report exists → Resolve (all questions answered and report generated)
+// 100% but no report → Assess (in progress)
 const getStageFromProgress = (progress: number, hasReport: boolean = false): 'set-up' | 'assess' | 'resolve' => {
   if (progress === 0) return 'set-up';
   if (progress < 100) return 'assess';
-  // 100% ama rapor yoksa hala Assess
+  // If 100% but no report, still Assess
   if (progress === 100 && !hasReport) return 'assess';
-  // 100% ve rapor varsa Resolve
+  // If 100% and report exists, Resolve
   return 'resolve';
 };
 
@@ -192,7 +192,7 @@ export function UserDashboard({
 
     if (projects.length > 0 && currentUser.id) {
       fetchAllProgresses();
-      // Progress'i periyodik olarak güncelle (her 3 saniyede bir)
+      // Periodically update progress (every 30 seconds)
       const interval = setInterval(fetchAllProgresses, 30000); // Changed for performance
       return () => clearInterval(interval);
     }
@@ -489,7 +489,7 @@ export function UserDashboard({
     }
   };
 
-  // Find or create a project for communication with a user (UseCaseOwner-Admin mantığı)
+  // Find or create a project for communication with a user (UseCaseOwner-Admin logic)
   const getCommunicationProject = async (otherUser: User): Promise<Project> => {
     // Try to find an existing project where both users are assigned
     let commProject = projects.find(p =>
@@ -1534,14 +1534,17 @@ export function UserDashboard({
                               <div
                                 className="flex-1 cursor-pointer"
                                 onClick={() => {
-                                  // Experts/viewers should not open the report modal by clicking the card.
-                                  // Prefer navigating to the full review screen when available.
                                   if (onReviewReport) {
                                     onReviewReport(reportId);
                                     return;
                                   }
-                                  // Fallback for older flows (should be rare)
-                                  handleViewReport(reportId);
+                                  const projectId = report.projectId?._id || report.projectId?.id || report.projectId;
+                                  const project = projects.find(p => (p.id || (p as any)._id) === projectId);
+                                  if (project) {
+                                    onViewProject({ ...project, openReportsTab: true } as any);
+                                  } else {
+                                    handleViewReport(reportId);
+                                  }
                                 }}
                               >
                                 <h3 className="font-medium text-white mb-1">{report.title}</h3>
@@ -1559,6 +1562,22 @@ export function UserDashboard({
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (onViewProject && report.projectId) {
+                                      const fullProject = projects.find(p => p.id === (report.projectId._id || report.projectId));
+                                      if (fullProject) {
+                                        onViewProject({ ...fullProject, openReportsTab: true } as any);
+                                      }
+                                    }
+                                  }}
+                                  className="px-3 py-1.5 text-sm text-purple-600 hover:bg-purple-50 rounded-lg transition-colors flex items-center gap-2"
+                                  title="View Unified Reports"
+                                >
+                                  <Database className="h-4 w-4" />
+                                  Unified View
+                                </button>
                                 {onReviewReport && (
                                   <button
                                     onClick={(e) => {

@@ -18,7 +18,7 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
   const [showDrawer, setShowDrawer] = useState(false);
   const [drawerDefaultTab, setDrawerDefaultTab] = useState<'evidence' | 'discussion'>('evidence');
   
-  // userVote'u normalize et - string, null, undefined kontrolü
+  // Normalize userVote - check for string, null, undefined
   const userVote = tension.userVote === 'agree' || tension.userVote === 'disagree' 
     ? tension.userVote 
     : null; 
@@ -61,22 +61,22 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
   const isUnderReview = reviewState.state === 'Under review';
 
   const canDelete = currentUser.role === 'admin' || tension.createdBy === currentUser.id;
-  // Tension sahibi ve adminler vote butonlarını kullanamaz
+  // Tension creator and admins cannot use vote buttons
   const isOwner = tension.createdBy === currentUser.id;
   const isAdmin = currentUser.role === 'admin';
   const canVote = !disableVoting && !isOwner && !isAdmin;
   
-  // Yüzdelik Hesaplama
-  // Eğer tüm oylar agree ise, kesinlikle %100 olmalı (yuvarlama hatasını önlemek için)
+  // Percentage Calculation
+  // If all votes are agree, it must be exactly 100% (to prevent rounding error)
   const agreePercentage = totalVotes > 0 
     ? (agreeCount === totalVotes ? 100 : Math.round((agreeCount / totalVotes) * 100))
     : 0;
 
-  // Evidence ve comment sayılarını hesapla
+  // Calculate evidence and comment counts
   const evidenceCount = (tension as any).evidences ? (tension as any).evidences.length : 0;
   const commentCount = tension.comments ? tension.comments.length : 0;
 
-  // Yüzdeye göre yeşil renk hesaplama - direkt hex renk kullanarak
+  // Calculate green color based on percentage - using direct hex color
   const getGreenColor = (percentage: number): string => {
     if (percentage === 0) return '#d1fae5'; // green-100
     if (percentage <= 25) return '#86efac'; // green-300
@@ -85,7 +85,7 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
     return '#16a34a'; // green-600
   };
 
-  // Card border rengini userVote'a göre belirle - GeneralQuestions'taki gibi
+  // Determine card border color based on userVote - like in GeneralQuestions
   const getCardBorderClass = () => {
     if (userVote === 'agree') {
       return 'border border-green-500/50 bg-green-500/10 shadow-md';
@@ -97,7 +97,7 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
 
   return (
     <div className={`rounded-lg p-4 hover:shadow-md transition-all duration-200 mb-4 ${getCardBorderClass()}`}>
-      {/* Üst Kısım: Risk Badge, Review Badge ve Tarih */}
+      {/* Top Section: Risk Badge, Review Badge and Date */}
       <div className="flex justify-between items-start mb-2">
         <div className="flex items-center space-x-2 flex-wrap">
           <span className={`px-2 py-1 text-xs rounded-full font-medium border ${
@@ -149,7 +149,7 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
         )}
       </div>
 
-      {/* Başlık ve Açıklama */}
+      {/* Title and Description */}
       <h4 className="text-md font-semibold text-white mb-1">
         {tension.claimStatement || "No claim statement"}
       </h4>
@@ -157,7 +157,7 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
         {tension.description}
       </p>
 
-      {/* İlkeler Arasındaki Gerilim */}
+      {/* Tension Between Principles */}
       <div className="text-xs font-medium text-blue-400 mb-4 bg-blue-500/10 inline-block px-2 py-1 rounded border border-blue-500/20">
         {tension.principle1} ↔ {tension.principle2}
       </div>
@@ -213,7 +213,7 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
         </div>
       )}
 
-      {/* --- BUTONLAR (GÜNCELLENDİ) --- */}
+      {/* --- BUTTONS (UPDATED) --- */}
       <div className="flex items-center justify-between pt-3 border-t border-white/10">
         <div className="flex space-x-3">
           {/* AGREE */}

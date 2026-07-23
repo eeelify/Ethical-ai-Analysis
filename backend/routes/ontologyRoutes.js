@@ -112,7 +112,22 @@ router.post('/report', async (req, res) => {
     // 5. Call Ontology Service
     const reportData = await ontologyService.generateReport(payload);
 
-    // 6. Return report to frontend
+    // 6. Save to OntologyChatConversation
+    const OntologyChatConversation = mongoose.model('OntologyChatConversation');
+    let conversation = await OntologyChatConversation.findOne({ projectId });
+    if (!conversation) {
+      conversation = new OntologyChatConversation({
+        projectId: project._id,
+        projectTitle: project.title,
+        title: `${project.title} assessment`,
+        status: 'completed',
+        messages: [],
+      });
+    }
+    conversation.ontologyResult = { report: reportData };
+    await conversation.save();
+
+    // 7. Return report to frontend
     res.json({ success: true, report: reportData });
   } catch (error) {
     console.error('Error generating ontology report:', error);
