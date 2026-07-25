@@ -2365,7 +2365,16 @@ exports.generateReportAtomic = async (req, res) => {
 
     const geminiNarrative = await generateReport(analysisDataWithCharts);
 
-    if (!geminiNarrative || geminiNarrative.trim().length === 0) {
+    let isNarrativeEmpty = false;
+    if (!geminiNarrative) {
+      isNarrativeEmpty = true;
+    } else if (typeof geminiNarrative === 'string' && geminiNarrative.trim().length === 0) {
+      isNarrativeEmpty = true;
+    } else if (typeof geminiNarrative === 'object' && Object.keys(geminiNarrative).length === 0) {
+      isNarrativeEmpty = true;
+    }
+
+    if (isNarrativeEmpty) {
       throw new Error('Gemini generated empty narrative');
     }
 
@@ -2374,14 +2383,22 @@ exports.generateReportAtomic = async (req, res) => {
     // ============================================================
     console.log('📄 Generating HTML report...');
 
-    const structuredNarrative = {
-      markdown: geminiNarrative,
-      executiveSummary: [],
-      topRiskDriversNarrative: [],
-      tensionsNarrative: [],
-      principleFindings: [],
-      recommendations: []
-    };
+    let structuredNarrative;
+    if (typeof geminiNarrative === 'object') {
+      structuredNarrative = {
+        ...geminiNarrative,
+        markdown: geminiNarrative.markdown || ''
+      };
+    } else {
+      structuredNarrative = {
+        markdown: geminiNarrative,
+        executiveSummary: [],
+        topRiskDriversNarrative: [],
+        tensionsNarrative: [],
+        principleFindings: [],
+        recommendations: []
+      };
+    }
 
     const htmlReport = generateHTMLReport(
       reportMetrics || {},
@@ -2411,8 +2428,8 @@ exports.generateReportAtomic = async (req, res) => {
       tensionsCount: tensions.length,
       overallERC: reportMetrics?.scoring?.totals?.overallAvg || null,
       riskLabel: reportMetrics?.scoring?.totalsOverall?.riskLabel || null,
-      evaluatorCount: evaluatorsData?.length || 0,
-      evaluatorRoles: [...new Set(evaluatorsData?.map(e => e.role) || [])],
+      evaluatorCount: evaluatorsData?.assigned?.length || 0,
+      evaluatorRoles: [...new Set(evaluatorsData?.assigned?.map(e => e.role) || [])],
       chartsGenerated: Object.keys(chartImages).length,
       chartTypes: Object.keys(chartImages)
     };
@@ -2421,8 +2438,16 @@ exports.generateReportAtomic = async (req, res) => {
       projectId,
       htmlContent: htmlReport,
       metadata,
-      narrative: geminiNarrative,
-      userId: userIdObj
+      narrative: typeof geminiNarrative === 'object' ? JSON.stringify(geminiNarrative) : geminiNarrative,
+      userId: userIdObj,
+      computedMetrics: reportMetrics ? {
+        scoring: reportMetrics.scoring,
+        evaluators: reportMetrics.evaluators,
+        coverage: reportMetrics.coverage,
+        tensions: reportMetrics.tensions,
+        chartImages: chartImages
+      } : null,
+      scoring: reportMetrics?.scoring || null
     });
 
     console.log('✅ ATOMIC REPORT GENERATION COMPLETED');

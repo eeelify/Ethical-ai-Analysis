@@ -214,7 +214,10 @@ function OntologyReportCard({
   onViewReport?: () => void;
 }) {
   const baseResult = ontologyReport?.ontologyResult ?? ontologyReport?.report ?? ontologyReport?.data ?? ontologyReport ?? {};
-  const result = baseResult.report ?? baseResult.data ?? baseResult;
+  let result = baseResult.report ?? baseResult.data ?? baseResult;
+  if (result?.report) {
+    result = result.report;
+  }
 
   const rawScore: number = result?.composite_risk_score ?? result?.scoreBreakdown?.overallRiskScore ?? result?.overallRiskScore;
   const riskScore = ontologyScore(rawScore);

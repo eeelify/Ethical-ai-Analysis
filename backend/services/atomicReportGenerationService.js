@@ -306,7 +306,7 @@ async function generateWordFallback(htmlContent, outputPath) {
  * @param {Object} params.userId - User who triggered generation
  * @returns {Promise<{reportId: string, pdfPath: string, wordPath: string, version: number}>}
  */
-async function generateReportFilesAtomic({ projectId, htmlContent, metadata, narrative, userId }) {
+async function generateReportFilesAtomic({ projectId, htmlContent, metadata, narrative, userId, computedMetrics, scoring }) {
   const startTime = Date.now();
   const projectIdObj = mongoose.Types.ObjectId.isValid(projectId)
     ? new mongoose.Types.ObjectId(projectId)
@@ -353,6 +353,8 @@ async function generateReportFilesAtomic({ projectId, htmlContent, metadata, nar
         generationDurationMs: null // Will be set after completion
       },
       htmlContent: htmlContent,
+      computedMetrics: computedMetrics || null,
+      scoring: scoring || null,
       generatedAt: new Date()
     });
 

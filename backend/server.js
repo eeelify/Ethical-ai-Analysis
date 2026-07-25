@@ -5023,7 +5023,12 @@ app.get('/api/ontology-reports/:ontologyId/view-pdf', async (req, res) => {
       return res.status(404).json({ error: 'Ontology report not found' });
     }
 
-    const result = ontologyDoc.ontologyResult || ontologyDoc.report || {};
+    let result = ontologyDoc.ontologyResult || ontologyDoc.report || {};
+    if (result.report && result.report.report) {
+      result = result.report.report;
+    } else if (result.report) {
+      result = result.report;
+    }
     const projectName = ontologyDoc.systemName || ontologyDoc.projectName || 'AI System';
 
     // Build a clean HTML page from ontology data
