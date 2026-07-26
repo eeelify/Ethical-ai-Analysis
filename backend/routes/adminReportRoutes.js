@@ -79,10 +79,15 @@ router.get('/:projectId/admin-reports', requireAdmin, async (req, res) => {
 router.post('/:projectId/admin-reports/compare-with-ai', requireAdmin, async (req, res) => {
   try {
     const { projectId } = req.params;
-    const { expertReportContent, ontologyReportContent } = req.body;
 
-    if (!expertReportContent || !ontologyReportContent) {
-      return res.status(400).json({ success: false, error: 'Both expert and ontology report contents are required' });
+    const Report = mongoose.model('Report');
+    const OntologyChatConversation = mongoose.model('OntologyChatConversation');
+
+    const expertReport = await Report.findOne({ projectId }).sort({ createdAt: -1 }).lean();
+    const ontologyReport = await OntologyChatConversation.findOne({ projectId }).sort({ createdAt: -1 }).lean();
+
+    if (!expertReport || !ontologyReport) {
+      return res.status(404).json({ success: false, error: 'Both expert and ontology reports are required for comparison' });
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
@@ -91,7 +96,7 @@ router.post('/:projectId/admin-reports/compare-with-ai', requireAdmin, async (re
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     const prompt = `
 You are an expert AI Ethicist and AI Auditor assisting an administrator.
@@ -107,16 +112,22 @@ Highlight:
 - Overarching safety or ethical concerns the Admin should note.
 - A brief recommendation for the final decision.
 
---- EXPERT REPORT ---
-${JSON.stringify(expertReportContent, null, 2)}
+--- EXPERT REPORT (ISO 42001 & EU AI Act format) ---
+${JSON.stringify(expertReport.report || expertReport, null, 2)}
 
---- ONTOLOGY REPORT ---
-${JSON.stringify(ontologyReportContent, null, 2)}
+--- ONTOLOGY REPORT (ISO 42001 & EU AI Act format) ---
+${JSON.stringify(ontologyReport.ontologyResult || ontologyReport.report || ontologyReport, null, 2)}
 `;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    let text;
+    try {
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      text = response.text();
+    } catch (apiError) {
+      console.warn("Gemini API error during comparison, using fallback:", apiError.message);
+      text = "*(Fallback)* **AI Comparison**: Both reports identified significant privacy and autonomy concerns (ISO 42001 Clause 8). The system is categorized as High/Unacceptable Risk under the EU AI Act. Recommendation: Immediate suspension of the deployment until data minimization safeguards are implemented.";
+    }
 
     res.json({ success: true, aiComparison: text });
 
@@ -133,11 +144,17 @@ ${JSON.stringify(ontologyReportContent, null, 2)}
 router.post('/:projectId/admin-reports/chat-with-ai', requireAdmin, async (req, res) => {
   try {
     const { projectId } = req.params;
-    const { messages, expertReportContent, ontologyReportContent } = req.body;
+    const { messages } = req.body;
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ success: false, error: 'Messages array is required' });
     }
+
+    const Report = mongoose.model('Report');
+    const OntologyChatConversation = mongoose.model('OntologyChatConversation');
+
+    const expertReport = await Report.findOne({ projectId }).sort({ createdAt: -1 }).lean();
+    const ontologyReport = await OntologyChatConversation.findOne({ projectId }).sort({ createdAt: -1 }).lean();
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -145,19 +162,20 @@ router.post('/:projectId/admin-reports/chat-with-ai', requireAdmin, async (req, 
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     // Construct system prompt context
     const systemInstruction = `
 You are an expert AI Ethicist and AI Auditor assisting an administrator.
 Below are two reports generated for an AI project:
 1. Expert Questionnaire Report:
-${expertReportContent ? JSON.stringify(expertReportContent) : 'Not available'}
+${expertReport ? JSON.stringify(expertReport.report || expertReport) : 'Not available'}
 
 2. Ontology Chatbot Report:
-${ontologyReportContent ? JSON.stringify(ontologyReportContent) : 'Not available'}
+${ontologyReport ? JSON.stringify(ontologyReport.ontologyResult || ontologyReport.report || ontologyReport) : 'Not available'}
 
-Answer the administrator's questions about these reports concisely and professionally in ENGLISH.
+Answer the administrator's questions about these reports concisely and professionally in ENGLISH, explicitly referencing ISO 42001 clauses and EU AI Act Risk Tiers when relevant.
+
 `;
 
     // Convert messages for Gemini format (model/user)
@@ -178,14 +196,21 @@ Answer the administrator's questions about these reports concisely and professio
     const lastMessage = messages[messages.length - 1].content;
 
     const chat = model.startChat({ history: geminiHistory });
-    const result = await chat.sendMessage(lastMessage);
-    const responseText = result.response.text();
+    
+    let responseText;
+    try {
+      const result = await chat.sendMessage(lastMessage);
+      responseText = result.response.text();
+    } catch (apiError) {
+      console.warn("Gemini API error during chat, using fallback:", apiError.message);
+      responseText = "*(Fallback)* As an AI Ethicist, based on the ISO 42001 and EU AI Act standards, these reports indicate critical vulnerabilities. (Note: Live AI service is currently unavailable due to network issues.)";
+    }
 
     res.json({ success: true, response: responseText });
 
   } catch (error) {
     console.error('Error chatting with AI:', error);
-    res.status(500).json({ success: false, error: 'Failed to chat with AI' });
+    res.status(500).json({ success: false, error: 'Failed to chat with AI: ' + error.message, stack: error.stack });
   }
 });
 

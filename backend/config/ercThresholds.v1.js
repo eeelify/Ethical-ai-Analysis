@@ -30,11 +30,10 @@ module.exports = {
      * NEVER applied to cumulative sums!
      */
     thresholds: {
-        MINIMAL: { min: 0.0, max: 0.5, label: 'Minimal Risk', color: '#4CAF50' },
-        LOW: { min: 0.5, max: 1.5, label: 'Low Risk', color: '#edbf4bff' },
-        MODERATE: { min: 1.5, max: 2.5, label: 'Moderate Risk', color: '#EF6C00' },
-        HIGH: { min: 2.5, max: 3.5, label: 'High Risk', color: '#D32F2F' },
-        CRITICAL: { min: 3.5, max: 4.0, label: 'Critical Risk', color: '#B71C1C' }
+        MINIMAL: { min: 0.0, max: 1.0, label: 'Minimal Risk', color: '#4CAF50' },
+        LIMITED: { min: 1.0, max: 2.0, label: 'Limited Risk', color: '#edbf4bff' },
+        HIGH: { min: 2.0, max: 3.0, label: 'High Risk', color: '#EF6C00' },
+        UNACCEPTABLE: { min: 3.0, max: 4.0, label: 'Unacceptable Risk', color: '#D32F2F' }
     },
 
     /**
@@ -48,16 +47,9 @@ module.exports = {
         const value = Number(ercValue);
         const thresholds = module.exports.thresholds;
 
-        for (const [level, threshold] of Object.entries(thresholds)) {
-            if (value >= threshold.min && value < threshold.max) {
-                return { level, ...threshold };
-            }
-            // Handle edge case: exactly max value
-            if (level === 'CRITICAL' && value >= threshold.min) {
-                return { level, ...threshold };
-            }
-        }
-
-        return { level: 'UNKNOWN', label: 'Out of Range', color: '#9E9E9E' };
+        if (value >= 3.0) return { level: 'UNACCEPTABLE', ...thresholds.UNACCEPTABLE };
+        if (value >= 2.0) return { level: 'HIGH', ...thresholds.HIGH };
+        if (value >= 1.0) return { level: 'LIMITED', ...thresholds.LIMITED };
+        return { level: 'MINIMAL', ...thresholds.MINIMAL };
     }
 };

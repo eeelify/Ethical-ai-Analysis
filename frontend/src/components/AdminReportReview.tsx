@@ -46,7 +46,9 @@ export function AdminReportReview({
         const json = await res.json();
         setMessages([...newMessages, { role: 'model', content: json.response }]);
       } else {
-        alert("AI chat failed.");
+        const errText = await res.text();
+        console.error("Backend Error 500 details:", errText);
+        alert(`AI chat failed: ${errText}`);
       }
     } catch (err) {
       console.error(err);

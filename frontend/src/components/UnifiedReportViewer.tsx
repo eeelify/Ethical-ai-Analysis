@@ -111,7 +111,7 @@ function ExpertReportCard({
 
   const handleViewDetailed = () => {
     if (!reportId) return;
-    window.open(apiBase(`/api/reports/${reportId}/pdf?userId=${userId}`), '_blank');
+    window.open(apiBase(`/api/reports/${reportId}/file?userId=${userId}`), '_blank');
   };
 
   const handleDownloadPDF = () => {
@@ -393,7 +393,7 @@ export function UnifiedReportViewer({ projectId, userId, onGenerateOntology, gen
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-white">Reports</h2>
-          <p className="text-gray-400 text-sm mt-1">Both reports now use the same <strong className="text-gray-200">Compliance Score (0–100)</strong> scale — higher is safer.</p>
+          <p className="text-gray-400 text-sm mt-1">Both reports use the <strong className="text-gray-200">EU AI Act Risk Scale (0–100)</strong> — higher score = higher risk.</p>
         </div>
         {currentUserRole === 'admin' && onReviewReports && (
           <button
@@ -409,10 +409,10 @@ export function UnifiedReportViewer({ projectId, userId, onGenerateOntology, gen
       {/* Score key */}
       <div className="flex flex-wrap gap-3 text-xs">
         {[
-          { label: "Minimal Risk", color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30", range: "75–100" },
-          { label: "Limited Risk",  color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/30",   range: "50–74" },
-          { label: "High Risk",     color: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/30",  range: "25–49" },
-          { label: "Unacceptable",  color: "text-red-400",     bg: "bg-red-500/10",     border: "border-red-500/30",     range: "0–24" },
+          { label: "Minimal Risk", color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30", range: "0-24" },
+          { label: "Limited Risk",  color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/30",   range: "25-49" },
+          { label: "High Risk",     color: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/30",  range: "50-74" },
+          { label: "Unacceptable",  color: "text-red-400",     bg: "bg-red-500/10",     border: "border-red-500/30",     range: "75-100" },
         ].map(b => (
           <span key={b.label} className={`px-3 py-1 rounded-full border ${b.bg} ${b.border} ${b.color} font-medium`}>
             {b.label} ({b.range})

@@ -1031,7 +1031,7 @@ export function AdminDashboardEnhanced({
         </div>
 
         {/* Other Tabs */}
-        <div className={`flex-1 min-h-0 overflow-y-auto ${activeTab === 'chats' ? 'hidden' : ''}`}>
+        <div className={`flex-1 min-h-0 ${activeTab === 'chats' ? 'hidden' : ''} ${activeTab === 'ontology' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`}>
           {activeTab === 'expert-questions' && (
             <div className="flex-1 min-h-0 flex flex-col">
               <ExpertQuestionManager />

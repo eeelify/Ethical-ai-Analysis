@@ -210,9 +210,16 @@ IMPROVEMENT REQUIREMENTS:
   - key strengths
   - key areas requiring attention
 - End with a forward-looking governance statement
-  tailored to this system.
+  tailored to this system, referencing ISO 42001 Certification readiness.
 
 The conclusion MUST be 2-3 substantive paragraphs.
+
+**CRITICAL STANDARD REQUIREMENTS (HYBRID MODEL):**
+1. **EU AI Act Risk Tiers:** You MUST classify the system and its principles using ONLY these risk tiers: "Unacceptable Risk", "High Risk", "Limited Risk", or "Minimal Risk".
+2. **ISO/IEC 42001:** You MUST structure your analysis professionally as an auditable AI Management System report. Cite specific ISO 42001 clauses (e.g., Clause 4 Context, Clause 8 Risk Assessment) where relevant.
+3. **NIST AI RMF:** When discussing mitigation or analysis, reference NIST AI RMF functions (Govern, Map, Measure, Manage).
+4. **Citations:** You MUST cite the source (e.g., "[ISO 42001: Clause 8.1]", "[EU AI Act: High Risk]") in your text analysis to look highly professional and auditable.
+5. **Language:** EVERYTHING MUST BE IN STRICT PROFESSIONAL ENGLISH. No Turkish words.
 
 You MUST NOT:
 - Introduce new data.
@@ -235,16 +242,16 @@ Return a RAW JSON OBJECT. No markdown formatting. No code blocks.
 {
   "executiveSummary": [
     "First paragraph must strictly state: 'The assessment identified a Cumulative Risk Volume of [X] across [Y] evaluated quantitative questions.'",
-    "Second paragraph: 'The Normalized Average ERC is [Z] / 4, classified as [Label].'",
-    "Bullet point 1 (Key risk driver)",
-    "Bullet point 2 (Key strength)",
-    "Bullet point 3 (Context)"
+    "Second paragraph: 'The Normalized Average ERC is [Z] / 4. According to the EU AI Act classification framework, this represents a [EU AI Act Risk Tier].'",
+    "Bullet point 1 (ISO 42001 System Context & Key risk driver)",
+    "Bullet point 2 (Key strength & NIST Measure)",
+    "Bullet point 3 (Context & Governance statement)"
   ],
   "principleFindings": [
     {
       "principleName": "Transparency",
-      "riskLevel": "Low",
-      "analysis": "Detailed analysis text..."
+      "riskLevel": "Limited Risk",
+      "analysis": "Detailed analysis text containing citations like [ISO 42001: Clause 8.2] or [NIST RMF: Measure]..."
     }
   ],
   "qualitativeAnalysis": {
@@ -285,14 +292,14 @@ Return a RAW JSON OBJECT. No markdown formatting. No code blocks.
     }
   ],
   "improvementRecommendations": {
-    "shortTerm": ["Detailed action 1", "Detailed action 2", "Detailed action 3"],
-    "mediumTerm": ["Strategic action 1", "Strategic action 2", "Strategic action 3"],
-    "longTerm": ["Governance action 1", "Governance action 2", "Governance action 3"]
+    "shortTerm": ["Action 1 [NIST RMF: Manage]", "Action 2 [ISO 42001: Annex A]"],
+    "mediumTerm": ["Strategic action 1", "Strategic action 2"],
+    "longTerm": ["Governance action 1 [ISO 42001: Clause 5]", "Governance action 2"]
   },
   "conclusion": [
-    "First paragraph: Overall assessment...",
-    "Second paragraph: Strengths and weaknesses...",
-    "Third paragraph: Future governance..."
+    "First paragraph: Overall assessment aligning with EU AI Act...",
+    "Second paragraph: Strengths, weaknesses, and ISO 42001 impact assessment...",
+    "Third paragraph: Future governance and certification readiness..."
   ]
 }
 `;
@@ -367,21 +374,21 @@ Return a RAW JSON OBJECT. No markdown formatting. No code blocks.
       throw new Error("❌ Gemini API Key is invalid or unauthorized.");
     }
 
-    if (errorMsg.includes("429") || errorMsgLower.includes("resource_exhausted") || errorMsgLower.includes("quota")) {
-      console.warn("⚠️ Gemini API quota exceeded. Falling back to mock report.");
+    if (errorMsg.includes("429") || errorMsgLower.includes("resource_exhausted") || errorMsgLower.includes("quota") || errorMsgLower.includes("fetch failed") || errorMsgLower.includes("network")) {
+      console.warn("⚠️ Gemini API connection or quota issue detected. Falling back to mock report.");
       return {
         executiveSummary: [
           "The assessment identified a Cumulative Risk Volume of 43 across 10 evaluated quantitative questions.",
-          "The Normalized Average ERC is 2.5 / 4, classified as Elevated Risk.",
-          "Data privacy and unmitigated bias are the primary drivers of this risk level.",
-          "The system shows strong documentation practices in technical robustness.",
-          "Overall, significant interventions are required before production deployment."
+          "The Normalized Average ERC is 2.5 / 4. According to the EU AI Act classification framework, this represents a High Risk.",
+          "Data privacy and unmitigated bias are the primary drivers of this risk level [ISO 42001: Clause 8.1].",
+          "The system shows strong documentation practices in technical robustness [NIST RMF: Measure].",
+          "Overall, significant interventions are required before production deployment to meet EU AI Act requirements."
         ],
         principleFindings: [
           {
             principleName: "Transparency",
-            riskLevel: "Medium",
-            analysis: "[MOCK DATA] Expert feedback indicates that while documentation exists, it is not readily accessible to end users."
+            riskLevel: "Limited Risk",
+            analysis: "[MOCK DATA] Expert feedback indicates that while documentation exists, it is not readily accessible to end users, presenting a transparency gap under [EU AI Act: Article 13] and [ISO 42001: Annex B]."
           }
         ],
         qualitativeAnalysis: {
@@ -405,19 +412,19 @@ Return a RAW JSON OBJECT. No markdown formatting. No code blocks.
         tensionsNarrative: [
           {
             tensionId: "T_MOCK",
-            analysis: "[MOCK DATA] Tension between data minimization and model accuracy requirements.",
+            analysis: "[MOCK DATA] Tension between data minimization and model accuracy requirements [ISO 42001: Clause 6.1].",
             mitigationStatus: "Proposed"
           }
         ],
         improvementRecommendations: {
-          shortTerm: ["[MOCK DATA] Implement explicit consent", "[MOCK DATA] Update privacy policy"],
-          mediumTerm: ["[MOCK DATA] Conduct algorithmic bias audit", "[MOCK DATA] Establish human-in-the-loop protocols"],
-          longTerm: ["[MOCK DATA] Create continuous monitoring framework", "[MOCK DATA] Form external ethics board"]
+          shortTerm: ["[MOCK DATA] Implement explicit consent [NIST RMF: Manage]", "[MOCK DATA] Update privacy policy [ISO 42001: Clause 8.2]"],
+          mediumTerm: ["[MOCK DATA] Conduct algorithmic bias audit [EU AI Act: High Risk Requirement]", "[MOCK DATA] Establish human-in-the-loop protocols"],
+          longTerm: ["[MOCK DATA] Create continuous monitoring framework [ISO 42001: Clause 9]", "[MOCK DATA] Form external ethics board"]
         },
         conclusion: [
-          "Overall, the system demonstrates foundational awareness of ethical AI principles but lacks robust implementation.",
-          "The most critical weakness is the handling of sensitive biometric data, while the strength lies in technical safety.",
-          "Future governance should focus on strict access controls and regular third-party audits."
+          "Overall, the system demonstrates foundational awareness of ethical AI principles but lacks robust implementation for EU AI Act compliance.",
+          "The most critical weakness is the handling of sensitive biometric data, while the strength lies in technical safety [ISO 42001: Clause 4.1].",
+          "Future governance should focus on strict access controls and regular third-party audits to achieve ISO 42001 certification readiness."
         ]
       };
     }
@@ -882,14 +889,14 @@ function buildUserPrompt(data) {
 ## REPORT STRUCTURE:
 Generate a comprehensive PDF-ready report with the following structure:
 
-1. **Executive Summary**
-   - Brief overview of the project
+1. **Executive Summary & ISO 42001 System Context**
+   - Brief overview of the project context (ISO 42001 Clause 4)
+   - EU AI Act Risk Tier classification (Unacceptable, High, Limited, Minimal)
    - Key findings and overall risk assessment
-   - Main recommendations
 
 2. **Risk Assessment Matrix**
    - Visual representation of risks by principle
-   - Severity levels and impact analysis
+   - EU AI Act Severity levels and impact analysis
 
 3. **Principle-by-Principle Analysis**
    - Detailed analysis for each ethical principle with data
@@ -905,14 +912,14 @@ Generate a comprehensive PDF-ready report with the following structure:
    - Conflict resolution strategies
    - Consensus building approaches
 
-5. **Actionable Recommendations**
-   - Prioritized recommendations
+5. **ISO 42001 Mitigation Strategy & Recommendations**
+   - Prioritized recommendations with NIST RMF (Govern, Map, Measure, Manage) mappings
    - Implementation steps
    - Timeline and resource requirements
 
-6. **Conclusion**
+6. **Conclusion & Certification Readiness**
    - Summary of key points
-   - Next steps
+   - Next steps towards ISO 42001 certification
    - Contact information
 
 **IMPORTANT FORMATTING REQUIREMENTS:**

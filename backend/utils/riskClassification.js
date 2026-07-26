@@ -1,22 +1,16 @@
 /**
  * CANONICAL RISK CLASSIFICATION FUNCTION
  * 
- * This is the ONLY allowed way to classify risk from numeric scores.
- * 
- * RULES:
- * - 0 = MINIMAL RISK (best case)
- * - 1 = LOW RISK
- * - 2 = MEDIUM RISK
- * - 3 = HIGH RISK
- * - 4 = MAX/CRITICAL RISK (worst case)
+ * RULES (EU AI Act Aligned):
+ * - 0 to <1 = MINIMAL_RISK
+ * - 1 to <2 = LIMITED_RISK
+ * - 2 to <3 = HIGH_RISK
+ * - 3 to 4+ = UNACCEPTABLE_RISK
  * 
  * Higher numeric score = Higher ethical risk
- * Lower numeric score = Lower ethical risk
- * 
- * NULL/undefined = Not evaluated (N/A)
  * 
  * @param {number|null|undefined} score - Risk score (0-4) or null/undefined
- * @returns {string} Risk classification: "MINIMAL_RISK" | "LOW_RISK" | "MEDIUM_RISK" | "HIGH_RISK" | "MAX_RISK" | "N/A"
+ * @returns {string} Risk classification: "MINIMAL_RISK" | "LIMITED_RISK" | "HIGH_RISK" | "UNACCEPTABLE_RISK" | "N/A"
  */
 function classifyRisk(score) {
   // NULL/undefined means not evaluated
@@ -30,11 +24,10 @@ function classifyRisk(score) {
   }
 
   // CORRECT SCALE: Higher score = Higher risk (UNBOUNDED)
-  if (score >= 4) return "MAX_RISK"; // 4+ = Critical
-  if (score >= 3) return "HIGH_RISK";
-  if (score >= 2) return "MEDIUM_RISK";
-  if (score >= 1) return "LOW_RISK";
-  return "MINIMAL_RISK"; // score < 1 (typically 0)
+  if (score >= 3) return "UNACCEPTABLE_RISK"; // 3+ = Unacceptable
+  if (score >= 2) return "HIGH_RISK"; // 2+ = High
+  if (score >= 1) return "LIMITED_RISK"; // 1+ = Limited
+  return "MINIMAL_RISK"; // score < 1
 }
 
 /**
@@ -46,10 +39,9 @@ function getRiskLabel(score) {
   const classification = classifyRisk(score);
   const labels = {
     "MINIMAL_RISK": "Minimal Risk",
-    "LOW_RISK": "Low Risk",
-    "MEDIUM_RISK": "Medium Risk",
+    "LIMITED_RISK": "Limited Risk",
     "HIGH_RISK": "High Risk",
-    "MAX_RISK": "Critical Risk",
+    "UNACCEPTABLE_RISK": "Unacceptable Risk",
     "N/A": "Not Evaluated"
   };
   return labels[classification] || "Unknown";
@@ -105,10 +97,9 @@ function classifyCumulativeRisk(cumulativeScore, questionCount) {
   const normalizedRisk = cumulativeScore / questionCount;
 
   // Apply standard 0-4 thresholds to normalized value
-  if (normalizedRisk >= 4) return "MAX_RISK";
-  if (normalizedRisk >= 3) return "HIGH_RISK";
-  if (normalizedRisk >= 2) return "MEDIUM_RISK";
-  if (normalizedRisk >= 1) return "LOW_RISK";
+  if (normalizedRisk >= 3) return "UNACCEPTABLE_RISK";
+  if (normalizedRisk >= 2) return "HIGH_RISK";
+  if (normalizedRisk >= 1) return "LIMITED_RISK";
   return "MINIMAL_RISK";
 }
 

@@ -149,10 +149,11 @@ def generate_zinspection_report(
     
     raw_text_section = f"\nDOCUMENT CONTENTS (from user upload):\n{raw_text}\n" if raw_text.strip() else ""
 
-    prompt = f"""You are a Z-Inspection AI ethics auditor.
-Generate a structured, user-friendly audit report based ONLY on the provided ontology data, legal context, and the document contents. 
-IMPORTANT: Use clear, non-technical language. Keep all text sections extremely concise (1-2 short sentences max per section) so non-expert users can quickly read and understand the report.
+    prompt = f"""You are a certified ISO/IEC 42001 AI ethics auditor.
+Generate a structured, user-friendly AI Management System audit report based ONLY on the provided ontology data, legal context, and the document contents. 
+IMPORTANT: Use clear, professional language suitable for an ISO 42001 compliance audit. 
 CRITICAL: YOU MUST OUTPUT STRICTLY IN ENGLISH. DO NOT USE ANY TURKISH WORDS.
+CRITICAL: YOU MUST explicitly cite ISO 42001 clauses (e.g. Clause 4, Clause 8) and EU AI Act risk tiers where relevant.
 
 ONTOLOGY DATA (Dynamic Graph Profile):
 System: {system_name}
@@ -167,10 +168,10 @@ LEGAL CONTEXT (from ChromaDB):
 {raw_text_section}
 Generate a JSON report with these exact fields:
 {{
-  "executive_summary": "1-2 sentence simple summary citing ontology data and document details",
-  "risk_assessment": "Short, clear risk level explanation with legal article reference",
+  "executive_summary": "1-2 sentence simple summary citing ontology data, document details, and EU AI Act risk tier.",
+  "risk_assessment": "Short, clear risk level explanation with ISO 42001 Clause 8 and EU AI Act reference",
   "composite_risk_score": 75,
-  "risk_level": "MinimalRisk | LimitedRisk | HighRisk | UnacceptableRisk",
+  "risk_level": "Minimal Risk | Limited Risk | High Risk | Unacceptable Risk",
   "score_components": {{
     "ethical_score": 80,
     "legal_score": 70,
@@ -187,9 +188,9 @@ Generate a JSON report with these exact fields:
       "description": "Short (1 sentence), clear explanation of how this trade-off manifests in this use case."
     }}
   ],
-  "legal_compliance": "Short, simple explanation of specific legal obligations with article numbers",
-  "recommendations": ["short, actionable recommendation 1", "short, actionable recommendation 2"],
-  "citation_sources": ["source1", "source2"]
+  "legal_compliance": "Short, simple explanation of specific EU AI Act obligations and ISO 42001 compliance.",
+  "recommendations": ["short, actionable recommendation [NIST RMF Map]", "short, actionable recommendation [ISO 42001 Clause 9]"],
+  "citation_sources": ["[ISO 42001: Clause 4]", "[EU AI Act: High Risk]"]
 }}
 
 CRITICAL INSTRUCTION 1: If the ONTOLOGY DATA properties (e.g. under the 'properties' key in the Dynamic Graph Profile JSON) contain `hasCompositeRiskScore`, `hasEthicalImpactScore`, `hasLegalComplianceScore`, `hasDataSensitivityScore`, `hasTechnicalRobustnessScore`, or `hasHumanOversightScore`, you MUST populate the corresponding fields (`composite_risk_score`, `risk_level`, and `score_components` with keys `ethical_score`, `legal_score`, `data_score`, `technical_score`, `oversight_score`) in your response JSON using those exact values. Do not recalculate, modify, or hallucinate these values.
@@ -221,8 +222,8 @@ def build_fallback_report(system_name: str, dynamic_profile: dict, inferred_data
     return {
         "status": "partial_success",
         "source": "ontology_fallback",
-        "executive_summary": f"Based on ontology reasoning, the system has been evaluated as {risk_level}. The Gemini API service was unavailable, so a detailed natural language report could not be generated. However, the raw ontology and knowledge graph outputs are summarized below.",
-        "risk_assessment": f"Risk Level: {risk_level}. This was determined by ontology reasoning.",
+        "executive_summary": f"Based on ontology reasoning, the system has been evaluated as {risk_level} under the EU AI Act classification. The LLM service was unavailable, so a detailed natural language report could not be generated. This fallback provides raw ontology outputs mapped to ISO 42001.",
+        "risk_assessment": f"Risk Level: {risk_level}. This was determined by deterministic ontology reasoning [ISO 42001: Clause 8.1].",
         "composite_risk_score": composite_score,
         "risk_level": risk_level,
         "score_components": {
@@ -232,13 +233,13 @@ def build_fallback_report(system_name: str, dynamic_profile: dict, inferred_data
             "technical_score": 50,
             "oversight_score": 50
         },
-        "risk_threshold_explanation": f"Ontology fallback generated due to LLM error. Base score: {composite_score}.",
-        "risk_trigger_safeguard_analysis": f"Triggers detected: {', '.join(triggers) if triggers else 'None'}. Safeguards detected: {', '.join(safeguards) if safeguards else 'None'}.",
+        "risk_threshold_explanation": f"Ontology fallback generated due to LLM error. Base score: {composite_score}. [EU AI Act Tier Mapping]",
+        "risk_trigger_safeguard_analysis": f"Triggers detected: {', '.join(triggers) if triggers else 'None'}. Safeguards detected: {', '.join(safeguards) if safeguards else 'None'} [NIST RMF: Measure].",
         "ethical_analysis": violations,
         "ethical_tensions": [],
-        "legal_compliance": f"Relevant inferred regulations: {', '.join(regulations) if regulations else 'None'}",
-        "recommendations": ["Review the detected triggers and safeguards manually.", "Try generating the report again when the LLM service is available."],
-        "citation_sources": [],
+        "legal_compliance": f"Relevant inferred regulations: {', '.join(regulations) if regulations else 'None'} [ISO 42001: Clause 4.1]",
+        "recommendations": ["Review the detected triggers and safeguards manually [NIST RMF: Manage].", "Ensure continuous monitoring protocols [ISO 42001: Clause 9]."],
+        "citation_sources": ["[ISO 42001: Clause 4]", "[EU AI Act]"],
         "error_detail": error_message
     }
 

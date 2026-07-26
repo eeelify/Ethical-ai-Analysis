@@ -622,6 +622,13 @@ export function ProjectDetail({
         setReportRefreshTrigger(prev => prev + 1);
         // Switch to reports tab
         setActiveTab('reports');
+        
+        // Auto-open the report if available
+        if (result && result.report && result.report._id) {
+          const reportId = result.report._id;
+          const uId = currentUser?.id || (currentUser as any)?._id;
+          window.open(api(`/api/reports/${reportId}/file?userId=${uId}`), '_blank');
+        }
       } else {
         const errorData = await response.json().catch(() => ({}));
         alert(`❌ Failed to generate expert report: ${errorData.error || 'Unknown error'}`);
@@ -1210,7 +1217,7 @@ export function ProjectDetail({
       </div>
 
       {/* Generating Report Overlay */}
-      {generating && (
+      {(generating || generatingExpert) && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="bg-[#050b14] rounded-lg p-6 max-w-md mx-4 shadow-xl">
             <div className="flex items-center gap-2.5" role="status" aria-live="polite">

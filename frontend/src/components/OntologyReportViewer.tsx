@@ -76,7 +76,7 @@ export function OntologyReportViewer({ report, onBack }: OntologyReportViewerPro
             </h1>
           </div>
           <div className={`px-4 py-2 rounded-lg font-bold border ${getRiskColor(riskLevel)}`}>
-            Risk Level: {riskLevel}
+            Risk Level: {riskLevel?.replace(/([a-z])([A-Z])/g, '$1 $2')}
           </div>
         </div>
       </div>
