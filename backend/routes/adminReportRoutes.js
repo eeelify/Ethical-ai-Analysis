@@ -73,6 +73,89 @@ router.get('/:projectId/admin-reports', requireAdmin, async (req, res) => {
 });
 
 /**
+ * Helper to sanitize report objects before sending to Gemini prompt context
+ * Removes huge HTML strings, base64 data, and limits long fields to prevent token limit errors (HTTP 429).
+ */
+function sanitizeReport(doc) {
+  if (!doc) return null;
+  const raw = doc.report || doc.ontologyResult || doc;
+  
+  // Deep clone
+  let clean = JSON.parse(JSON.stringify(raw));
+
+  function cleanObj(obj) {
+    if (typeof obj === 'string') {
+      return obj.length > 2000 ? obj.substring(0, 2000) + '... [truncated]' : obj;
+    }
+    if (Array.isArray(obj)) {
+      return obj.map(cleanObj);
+    }
+    if (obj !== null && typeof obj === 'object') {
+      const result = {};
+      for (const [key, val] of Object.entries(obj)) {
+        if (['htmlContent', 'pdfPath', 'wordPath', 'pdfContent', 'chartImages', 'base64', 'rawResponse'].includes(key)) {
+          continue;
+        }
+        result[key] = cleanObj(val);
+      }
+      return result;
+    }
+    return obj;
+  }
+
+  return cleanObj(clean);
+}
+
+const CANDIDATE_MODELS = [
+  'gemini-3.6-flash',
+  'gemini-2.5-flash',
+  'gemini-2.0-flash',
+  'gemini-2.0-flash-lite',
+  'models/gemini-3.6-flash',
+  'models/gemini-2.5-flash',
+  'models/gemini-2.0-flash'
+];
+
+async function executeGeminiWithRetry(fn) {
+  let lastError = null;
+
+  for (const modelName of CANDIDATE_MODELS) {
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const result = await fn(modelName);
+        if (result) return result;
+      } catch (err) {
+        lastError = err;
+        const msg = err?.message || '';
+        console.warn(`⚠️ Gemini model '${modelName}' (deneme ${attempt}/3) hata aldı:`, msg);
+
+        const isNotFound = msg.includes('404') || msg.toLowerCase().includes('not found');
+        if (isNotFound) {
+          // Model bulunamadıysa hemen bir sonraki modele geç
+          break;
+        }
+
+        const isRateLimit = msg.includes('429') || 
+                            msg.includes('RESOURCE_EXHAUSTED') || 
+                            msg.toLowerCase().includes('quota') || 
+                            msg.toLowerCase().includes('retry') ||
+                            msg.toLowerCase().includes('free_tier');
+
+        if (isRateLimit && attempt < 3) {
+          const waitMs = attempt * 4000; // Deneme 1: 4sn, Deneme 2: 8sn bekle
+          console.log(`⏳ Gemini Kota/Sınır uyarısı. ${waitMs / 1000} saniye beklenip tekrar deneniyor...`);
+          await new Promise(res => setTimeout(res, waitMs));
+          continue;
+        }
+
+        break;
+      }
+    }
+  }
+  throw lastError;
+}
+
+/**
  * POST /api/projects/:projectId/admin-reports/compare-with-ai
  * Ask Gemini to compare Expert Report and Ontology Report
  */
@@ -96,7 +179,6 @@ router.post('/:projectId/admin-reports/compare-with-ai', requireAdmin, async (re
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     const prompt = `
 You are an expert AI Ethicist and AI Auditor assisting an administrator.
@@ -113,19 +195,22 @@ Highlight:
 - A brief recommendation for the final decision.
 
 --- EXPERT REPORT (ISO 42001 & EU AI Act format) ---
-${JSON.stringify(expertReport.report || expertReport, null, 2)}
+${JSON.stringify(sanitizeReport(expertReport), null, 2)}
 
 --- ONTOLOGY REPORT (ISO 42001 & EU AI Act format) ---
-${JSON.stringify(ontologyReport.ontologyResult || ontologyReport.report || ontologyReport, null, 2)}
+${JSON.stringify(sanitizeReport(ontologyReport), null, 2)}
 `;
 
     let text;
     try {
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      text = response.text();
+      text = await executeGeminiWithRetry(async (modelName) => {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        return response.text();
+      });
     } catch (apiError) {
-      console.warn("Gemini API error during comparison, using fallback:", apiError.message);
+      console.warn("All Gemini comparison models failed, using fallback:", apiError?.message);
       text = "*(Fallback)* **AI Comparison**: Both reports identified significant privacy and autonomy concerns (ISO 42001 Clause 8). The system is categorized as High/Unacceptable Risk under the EU AI Act. Recommendation: Immediate suspension of the deployment until data minimization safeguards are implemented.";
     }
 
@@ -162,48 +247,53 @@ router.post('/:projectId/admin-reports/chat-with-ai', requireAdmin, async (req, 
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-    // Construct system prompt context
+    // Construct system prompt context with sanitized reports
     const systemInstruction = `
 You are an expert AI Ethicist and AI Auditor assisting an administrator.
 Below are two reports generated for an AI project:
 1. Expert Questionnaire Report:
-${expertReport ? JSON.stringify(expertReport.report || expertReport) : 'Not available'}
+${expertReport ? JSON.stringify(sanitizeReport(expertReport)) : 'Not available'}
 
 2. Ontology Chatbot Report:
-${ontologyReport ? JSON.stringify(ontologyReport.ontologyResult || ontologyReport.report || ontologyReport) : 'Not available'}
+${ontologyReport ? JSON.stringify(sanitizeReport(ontologyReport)) : 'Not available'}
 
 Answer the administrator's questions about these reports concisely and professionally in ENGLISH, explicitly referencing ISO 42001 clauses and EU AI Act Risk Tiers when relevant.
-
 `;
 
     // Convert messages for Gemini format (model/user)
     const geminiHistory = [];
-    // We start with the system instruction as the first user message, then a model acknowledgment
     geminiHistory.push({ role: 'user', parts: [{ text: systemInstruction }] });
     geminiHistory.push({ role: 'model', parts: [{ text: 'Understood. How can I help you analyze these reports?' }] });
 
-    // Append the actual chat history
-    for (let i = 0; i < messages.length - 1; i++) {
-      const msg = messages[i];
+    // Append history (only last 6 messages to keep context window manageable)
+    const recentMessages = messages.slice(-6);
+    for (let i = 0; i < recentMessages.length - 1; i++) {
+      const msg = recentMessages[i];
       geminiHistory.push({
         role: msg.role === 'user' ? 'user' : 'model',
         parts: [{ text: msg.content }]
       });
     }
 
-    const lastMessage = messages[messages.length - 1].content;
+    const lastMessage = recentMessages[recentMessages.length - 1].content;
 
-    const chat = model.startChat({ history: geminiHistory });
-    
     let responseText;
+
     try {
-      const result = await chat.sendMessage(lastMessage);
-      responseText = result.response.text();
+      responseText = await executeGeminiWithRetry(async (modelName) => {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const chat = model.startChat({ history: geminiHistory });
+        const result = await chat.sendMessage(lastMessage);
+        return result.response.text();
+      });
     } catch (apiError) {
-      console.warn("Gemini API error during chat, using fallback:", apiError.message);
-      responseText = "*(Fallback)* As an AI Ethicist, based on the ISO 42001 and EU AI Act standards, these reports indicate critical vulnerabilities. (Note: Live AI service is currently unavailable due to network issues.)";
+      console.warn("Gemini API error during chat (all attempts/models failed), using fallback:", apiError?.message);
+      let errorReason = apiError?.message || 'Quota/Network issue';
+      if (errorReason.includes('429') || errorReason.includes('RESOURCE_EXHAUSTED') || errorReason.toLowerCase().includes('quota')) {
+        errorReason = 'Google Gemini Ücretsiz Katman Kota Sınırı (HTTP 429 Too Many Requests) aşıldı. Lütfen 1-2 dakika bekleyin veya Google AI Studio\'dan yeni bir API Key alıp ekleyin.';
+      }
+      responseText = `*(Fallback)* As an AI Ethicist, based on the ISO 42001 and EU AI Act standards, these reports indicate critical vulnerabilities. (Note: Live AI service error: ${errorReason})`;
     }
 
     res.json({ success: true, response: responseText });

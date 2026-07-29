@@ -305,8 +305,10 @@ Return a RAW JSON OBJECT. No markdown formatting. No code blocks.
 `;
 
   const modelNamesToTry = [
-    "gemini-2.0-flash", // Available as "Gemini 2 Flash"
-    "gemini-1.5-flash"  // Fallback
+    "gemini-3.6-flash",
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash"
   ];
 
 
