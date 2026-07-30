@@ -1063,44 +1063,79 @@ When in doubt, choose the MORE CONSERVATIVE interpretation.
    5. ONTOLOGY CHAT CONVERSATION (LLM)
 ============================================================ */
 
+// Chat model fallback chain. The primary model is configurable via env, and we
+// automatically fall back to other models if one is quota-exhausted (429) or
+// unavailable (404). "gemini-2.0-flash" is kept last because some API keys have
+// a free-tier limit of 0 for it.
+const CHAT_MODEL_CANDIDATES = Array.from(new Set([
+  process.env.GEMINI_CHAT_MODEL,
+  process.env.GEMINI_MODEL,
+  "gemini-flash-latest",
+  "gemini-2.5-flash",
+  "gemini-2.0-flash"
+].filter(Boolean)));
+
 async function generateChatResponse(messages, ontologyResult) {
-  try {
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash", 
-      systemInstruction: `You are a helpful, conversational AI ethics and compliance assistant for the Z-Inspection platform.
+  const systemInstruction = `You are a helpful, conversational AI ethics and compliance assistant for the Z-Inspection platform.
 Your job is to answer user questions regarding AI ethics, data security, privacy, and the ontology of AI systems.
 You will be provided with the current conversation history. 
 If the user provides a system description, the backend will have performed an automatic ontology assessment (identifying risks, safeguards, etc.). The summary of this assessment will be provided to you.
 Incorporate the findings from the ontology assessment in a natural, conversational way into your response, IF it is relevant to the user's latest query. If the user just says "hello" or asks a general question, just answer the question normally without dumping the assessment.
-Respond in Turkish unless the user explicitly speaks to you in English. Be polite, concise, and structured.`,
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 2048
-      }
-    });
+Respond in Turkish unless the user explicitly speaks to you in English. Be polite, concise, and structured.`;
 
-    let promptText = "Conversation History:\n";
-    messages.forEach((msg, idx) => {
-      promptText += `[${msg.sender.toUpperCase()}]: ${msg.text}\n`;
-    });
+  let promptText = "Conversation History:\n";
+  messages.forEach((msg, idx) => {
+    promptText += `[${msg.sender.toUpperCase()}]: ${msg.text}\n`;
+  });
 
-    if (ontologyResult && (ontologyResult.primaryRisks?.length > 0 || ontologyResult.recommendedActions?.length > 0)) {
-      promptText += `\n--- AUTOMATED ONTOLOGY ASSESSMENT ---\n`;
-      promptText += `Primary Risks: ${JSON.stringify(ontologyResult.primaryRisks.map(r => r.value || r.title))}\n`;
-      promptText += `Recommended Actions: ${JSON.stringify(ontologyResult.recommendedActions.map(a => a.value || a.action))}\n`;
-      promptText += `(Use this information to inform your response if the user's query is about their system description. Don't mention the 'Automated Ontology Assessment' explicitly, just use the facts.)\n`;
-    }
-
-    const result = await model.generateContent(promptText);
-    const text = result.response.text();
-    return text;
-  } catch (error) {
-    console.error('❌ Gemini Chat Generation Failed:', error.message);
-    if (error.message.includes('429') || error.message.includes('quota')) {
-      return "Üzgünüm, şu anda yapay zeka limitlerine (Rate Limit) takıldık. Lütfen 30 saniye bekleyip tekrar deneyin.\n\n(Geçici sistem değerlendirmesi ektedir.)";
-    }
-    return null; // Let the caller fallback to standard response
+  if (ontologyResult && (ontologyResult.primaryRisks?.length > 0 || ontologyResult.recommendedActions?.length > 0)) {
+    promptText += `\n--- AUTOMATED ONTOLOGY ASSESSMENT ---\n`;
+    promptText += `Primary Risks: ${JSON.stringify(ontologyResult.primaryRisks.map(r => r.value || r.title))}\n`;
+    promptText += `Recommended Actions: ${JSON.stringify(ontologyResult.recommendedActions.map(a => a.value || a.action))}\n`;
+    promptText += `(Use this information to inform your response if the user's query is about their system description. Don't mention the 'Automated Ontology Assessment' explicitly, just use the facts.)\n`;
   }
+
+  let sawQuotaError = false;
+
+  for (const modelName of CHAT_MODEL_CANDIDATES) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        systemInstruction,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 2048
+        }
+      });
+
+      const result = await model.generateContent(promptText);
+      const text = result.response.text();
+      if (modelName !== CHAT_MODEL_CANDIDATES[0]) {
+        console.log(`✅ Gemini Chat: fell back to model "${modelName}"`);
+      }
+      return text;
+    } catch (error) {
+      const message = error.message || String(error);
+      console.error(`❌ Gemini Chat Generation Failed (model: ${modelName}):`, message);
+
+      const isQuota = message.includes('429') || /quota|RESOURCE_EXHAUSTED/i.test(message);
+      const isUnavailable = /404|not found|no longer available|not supported/i.test(message);
+
+      if (isQuota) sawQuotaError = true;
+
+      // Try the next candidate on quota/availability errors; otherwise stop.
+      if (isQuota || isUnavailable) {
+        continue;
+      }
+      return null; // Non-recoverable error: let caller use the deterministic fallback.
+    }
+  }
+
+  // All candidate models failed.
+  if (sawQuotaError) {
+    return "Üzgünüm, şu anda yapay zeka limitlerine (Rate Limit) takıldık. Lütfen 30 saniye bekleyip tekrar deneyin.\n\n(Geçici sistem değerlendirmesi ektedir.)";
+  }
+  return null; // Let the caller fallback to standard response
 }
 
 /* ============================================================

@@ -790,9 +790,11 @@ async function extractOntologyChatFactsWithGemini({ messages, previousState, fac
   }
 
   const prompt = buildPrompt({ userMessages, previousState, factLabels });
-  const preferredModelName = normalizeWhitespace(process.env.GEMINI_ONTOLOGY_CHAT_MODEL || process.env.GEMINI_MODEL || 'gemini-2.0-flash');
+  const preferredModelName = normalizeWhitespace(process.env.GEMINI_ONTOLOGY_CHAT_MODEL || process.env.GEMINI_MODEL || 'gemini-flash-latest');
   const modelNames = Array.from(new Set([
     preferredModelName,
+    'gemini-flash-latest',
+    'gemini-2.5-flash',
     'gemini-2.0-flash',
     'gemini-1.5-flash'
   ].filter(Boolean)));
@@ -847,7 +849,9 @@ async function extractOntologyChatFactsWithGemini({ messages, previousState, fac
       lastError = error;
       const message = error.message || String(error);
       const modelUnavailable = /404|not found|not supported|not available/i.test(message);
-      if (!modelUnavailable) break;
+      const quotaExhausted = message.includes('429') || /quota|RESOURCE_EXHAUSTED/i.test(message);
+      // On unavailable model (404) or quota exhaustion (429) try the next model.
+      if (!modelUnavailable && !quotaExhausted) break;
     }
   }
 
