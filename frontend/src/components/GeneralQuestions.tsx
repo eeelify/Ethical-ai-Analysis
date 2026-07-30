@@ -479,10 +479,10 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
 
   if (loading || generalQuestions.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#050b14]">
         <div className="flex flex-col items-center">
           <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-4" />
-          <p className="text-gray-500">Loading general questions...</p>
+          <p className="text-slate-500">Loading general questions...</p>
         </div>
       </div>
     );
@@ -490,10 +490,10 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
 
   if (generalQuestions.length === 0 && !loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#050b14]">
         <div className="flex flex-col items-center">
           <AlertTriangle className="w-10 h-10 text-yellow-600 mb-4" />
-          <p className="text-gray-600">No questions found for your role.</p>
+          <p className="text-slate-400">No questions found for your role.</p>
           <button
             onClick={() => {
               try {
@@ -512,25 +512,25 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
   }
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
+    <div className="h-screen bg-[#050b14] flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b sticky top-0 z-50 flex-shrink-0">
+      <div className="bg-[#0b1221] shadow-[0_0_15px_rgba(0,0,0,0.5)] border-b sticky top-0 z-50 flex-shrink-0">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
 
               <div>
-                <h1 className="text-xl text-gray-900 font-bold tracking-tight">
+                <h1 className="text-xl text-white font-bold tracking-tight">
                   Questions
                 </h1>
-                <p className="text-sm text-gray-600">{project.title}</p>
+                <p className="text-sm text-slate-400">{project.title}</p>
               </div>
             </div>
 
             <div className="flex items-center space-x-4">
               <div className="text-right">
-                <p className="text-xs text-gray-500 font-medium">Progress</p>
-                <p className="text-sm font-bold text-gray-900">{completionPercentage}%</p>
+                <p className="text-xs text-slate-500 font-medium">Progress</p>
+                <p className="text-sm font-bold text-white">{completionPercentage}%</p>
               </div>
             </div>
           </div>
@@ -540,15 +540,15 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
       <div className="flex-1 flex min-h-0 overflow-hidden">
         {/* Questions Sidebar */}
         {sidebarOpen && (
-          <div className="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 h-full">
-            <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
-              <h2 className="text-sm font-semibold text-gray-900">Questions</h2>
+          <div className="w-64 bg-[#0b1221] border-r border-white/10 flex flex-col flex-shrink-0 h-full">
+            <div className="p-4 border-b border-white/10 flex items-center justify-between flex-shrink-0">
+              <h2 className="text-sm font-semibold text-white">Questions</h2>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                className="p-1 hover:bg-[#0f172a] rounded transition-colors"
                 aria-label="Close sidebar"
               >
-                <X className="h-4 w-4 text-gray-500" />
+                <X className="h-4 w-4 text-slate-500" />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto min-h-0">
@@ -565,14 +565,14 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
                       onClick={() => navigateToQuestion(index)}
                       className={`w-full text-left p-3 rounded-lg mb-1 transition-all ${isCurrent
                         ? 'bg-blue-50 border-2 border-blue-500 text-blue-900'
-                        : 'hover:bg-gray-50 border-2 border-transparent text-gray-700'
+                        : 'hover:bg-[#050b14] border-2 border-transparent text-slate-300'
                         }`}
                     >
                       <div className="flex items-center gap-2">
                         {isCompleted ? (
                           <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
                         ) : (
-                          <div className={`h-5 w-5 rounded-full border-2 flex-shrink-0 ${isCurrent ? 'border-blue-500 bg-blue-100' : 'border-gray-300'
+                          <div className={`h-5 w-5 rounded-full border-2 flex-shrink-0 ${isCurrent ? 'border-blue-500 bg-blue-100' : 'border-white/20'
                             }`}>
                             <span className={`text-xs font-medium flex items-center justify-center h-full ${isCurrent ? 'text-blue-600' : 'text-gray-400'
                               }`}>
@@ -584,7 +584,7 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
                           Q{questionNumber}
                         </span>
                       </div>
-                      <p className={`text-xs mt-1 truncate ${isCurrent ? 'text-blue-700' : 'text-gray-500'
+                      <p className={`text-xs mt-1 truncate ${isCurrent ? 'text-blue-700' : 'text-slate-500'
                         }`}>
                         {q.questionEn.substring(0, 40)}...
                       </p>
@@ -610,8 +610,8 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
         <div className="flex-1 px-4 py-8 max-w-5xl mx-auto w-full flex flex-col min-h-0">
           <div className="flex-1 overflow-y-auto min-h-0 pb-24">
             {/* Question Card */}
-            <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col min-h-0">
-              <div className="p-8 border-b border-gray-100 bg-white">
+            <div className="bg-[#0b1221] rounded-3xl shadow-xl shadow-gray-200/50 border border-white/5 flex flex-col min-h-0">
+              <div className="p-8 border-b border-white/5 bg-[#0b1221]">
                 <div className="flex flex-wrap items-center gap-3 mb-4">
                   <span className="px-3 py-1 bg-blue-100 text-blue-600 text-sm font-medium rounded-full">
                     Question {currentQuestionIndex + 1} of {generalQuestions.length}
@@ -633,15 +633,15 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
                   )}
                 </div>
 
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-3">
+                <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight mb-3">
                   {currentQuestion.questionEn}
                 </h2>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-slate-500">
                   Principle: {currentQuestion.principle}
                 </p>
               </div>
 
-              <div className="p-8 bg-gray-50/30">
+              <div className="p-8 bg-[#050b14]/30">
                 {currentQuestion.type === 'multiple-choice' && (
                   <div className="space-y-3 max-w-2xl">
                     {currentQuestion.options?.map((option, idx) => {
@@ -655,17 +655,17 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
                         <label
                           key={idx}
                           className={`group flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${isSelected
-                            ? 'border-blue-600 bg-blue-50/50 shadow-sm'
-                            : 'border-gray-200 hover:border-blue-300 hover:bg-white'
+                            ? 'border-blue-600 bg-blue-50/50 shadow-[0_0_15px_rgba(0,0,0,0.5)]'
+                            : 'border-white/10 hover:border-blue-300 hover:bg-[#0b1221]'
                             }`}
                         >
                           <div
                             className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 transition-colors ${isSelected
                               ? 'border-blue-600 bg-blue-600'
-                              : 'border-gray-300 group-hover:border-blue-400'
+                              : 'border-white/20 group-hover:border-blue-400'
                               }`}
                           >
-                            {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
+                            {isSelected && <div className="w-2 h-2 rounded-full bg-[#0b1221]" />}
                           </div>
                           <input
                             type="radio"
@@ -683,7 +683,7 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
                             className="hidden"
                           />
                           <span
-                            className={`text-lg font-medium transition-colors ${isSelected ? 'text-blue-900' : 'text-gray-700'
+                            className={`text-lg font-medium transition-colors ${isSelected ? 'text-blue-900' : 'text-slate-300'
                               }`}
                           >
                             {optionLabel}
@@ -710,16 +710,16 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
                         }
                       }}
                       rows={8}
-                      className="w-full px-5 py-4 text-lg text-gray-800 border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all resize-none placeholder-gray-400 bg-white"
+                      className="w-full px-5 py-4 text-lg text-gray-200 border-2 border-white/10 rounded-2xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all resize-none placeholder-gray-400 bg-[#0b1221]"
                       placeholder="Type your answer here..."
                     />
                   </div>
                 )}
 
                 {/* Risk Score Selection (0-4) */}
-                <div className="mt-8 pt-6 border-t border-gray-200">
+                <div className="mt-8 pt-6 border-t border-white/10">
                   <div className="flex items-center gap-2 mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Importance Score for This Question</h3>
+                    <h3 className="text-lg font-semibold text-white">Importance Score for This Question</h3>
                     <span className="px-2.5 py-0.5 bg-red-50 text-red-600 text-xs font-medium rounded-full border border-red-100">
                       Required
                     </span>
@@ -763,18 +763,18 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
 
                       // Color scheme: 4 = highest risk (red), 0 = no risk (green)
                       const colorClasses = {
-                        red: isSelected ? 'border-red-700 bg-red-100 shadow-md ring-2 ring-red-200 ring-offset-2' : 'border-gray-200 hover:border-red-300 hover:bg-red-50',
-                        orange: isSelected ? 'border-orange-600 bg-orange-100 shadow-md ring-2 ring-orange-200 ring-offset-2' : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50',
-                        yellow: isSelected ? 'border-yellow-600 bg-yellow-100 shadow-md ring-2 ring-yellow-200 ring-offset-2' : 'border-gray-200 hover:border-yellow-300 hover:bg-yellow-50/30',
-                        blue: isSelected ? 'border-blue-500 bg-blue-50 shadow-md' : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50/30',
-                        green: isSelected ? 'border-green-500 bg-green-50 shadow-md' : 'border-gray-200 hover:border-green-300 hover:bg-green-50/30'
+                        red: isSelected ? 'border-red-700 bg-red-100 shadow-md ring-2 ring-red-200 ring-offset-2' : 'border-white/10 hover:border-red-300 hover:bg-red-50',
+                        orange: isSelected ? 'border-orange-600 bg-orange-100 shadow-md ring-2 ring-orange-200 ring-offset-2' : 'border-white/10 hover:border-orange-300 hover:bg-orange-50',
+                        yellow: isSelected ? 'border-yellow-600 bg-yellow-100 shadow-md ring-2 ring-yellow-200 ring-offset-2' : 'border-white/10 hover:border-yellow-300 hover:bg-yellow-50/30',
+                        blue: isSelected ? 'border-blue-500 bg-blue-50 shadow-md' : 'border-white/10 hover:border-blue-300 hover:bg-blue-50/30',
+                        green: isSelected ? 'border-green-500 bg-green-50 shadow-md' : 'border-white/10 hover:border-green-300 hover:bg-green-50/30'
                       };
                       const bgColorClasses = {
-                        red: isSelected ? 'bg-red-200 text-red-900' : 'bg-gray-100 text-gray-400',
-                        orange: isSelected ? 'bg-orange-200 text-orange-900' : 'bg-gray-100 text-gray-400',
-                        yellow: isSelected ? 'bg-yellow-200 text-yellow-900' : 'bg-gray-100 text-gray-400',
-                        blue: isSelected ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400',
-                        green: isSelected ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
+                        red: isSelected ? 'bg-red-200 text-red-900' : 'bg-[#0f172a] text-gray-400',
+                        orange: isSelected ? 'bg-orange-200 text-orange-900' : 'bg-[#0f172a] text-gray-400',
+                        yellow: isSelected ? 'bg-yellow-200 text-yellow-900' : 'bg-[#0f172a] text-gray-400',
+                        blue: isSelected ? 'bg-blue-100 text-blue-600' : 'bg-[#0f172a] text-gray-400',
+                        green: isSelected ? 'bg-green-100 text-green-600' : 'bg-[#0f172a] text-gray-400'
                       };
                       return (
                         <label
@@ -816,10 +816,10 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-colors ${bgColorClasses[color]}`}>
                             <span className="text-lg font-bold">{value}</span>
                           </div>
-                          <span className={`text-xs font-bold text-center ${isSelected ? 'text-gray-900' : 'text-gray-500'}`}>
+                          <span className={`text-xs font-bold text-center ${isSelected ? 'text-white' : 'text-slate-500'}`}>
                             {label}
                           </span>
-                          <span className={`text-xs text-center mt-1 leading-tight ${isSelected ? 'text-gray-600' : 'text-gray-400'}`}>
+                          <span className={`text-xs text-center mt-1 leading-tight ${isSelected ? 'text-slate-400' : 'text-gray-400'}`}>
                             {desc}
                           </span>
                         </label>
@@ -832,10 +832,10 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
           </div>
 
           {/* Navigation Footer */}
-          <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 flex justify-between items-center z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] flex-shrink-0">
+          <div className="sticky bottom-0 bg-[#0b1221] border-t border-white/10 p-6 flex justify-between items-center z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] flex-shrink-0">
             <button
               onClick={handleBack}
-              className="flex items-center px-6 py-3 rounded-xl font-semibold transition-all border-2 text-gray-700 bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300 shadow-sm"
+              className="flex items-center px-6 py-3 rounded-xl font-semibold transition-all border-2 text-slate-300 bg-[#0b1221] border-white/10 hover:bg-[#050b14] hover:border-white/20 shadow-[0_0_15px_rgba(0,0,0,0.5)]"
             >
               <ChevronLeft className="w-5 h-5 mr-2" /> {isFirstQuestion ? 'Back' : 'Previous'}
             </button>

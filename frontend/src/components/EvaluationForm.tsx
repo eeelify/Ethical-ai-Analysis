@@ -1744,7 +1744,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
   return (
     <div className="min-h-screen bg-[#0a1122] flex flex-col">
       {/* Header */}
-      <div className="bg-[#050b14] shadow-sm border-b sticky top-0 z-[9999]">
+      <div className="bg-[#050b14] shadow-[0_0_15px_rgba(0,0,0,0.5)] border-b sticky top-0 z-[9999]">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -1779,8 +1779,8 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
       <div className="flex-1 px-4 py-8 pb-32 max-w-5xl mx-auto w-full flex flex-col">
         {/* Stage Navigation Tabs */}
-        <div className="bg-[#050b14] rounded-2xl shadow-sm border border-white/5 p-2 mb-8 flex justify-between items-center sticky top-[88px] z-40 backdrop-blur-sm bg-[#050b14]/90">
-          <div className="flex space-x-1 bg-gray-100/50 p-1 rounded-xl">
+        <div className="bg-[#050b14] rounded-2xl shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-white/5 p-2 mb-8 flex justify-between items-center sticky top-[88px] z-40 backdrop-blur-sm bg-[#050b14]/90">
+          <div className="flex space-x-1 bg-[#0f172a]/50 p-1 rounded-xl">
             {stages.map((stage) => (
               <button
                 key={stage.key}
@@ -1798,7 +1798,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
           {currentStage !== 'resolve' && currentStage !== 'set-up' && (
             <button
               onClick={() => setShowAddQuestion(true)}
-              className="px-4 py-2 text-sm font-bold text-blue-700 bg-cyan-500/10 border border-blue-200 rounded-xl hover:bg-blue-100 transition-all flex items-center shadow-sm"
+              className="px-4 py-2 text-sm font-bold text-blue-700 bg-cyan-500/10 border border-blue-200 rounded-xl hover:bg-blue-100 transition-all flex items-center shadow-[0_0_15px_rgba(0,0,0,0.5)]"
             >
               <Plus className="h-4 w-4 mr-2" /> Add Question
             </button>
@@ -1862,7 +1862,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                     </div>
                     <div className="space-y-3 max-h-80 overflow-y-auto">
                       {generalRisks.length === 0 ? (
-                        <div className="text-center py-8 bg-[#050b14] rounded-lg border-2 border-dashed border-gray-300">
+                        <div className="text-center py-8 bg-[#050b14] rounded-lg border-2 border-dashed border-white/20">
                           <AlertTriangle className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                           <p className="text-sm text-slate-400 italic">No risks added yet.</p>
                         </div>
@@ -1918,7 +1918,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                             setGeneralRisks(updated);
                                             setIsDraft(true);
                                           }}
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                          className="w-full px-3 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                           placeholder="Enter risk title..."
                                         />
                                       </div>
@@ -1933,7 +1933,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                             setIsDraft(true);
                                           }}
                                           rows={2}
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                                          className="w-full px-3 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
                                           placeholder="Add description..."
                                         />
                                       </div>
@@ -1947,7 +1947,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                             setGeneralRisks(updated);
                                             setIsDraft(true);
                                           }}
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                          className="w-full px-3 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                         >
                                           {riskSeverityOptions.map(opt => (
                                             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -1989,7 +1989,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                         <div className="text-xs text-slate-400 mt-1">{risk.description}</div>
                                       )}
                                       <div className="flex items-center gap-2 text-xs text-slate-400">
-                                        <span className="px-2 py-0.5 bg-gray-100 rounded-full border border-white/10">
+                                        <span className="px-2 py-0.5 bg-[#0f172a] rounded-full border border-white/10">
                                           {relatedQuestions.length} related question(s)
                                         </span>
                                         <span className="text-gray-400">Click to edit</span>
@@ -2116,7 +2116,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
                   <div className="space-y-4">
                     {generalRisks.length === 0 ? (
-                      <div className="text-center py-8 bg-[#050b14] rounded-lg border-2 border-dashed border-gray-300">
+                      <div className="text-center py-8 bg-[#050b14] rounded-lg border-2 border-dashed border-white/20">
                         <AlertTriangle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                         <p className="text-sm text-slate-400 italic mb-6">No risks added yet. Click "Add Risk" to start.</p>
                         <button
@@ -2153,7 +2153,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                       setGeneralRisks(updated);
                                       setIsDraft(true);
                                     }}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                     placeholder="Enter risk title..."
                                   />
                                 </div>
@@ -2170,7 +2170,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                       setIsDraft(true);
                                     }}
                                     rows={2}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
                                     placeholder="Enter risk description (optional)..."
                                   />
                                 </div>
@@ -2205,7 +2205,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                       <div className="font-semibold text-white">Questions</div>
                       <button
                         type="button"
-                        className="p-2 rounded-lg hover:bg-gray-100"
+                        className="p-2 rounded-lg hover:bg-[#0f172a]"
                         onClick={() => setShowQuestionNav(false)}
                         aria-label="Close questions"
                       >
@@ -2243,7 +2243,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
               {/* Desktop: left question list */}
               <div className="hidden md:block md:w-56 lg:w-64 shrink-0">
-                <div className="bg-[#050b14] rounded-2xl shadow-sm border border-white/5 p-3 md:sticky md:top-[180px] max-h-[calc(100vh-200px)] overflow-y-auto">
+                <div className="bg-[#050b14] rounded-2xl shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-white/5 p-3 md:sticky md:top-[180px] max-h-[calc(100vh-200px)] overflow-y-auto">
                   <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-2 pb-2">
                     Questions
                   </div>
@@ -2274,7 +2274,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
               <div className="bg-[#050b14] rounded-3xl shadow-xl shadow-gray-200/50 border border-white/5 overflow-hidden flex flex-col flex-1 animate-in fade-in slide-in-from-bottom-4 duration-300 min-h-0 mb-24">
                 <div className="p-8 border-b border-white/5 bg-[#050b14]">
                   <div className="flex flex-wrap items-center gap-3 mb-4">
-                    <span className="px-3 py-1 bg-gray-100 text-slate-400 text-sm font-medium rounded-full">
+                    <span className="px-3 py-1 bg-[#0f172a] text-slate-400 text-sm font-medium rounded-full">
                       Question {currentQuestionIndex + 1} of {currentQuestions.length}
                     </span>
                     <button
@@ -2317,10 +2317,10 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                         const isSelected = currentAnswer === optionValue;
                         return (
                           <label key={optionValue} className={`group flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${isSelected
-                            ? 'border-blue-600 bg-cyan-500/10/50 shadow-sm'
+                            ? 'border-blue-600 bg-cyan-500/10/50 shadow-[0_0_15px_rgba(0,0,0,0.5)]'
                             : 'border-white/10 hover:border-blue-300 hover:bg-[#050b14]'
                             }`}>
-                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 transition-colors ${isSelected ? 'border-blue-600 bg-blue-600' : 'border-gray-300 group-hover:border-blue-400'
+                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 transition-colors ${isSelected ? 'border-blue-600 bg-blue-600' : 'border-white/20 group-hover:border-blue-400'
                               }`}>
                               <div className="w-2 h-2 rounded-full bg-[#050b14]" />
                             </div>
@@ -2391,10 +2391,10 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                         const isChecked = currentAnswers.includes(optionValue);
                         return (
                           <label key={optionValue} className={`group flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${isChecked
-                            ? 'border-blue-600 bg-cyan-500/10/50 shadow-sm'
+                            ? 'border-blue-600 bg-cyan-500/10/50 shadow-[0_0_15px_rgba(0,0,0,0.5)]'
                             : 'border-white/10 hover:border-blue-300 hover:bg-[#050b14]'
                             }`}>
-                            <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center mr-4 transition-colors ${isChecked ? 'border-blue-600 bg-blue-600' : 'border-gray-300 group-hover:border-blue-400'
+                            <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center mr-4 transition-colors ${isChecked ? 'border-blue-600 bg-blue-600' : 'border-white/20 group-hover:border-blue-400'
                               }`}>
                               <CheckCircle className="w-4 h-4 text-white" />
                             </div>
@@ -2440,7 +2440,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                 : level === 'medium'
                                   ? 'border-yellow-500 bg-yellow-50 shadow-md'
                                   : 'border-red-500 bg-red-50 shadow-md'
-                              : 'border-white/10 hover:border-gray-300 hover:bg-[#0a1122]'
+                              : 'border-white/10 hover:border-white/20 hover:bg-[#0a1122]'
                               }`}
                           >
                             <input
@@ -2458,7 +2458,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                   : level === 'medium'
                                     ? 'bg-yellow-100 text-yellow-600'
                                     : 'bg-red-100 text-red-600'
-                                : 'bg-gray-100 text-gray-400'
+                                : 'bg-[#0f172a] text-gray-400'
                                 }`}
                             >
                               {level === 'low' && <CheckCircle className="w-6 h-6" />}
@@ -2550,11 +2550,11 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                           green: isSelected ? 'border-2 border-green-500 bg-green-50 shadow-md' : 'border-2 border-white/10 hover:border-green-300 hover:bg-green-50/30'
                         };
                         const bgColorClasses = {
-                          red: isSelected ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-400',
-                          orange: isSelected ? 'bg-orange-200 text-orange-800' : 'bg-gray-100 text-gray-400',
-                          yellow: isSelected ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-400',
-                          blue: isSelected ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400',
-                          green: isSelected ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
+                          red: isSelected ? 'bg-red-100 text-red-700' : 'bg-[#0f172a] text-gray-400',
+                          orange: isSelected ? 'bg-orange-200 text-orange-800' : 'bg-[#0f172a] text-gray-400',
+                          yellow: isSelected ? 'bg-yellow-100 text-yellow-600' : 'bg-[#0f172a] text-gray-400',
+                          blue: isSelected ? 'bg-blue-100 text-blue-600' : 'bg-[#0f172a] text-gray-400',
+                          green: isSelected ? 'bg-green-100 text-green-600' : 'bg-[#0f172a] text-gray-400'
                         };
 
                         return (
@@ -2617,7 +2617,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
               </div>
             </div>
           ) : (
-            <div className="text-center py-32 bg-[#050b14] rounded-3xl shadow-sm border border-dashed border-white/10 flex flex-col items-center justify-center">
+            <div className="text-center py-32 bg-[#050b14] rounded-3xl shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-dashed border-white/10 flex flex-col items-center justify-center">
               <div className="w-24 h-24 bg-[#0a1122] rounded-full flex items-center justify-center mb-6 ring-8 ring-gray-50/50">
                 <Info className="w-12 h-12 text-gray-300" />
               </div>
@@ -2644,7 +2644,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
             <>
               <button
                 onClick={() => setShowReviewScreen(false)}
-                className="flex items-center px-6 py-3 rounded-xl font-semibold transition-all border-2 text-slate-300 bg-[#050b14] border-white/10 hover:bg-[#0a1122] hover:border-gray-300 shadow-sm"
+                className="flex items-center px-6 py-3 rounded-xl font-semibold transition-all border-2 text-slate-300 bg-[#050b14] border-white/10 hover:bg-[#0a1122] hover:border-white/20 shadow-[0_0_15px_rgba(0,0,0,0.5)]"
               >
                 <ChevronLeft className="w-5 h-5 mr-2" /> Back to Questions
               </button>
@@ -2675,7 +2675,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                 disabled={currentStage === 'set-up'}
                 className={`flex items-center px-6 py-3 rounded-xl font-semibold transition-all border-2 ${currentStage === 'set-up'
                   ? 'text-gray-300 border-white/5 cursor-not-allowed bg-[#0a1122]'
-                  : 'text-slate-300 bg-[#050b14] border-white/10 hover:bg-[#0a1122] hover:border-gray-300 shadow-sm'
+                  : 'text-slate-300 bg-[#050b14] border-white/10 hover:bg-[#0a1122] hover:border-white/20 shadow-[0_0_15px_rgba(0,0,0,0.5)]'
                   }`}
               >
                 <ChevronLeft className="w-5 h-5 mr-2" /> Previous
@@ -2777,7 +2777,7 @@ function AddQuestionModal({ currentStage, onClose, onAdd }: AddQuestionModalProp
               Adding to <span className="font-semibold text-blue-600 uppercase">{currentStage}</span> stage
             </p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-slate-400 transition-colors bg-[#0a1122] p-2 rounded-full hover:bg-gray-100">
+          <button onClick={onClose} className="text-gray-400 hover:text-slate-400 transition-colors bg-[#0a1122] p-2 rounded-full hover:bg-[#0f172a]">
             <XCircle className="w-6 h-6" />
           </button>
         </div>
@@ -2886,7 +2886,7 @@ function AddQuestionModal({ currentStage, onClose, onAdd }: AddQuestionModalProp
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 rounded-xl text-slate-300 font-medium hover:bg-gray-100 transition-colors border-2 border-transparent hover:border-white/10"
+              className="px-6 py-3 rounded-xl text-slate-300 font-medium hover:bg-[#0f172a] transition-colors border-2 border-transparent hover:border-white/10"
             >
               Cancel
             </button>

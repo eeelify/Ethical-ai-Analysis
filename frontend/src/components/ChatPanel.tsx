@@ -538,7 +538,7 @@ export function ChatPanel({
                                 key={message.id}
                                 className={`rounded-lg px-3 py-2 ${isFromMe
                                   ? 'bg-blue-600 text-white'
-                                  : 'bg-[#1a2333] text-white border border-white/5 shadow-sm'
+                                  : 'bg-[#1a2333] text-white border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)]'
                                   }`}
                               >
                                 <div className="text-sm whitespace-pre-wrap break-words">{message.text}</div>

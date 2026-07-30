@@ -197,14 +197,14 @@ export function ProfileModal({ user, onClose, onUpdate, onLogout }: ProfileModal
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">Profile Settings</h2>
+      <div className="bg-[#0b1221] rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-[#0b1221] border-b border-white/10 px-6 py-4 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-white">Profile Settings</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-[#0f172a] rounded-full transition-colors"
           >
-            <X className="h-5 w-5 text-gray-500" />
+            <X className="h-5 w-5 text-slate-500" />
           </button>
         </div>
 
@@ -222,10 +222,10 @@ export function ProfileModal({ user, onClose, onUpdate, onLogout }: ProfileModal
                 <img
                   src={profileImage}
                   alt="Profile"
-                  className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+                  className="w-32 h-32 rounded-full object-cover border-4 border-white/10"
                 />
               ) : (
-                <div className="w-32 h-32 rounded-full bg-gray-900 flex items-center justify-center text-white text-4xl font-medium border-4 border-gray-200">
+                <div className="w-32 h-32 rounded-full bg-gray-900 flex items-center justify-center text-white text-4xl font-medium border-4 border-white/10">
                   {getInitials()}
                 </div>
               )}
@@ -253,7 +253,7 @@ export function ProfileModal({ user, onClose, onUpdate, onLogout }: ProfileModal
                 <p className="text-xs text-red-600 font-medium">Delete picture</p>
               </div>
             ) : (
-              <p className="text-sm text-gray-500 text-center">
+              <p className="text-sm text-slate-500 text-center">
                 Click upload to add profile image
               </p>
             )}
@@ -261,69 +261,69 @@ export function ProfileModal({ user, onClose, onUpdate, onLogout }: ProfileModal
 
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Email (read-only) */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Email</label>
             <input
               type="email"
               value={user.email}
               disabled
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+              className="w-full px-4 py-2 border border-white/20 rounded-lg bg-[#050b14] text-slate-500 cursor-not-allowed"
             />
           </div>
 
           {/* Role (read-only) */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Role</label>
             <input
               type="text"
               value={user.role}
               disabled
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed capitalize"
+              className="w-full px-4 py-2 border border-white/20 rounded-lg bg-[#050b14] text-slate-500 cursor-not-allowed capitalize"
             />
           </div>
 
           {/* Last Seen */}
           {lastSeen && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Last Seen</label>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Last Seen</label>
               <input
                 type="text"
                 value={lastSeen}
                 disabled
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                className="w-full px-4 py-2 border border-white/20 rounded-lg bg-[#050b14] text-slate-500 cursor-not-allowed"
               />
             </div>
           )}
 
           {/* Password Change Section */}
-          <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Change Password</h3>
+          <div className="border-t border-white/10 pt-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Change Password</h3>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Old Password</label>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Old Password</label>
                 <div className="relative">
                   <input
                     type={showOldPassword ? 'text' : 'password'}
                     value={oldPassword}
                     onChange={(e) => setOldPassword(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                     placeholder="Enter old password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowOldPassword(!showOldPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-slate-300"
                   >
                     {showOldPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -331,19 +331,19 @@ export function ProfileModal({ user, onClose, onUpdate, onLogout }: ProfileModal
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                <label className="block text-sm font-medium text-slate-300 mb-2">New Password</label>
                 <div className="relative">
                   <input
                     type={showNewPassword ? 'text' : 'password'}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                     placeholder="Enter new password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-slate-300"
                   >
                     {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -351,19 +351,19 @@ export function ProfileModal({ user, onClose, onUpdate, onLogout }: ProfileModal
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Confirm New Password</label>
                 <div className="relative">
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                     placeholder="Confirm new password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-slate-300"
                   >
                     {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -373,7 +373,7 @@ export function ProfileModal({ user, onClose, onUpdate, onLogout }: ProfileModal
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+          <div className="flex items-center justify-between pt-6 border-t border-white/10">
             <button
               onClick={handleDeleteAccount}
               className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center"
@@ -384,7 +384,7 @@ export function ProfileModal({ user, onClose, onUpdate, onLogout }: ProfileModal
             <div className="flex space-x-3">
               <button
                 onClick={onClose}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-6 py-2 border border-white/20 text-slate-300 rounded-lg hover:bg-[#050b14] transition-colors"
               >
                 Cancel
               </button>

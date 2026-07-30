@@ -32,7 +32,7 @@ export function UseCaseOwners({ currentUser, projects, users, onViewOwner }: Use
           <div
             key={owner.id}
             onClick={() => onViewOwner(owner)}
-            className="bg-[#0a1122] rounded-lg shadow-sm border border-white/10 p-6 hover:shadow-md hover:bg-[#0f172a] transition-colors cursor-pointer"
+            className="bg-[#0a1122] rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-white/10 p-6 hover:shadow-md hover:bg-[#0f172a] transition-colors cursor-pointer"
           >
             <div className="flex items-start mb-4">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white mr-3">

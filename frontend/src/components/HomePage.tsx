@@ -63,7 +63,7 @@ export function HomePage({ navigateTo }: { navigateTo?: (path: string) => void }
               </button>
               <button 
                 onClick={() => handleNavigate('/register')}
-                className="bg-white/5 border border-white/10 text-white px-5 py-2 text-sm rounded-lg font-medium hover:bg-white/10 hover:border-cyan-500/50 transition-all shadow-[0_0_15px_rgba(0,0,0,0.5)]"
+                className="bg-[#0b1221]/5 border border-white/10 text-white px-5 py-2 text-sm rounded-lg font-medium hover:bg-[#0b1221]/10 hover:border-cyan-500/50 transition-all shadow-[0_0_15px_rgba(0,0,0,0.5)]"
               >
                 Sign Up
               </button>
@@ -81,9 +81,9 @@ export function HomePage({ navigateTo }: { navigateTo?: (path: string) => void }
         {/* Mobile Nav */}
         {mobileMenuOpen && (
           <div className="md:hidden absolute top-full left-0 w-full bg-[#050b14]/95 backdrop-blur-xl border-b border-white/5 py-4 px-4 flex flex-col gap-4 shadow-2xl">
-            <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-medium p-2 rounded-md hover:bg-white/5">About</a>
-            <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-medium p-2 rounded-md hover:bg-white/5">Features</a>
-            <div className="h-px bg-white/10 my-2"></div>
+            <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-medium p-2 rounded-md hover:bg-[#0b1221]/5">About</a>
+            <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-medium p-2 rounded-md hover:bg-[#0b1221]/5">Features</a>
+            <div className="h-px bg-[#0b1221]/10 my-2"></div>
             <button onClick={() => handleNavigate('/login')} className="text-left text-slate-300 hover:text-white font-medium p-2">Log In</button>
             <button onClick={() => handleNavigate('/register')} className="bg-gradient-to-r from-indigo-600 to-cyan-600 text-white p-3 rounded-lg font-medium text-center shadow-lg">Sign Up</button>
           </div>
@@ -94,7 +94,7 @@ export function HomePage({ navigateTo }: { navigateTo?: (path: string) => void }
       <section className="relative pt-32 md:pt-48 pb-20 md:pb-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto z-10 flex flex-col items-center text-center">
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white tracking-tight mb-6 leading-tight max-w-4xl">
           Ontology-Driven <br className="hidden sm:block"/>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-teal-300 drop-shadow-sm">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-teal-300 drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]">
             Ethical AI Assessment
           </span>
         </h1>
@@ -108,7 +108,7 @@ export function HomePage({ navigateTo }: { navigateTo?: (path: string) => void }
             onClick={() => handleNavigate('/register')}
             className="group relative px-8 py-4 bg-gradient-to-r from-indigo-600 to-cyan-600 rounded-xl font-semibold text-white overflow-hidden shadow-[0_0_20px_rgba(99,102,241,0.3)] transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(34,211,238,0.4)]"
           >
-            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+            <div className="absolute inset-0 bg-[#0b1221]/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
             <span className="relative flex items-center justify-center gap-2">
               Get Started <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </span>
@@ -116,7 +116,7 @@ export function HomePage({ navigateTo }: { navigateTo?: (path: string) => void }
           
           <button 
             onClick={() => handleNavigate('/login')}
-            className="px-8 py-4 bg-white/5 border border-white/10 rounded-xl font-semibold text-slate-300 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all backdrop-blur-sm"
+            className="px-8 py-4 bg-[#0b1221]/5 border border-white/10 rounded-xl font-semibold text-slate-300 hover:text-white hover:bg-[#0b1221]/10 hover:border-white/20 transition-all backdrop-blur-sm"
           >
             Log In
           </button>
@@ -170,7 +170,7 @@ export function HomePage({ navigateTo }: { navigateTo?: (path: string) => void }
                   { label: 'Conformity Assessment', desc: 'Third-party audits & CE marking for high-risk AI', color: 'text-cyan-400' },
                   { label: 'Fundamental Rights', desc: 'Non-discrimination, privacy & dignity safeguards', color: 'text-indigo-400' },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-white/3 border border-white/5 hover:border-rose-500/20 transition-colors">
+                  <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-[#0b1221]/3 border border-white/5 hover:border-rose-500/20 transition-colors">
                     <ChevronRight className={`w-4 h-4 mt-0.5 shrink-0 ${item.color}`} />
                     <div>
                       <span className="text-slate-200 text-sm font-medium">{item.label}</span>
@@ -212,7 +212,7 @@ export function HomePage({ navigateTo }: { navigateTo?: (path: string) => void }
                   { label: 'Societal & Environmental Wellbeing', color: 'text-emerald-400' },
                   { label: 'Accountability', color: 'text-purple-400' },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl bg-white/3 border border-white/5 hover:border-indigo-500/20 transition-colors">
+                  <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl bg-[#0b1221]/3 border border-white/5 hover:border-indigo-500/20 transition-colors">
                     <div className={`w-2 h-2 rounded-full bg-current shrink-0 ${item.color}`} />
                     <span className="text-slate-300 text-sm">{item.label}</span>
                   </div>
@@ -298,7 +298,7 @@ export function HomePage({ navigateTo }: { navigateTo?: (path: string) => void }
                 ].map((col, i) => (
                   <div key={i} className={`relative rounded-2xl border ${col.border} bg-gradient-to-b ${col.color} p-6`}>
                     <div className="flex items-center gap-3 mb-4">
-                      <div className={`w-8 h-8 rounded-lg bg-white/5 border ${col.border} flex items-center justify-center`}>
+                      <div className={`w-8 h-8 rounded-lg bg-[#0b1221]/5 border ${col.border} flex items-center justify-center`}>
                         <col.icon className={`w-4 h-4 ${col.accent}`} />
                       </div>
                       <span className={`text-xs font-bold uppercase tracking-widest ${col.accent}`}>Step {col.step}</span>
@@ -366,7 +366,7 @@ export function HomePage({ navigateTo }: { navigateTo?: (path: string) => void }
               { icon: Network, color: 'text-cyan-400', glow: 'group-hover:shadow-[0_0_30px_rgba(34,211,238,0.2)]', title: 'GraphRAG Reports', desc: 'Generate highly accurate, context-aware narratives grounded strictly in Knowledge Graphs.' },
               { icon: Download, color: 'text-purple-400', glow: 'group-hover:shadow-[0_0_30px_rgba(192,132,252,0.2)]', title: 'Export & Share', desc: 'Download comprehensive assessment reports securely for stakeholder distribution.' }
             ].map((f, i) => (
-              <div key={i} className={`group bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm relative overflow-hidden ${f.glow}`}>
+              <div key={i} className={`group bg-[#0b1221]/5 border border-white/10 rounded-2xl p-8 hover:bg-[#0b1221]/10 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm relative overflow-hidden ${f.glow}`}>
                 {/* Subtle gradient overlay on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/0 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 
@@ -410,7 +410,7 @@ export function HomePage({ navigateTo }: { navigateTo?: (path: string) => void }
                   </div>
                   {/* Mobile Vertical Line */}
                   {i !== 5 && (
-                    <div className="lg:hidden absolute w-[2px] h-12 bg-white/10 left-[23px] translate-y-12 z-0"></div>
+                    <div className="lg:hidden absolute w-[2px] h-12 bg-[#0b1221]/10 left-[23px] translate-y-12 z-0"></div>
                   )}
                   <div className="text-left lg:text-center">
                     <div className="text-white font-bold mb-1">{w.title}</div>
@@ -588,13 +588,13 @@ function FlowArrow({ label, color = 'default' }: { label: string; color?: string
       {/* dashed animated line */}
       <div className={`w-[2px] h-8 bg-gradient-to-b ${arrowColorMap[color] ?? arrowColorMap.default} relative overflow-hidden`}>
         <motion.div
-          className="absolute inset-x-0 top-0 h-3 bg-white/30 rounded-full blur-sm"
+          className="absolute inset-x-0 top-0 h-3 bg-[#0b1221]/30 rounded-full blur-sm"
           animate={{ y: ['-100%', '400%'] }}
           transition={{ duration: 1.4, repeat: Infinity, ease: 'linear', repeatDelay: 0.3 }}
         />
       </div>
       {/* label */}
-      <span className={`text-[10px] font-mono px-2 py-0.5 rounded border border-white/5 bg-white/3 mb-1 ${arrowTextMap[color] ?? arrowTextMap.default}`}>
+      <span className={`text-[10px] font-mono px-2 py-0.5 rounded border border-white/5 bg-[#0b1221]/3 mb-1 ${arrowTextMap[color] ?? arrowTextMap.default}`}>
         {label}
       </span>
       {/* chevron arrow */}

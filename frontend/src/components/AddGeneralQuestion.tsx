@@ -144,13 +144,13 @@ export function AddGeneralQuestion({ project, currentUser, onBack, onComplete }:
   return (
     <div className="min-h-screen bg-[#0a1122] flex flex-col">
       {/* Header */}
-      <div className="bg-[#050b14] shadow-sm border-b sticky top-0 z-20">
+      <div className="bg-[#050b14] shadow-[0_0_15px_rgba(0,0,0,0.5)] border-b sticky top-0 z-20">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
                 onClick={onBack}
-                className="flex items-center text-slate-400 hover:text-white transition-colors bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg text-sm font-medium"
+                className="flex items-center text-slate-400 hover:text-white transition-colors bg-[#0f172a] hover:bg-gray-200 px-3 py-1.5 rounded-lg text-sm font-medium"
               >
                 Back
               </button>
@@ -338,7 +338,7 @@ export function AddGeneralQuestion({ project, currentUser, onBack, onComplete }:
                     <button
                       type="button"
                       onClick={() => setShowAddQuestion(false)}
-                      className="px-6 py-2 rounded-xl text-slate-300 font-medium hover:bg-gray-100 transition-colors"
+                      className="px-6 py-2 rounded-xl text-slate-300 font-medium hover:bg-[#0f172a] transition-colors"
                     >
                       Cancel
                     </button>
@@ -360,7 +360,7 @@ export function AddGeneralQuestion({ project, currentUser, onBack, onComplete }:
         <div className="sticky bottom-0 bg-[#050b14] border-t border-white/10 p-6 mt-8 flex justify-between items-center z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
           <button
             onClick={onBack}
-            className="flex items-center px-6 py-3 rounded-xl font-semibold transition-all border-2 text-slate-300 bg-[#050b14] border-white/10 hover:bg-[#0a1122] hover:border-gray-300 shadow-sm"
+            className="flex items-center px-6 py-3 rounded-xl font-semibold transition-all border-2 text-slate-300 bg-[#050b14] border-white/10 hover:bg-[#0a1122] hover:border-white/20 shadow-[0_0_15px_rgba(0,0,0,0.5)]"
           >
             Back
           </button>

@@ -916,7 +916,7 @@ export function OntologyChatBox({ project, currentUser }: OntologyChatBoxProps) 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const statusClass = {
-    not_started: 'border-slate-700 bg-white/5 text-slate-300',
+    not_started: 'border-slate-700 bg-[#0b1221]/5 text-slate-300',
     needs_more_information: 'border-yellow-500/30 bg-yellow-500/10 text-yellow-300',
     completed: 'border-green-500/30 bg-green-500/10 text-green-300',
     error: 'border-red-500/30 bg-red-500/10 text-red-300'
@@ -1172,7 +1172,7 @@ export function OntologyChatBox({ project, currentUser }: OntologyChatBoxProps) 
           <button
             onClick={createNewChat}
             disabled={creating || loadingHistory}
-            className="inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-300 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-300 hover:bg-[#0b1221]/5 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {creating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
             New chat
@@ -1180,7 +1180,7 @@ export function OntologyChatBox({ project, currentUser }: OntologyChatBoxProps) 
           <button
             onClick={clearConversation}
             disabled={clearing || loadingHistory || !conversationId}
-            className="inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-300 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-300 hover:bg-[#0b1221]/5 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {clearing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
             Delete chat
@@ -1216,7 +1216,7 @@ export function OntologyChatBox({ project, currentUser }: OntologyChatBoxProps) 
                   className={`rounded-lg border px-3 py-2 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
                     isActive
                       ? 'border-cyan-500/40 bg-cyan-500/10'
-                      : 'border-white/10 bg-[#050b14] hover:border-cyan-500/30 hover:bg-white/5'
+                      : 'border-white/10 bg-[#050b14] hover:border-cyan-500/30 hover:bg-[#0b1221]/5'
                   }`}
                 >
                   <div className="truncate text-sm font-medium text-white">
@@ -1276,7 +1276,7 @@ export function OntologyChatBox({ project, currentUser }: OntologyChatBoxProps) 
                       <Bot className="h-4 w-4" />
                     </div>
                   )}
-                  <div className={`max-w-[78%] rounded-lg border px-4 py-3 text-sm shadow-sm ${
+                  <div className={`max-w-[78%] rounded-lg border px-4 py-3 text-sm shadow-[0_0_15px_rgba(0,0,0,0.5)] ${
                     isUser
                       ? 'border-blue-500/30 bg-blue-500/15 text-blue-50'
                       : 'border-white/10 bg-[#050b14] text-slate-300'

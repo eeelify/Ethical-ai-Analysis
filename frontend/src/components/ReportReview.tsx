@@ -237,7 +237,7 @@ export function ReportReview({
               <button
                 onClick={handleFinalize}
                 disabled={finalizing || loading}
-                className="px-4 py-2 rounded-lg bg-[#0b1221] hover:bg-white/10 text-white text-sm font-semibold flex items-center gap-2 disabled:opacity-60"
+                className="px-4 py-2 rounded-lg bg-[#0b1221] hover:bg-[#0b1221]/10 text-white text-sm font-semibold flex items-center gap-2 disabled:opacity-60"
               >
                 {finalizing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
                 Finalize & Lock
@@ -270,7 +270,7 @@ export function ReportReview({
                     Report Summary
                   </button>
 
-                  <div className="h-px bg-gray-100 my-2" />
+                  <div className="h-px bg-[#0f172a] my-2" />
 
                   {(() => {
                     const sections = Array.isArray(report?.sections) ? report!.sections!.filter(s => s.principle !== "FULL_REPORT") : [];
@@ -284,7 +284,7 @@ export function ReportReview({
                           onClick={() => setActivePrinciple(p)}
                           className={`w-full text-left px-3 py-2 rounded-lg border text-sm transition-colors ${active
                             ? "border-blue-500 bg-blue-500/20 text-blue-300"
-                            : "border-white/10 hover:bg-white/5 text-gray-300"
+                            : "border-white/10 hover:bg-[#0b1221]/5 text-gray-300"
                             }`}
                         >
                           {p}
@@ -378,7 +378,7 @@ export function ReportReview({
                             <button
                               onClick={handleAddComment}
                               disabled={!canComment || commenting || !commentText.trim()}
-                              className="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors shadow-sm disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
+                              className="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors shadow-[0_0_15px_rgba(0,0,0,0.5)] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
                             >
                               {commenting ? (
                                 <div className="flex items-center gap-2">
@@ -453,7 +453,7 @@ export function ReportReview({
                             <button
                               onClick={handleAddComment}
                               disabled={!canComment || commenting || !commentText.trim()}
-                              className="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors shadow-sm disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
+                              className="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors shadow-[0_0_15px_rgba(0,0,0,0.5)] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
                             >
                               {commenting ? (
                                 <div className="flex items-center gap-2">

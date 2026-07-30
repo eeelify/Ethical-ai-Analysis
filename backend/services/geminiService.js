@@ -305,9 +305,8 @@ Return a RAW JSON OBJECT. No markdown formatting. No code blocks.
 `;
 
   const modelNamesToTry = [
-    "gemini-3.6-flash",
-    "gemini-2.5-flash",
-    "gemini-2.0-flash",
+    "gemini-flash-lite-latest",
+    "gemini-1.5-pro",
     "gemini-1.5-flash"
   ];
 
@@ -337,9 +336,8 @@ Return a RAW JSON OBJECT. No markdown formatting. No code blocks.
         const jsonString = reportText.replace(/```json\n?|```/g, '').trim();
         reportData = JSON.parse(jsonString);
       } catch (e) {
-        console.warn('⚠️ Gemini returned invalid JSON, attempting fallback parse or returning raw text if needed:', e.message);
-        // Fallback: If parsing fails, we might have to throw or return partial data
-        throw new Error("Failed to parse Gemini JSON response");
+        console.warn('⚠️ Gemini returned invalid JSON:', e.message);
+        throw new Error("JSON_PARSE_ERROR");
       }
 
       if (!reportData) {
@@ -352,6 +350,11 @@ Return a RAW JSON OBJECT. No markdown formatting. No code blocks.
     } catch (error) {
       console.error(`❌ Model ${modelName} failed:`, error.message);
       lastError = error;
+
+      // If it's a JSON parse error, try the next model
+      if (error.message === "JSON_PARSE_ERROR") {
+        continue;
+      }
 
       // If it's not a 404 (model not found), don't try other models
       if (!error.message.includes("404") && !error.message.includes("not found")) {
@@ -376,8 +379,8 @@ Return a RAW JSON OBJECT. No markdown formatting. No code blocks.
       throw new Error("❌ Gemini API Key is invalid or unauthorized.");
     }
 
-    if (errorMsg.includes("429") || errorMsgLower.includes("resource_exhausted") || errorMsgLower.includes("quota") || errorMsgLower.includes("fetch failed") || errorMsgLower.includes("network")) {
-      console.warn("⚠️ Gemini API connection or quota issue detected. Falling back to mock report.");
+    if (errorMsg === "JSON_PARSE_ERROR" || errorMsg.includes("429") || errorMsgLower.includes("resource_exhausted") || errorMsgLower.includes("quota") || errorMsgLower.includes("fetch failed") || errorMsgLower.includes("network")) {
+      console.warn("⚠️ Gemini API issue or JSON parsing failed. Falling back to mock report.");
       return {
         executiveSummary: [
           "The assessment identified a Cumulative Risk Volume of 43 across 10 evaluated quantitative questions.",

@@ -111,13 +111,13 @@ export function TensionDetail({ tension: initialTension, currentUser, users, onB
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#050b14]">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-[#0b1221] shadow-[0_0_15px_rgba(0,0,0,0.5)] border-b">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <span className="text-gray-600 font-medium">Tension Details</span>
+              <span className="text-slate-400 font-medium">Tension Details</span>
             </div>
             {canDelete && (
               <button
@@ -154,19 +154,19 @@ export function TensionDetail({ tension: initialTension, currentUser, users, onB
 
       <div className="px-6 py-6 max-w-5xl mx-auto">
         {/* Tension Details */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+        <div className="bg-[#0b1221] rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border p-6 mb-6">
           <div className="flex items-center mb-3">
-            <span className={`px-2 py-1 text-xs rounded-full ${statusColors[tension.status as keyof typeof statusColors]?.bg || 'bg-gray-100'} mr-2`}>
+            <span className={`px-2 py-1 text-xs rounded-full ${statusColors[tension.status as keyof typeof statusColors]?.bg || 'bg-[#0f172a]'} mr-2`}>
               {(tension.status || 'ongoing').toUpperCase()}
             </span>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-slate-500">
               Created by {creator?.name || 'Unknown'} on {new Date(tension.createdAt).toLocaleDateString()}
             </span>
           </div>
-          <h1 className="text-2xl text-gray-900 mb-3">{tension.claimStatement || "No claim statement"}</h1>
-          <div className="bg-gray-50 border rounded-lg p-4 mb-4">
-              <div className="text-sm text-gray-600 mb-1">Argument:</div>
-              <p className="text-gray-900">{tension.description}</p>
+          <h1 className="text-2xl text-white mb-3">{tension.claimStatement || "No claim statement"}</h1>
+          <div className="bg-[#050b14] border rounded-lg p-4 mb-4">
+              <div className="text-sm text-slate-400 mb-1">Argument:</div>
+              <p className="text-white">{tension.description}</p>
           </div>
           {tension.principle1 && (
             <div className="mt-2 text-sm text-blue-800 bg-blue-50 p-3 rounded border border-blue-100">
@@ -176,9 +176,9 @@ export function TensionDetail({ tension: initialTension, currentUser, users, onB
         </div>
 
         {/* EVIDENCE LIBRARY */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+        <div className="bg-[#0b1221] rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border p-6 mb-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl text-gray-900">Evidence Library</h2>
+            <h2 className="text-xl text-white">Evidence Library</h2>
             {!isAdmin && (
               <button onClick={() => setShowAddEvidence(true)} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center">
                 <Plus className="h-4 w-4 mr-2" /> Add Evidence
@@ -196,9 +196,9 @@ export function TensionDetail({ tension: initialTension, currentUser, users, onB
                       <div className="flex-1">
                         <div className="flex items-center mb-2">
                           <FileText className="h-5 w-5 text-blue-500 mr-2" />
-                          <h3 className="text-gray-900 font-medium">{ev.title}</h3>
+                          <h3 className="text-white font-medium">{ev.title}</h3>
                         </div>
-                        <p className="text-sm text-gray-600 mb-2">{ev.description}</p>
+                        <p className="text-sm text-slate-400 mb-2">{ev.description}</p>
                         <div className="text-xs text-gray-400">
                            Uploaded by {uploader?.name || 'Unknown'} on {new Date(ev.uploadedAt).toLocaleDateString()}
                         </div>
@@ -238,7 +238,7 @@ export function TensionDetail({ tension: initialTension, currentUser, users, onB
                         className={`px-3 py-2 text-sm font-medium rounded-lg border flex items-center space-x-2 ${
                           ev.fileData || ev.fileUrl
                             ? 'text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300'
-                            : 'text-gray-400 border-gray-200 cursor-not-allowed'
+                            : 'text-gray-400 border-white/10 cursor-not-allowed'
                         }`}
                         title={ev.fileData || ev.fileUrl ? "Download file" : "File not available"}
                         disabled={!ev.fileData && !ev.fileUrl}
@@ -251,7 +251,7 @@ export function TensionDetail({ tension: initialTension, currentUser, users, onB
                  );
               })
             ) : (
-              <div className="text-center py-8 text-gray-500 border-2 border-dashed rounded-lg">
+              <div className="text-center py-8 text-slate-500 border-2 border-dashed rounded-lg">
                 <FileText className="h-10 w-10 text-gray-300 mx-auto mb-2" />
                 No evidence added yet.
               </div>
@@ -260,27 +260,27 @@ export function TensionDetail({ tension: initialTension, currentUser, users, onB
         </div>
 
         {/* COMMENTS SECTION */}
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h2 className="text-xl text-gray-900 mb-6">Discussion</h2>
+        <div className="bg-[#0b1221] rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border p-6">
+          <h2 className="text-xl text-white mb-6">Discussion</h2>
           
           <div className="space-y-6 mb-8">
             {tension.comments && tension.comments.length > 0 ? (
               tension.comments.map((comment: any, index: number) => (
                 <div key={index} className="flex space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-slate-400">
                     {comment.authorName ? comment.authorName.charAt(0) : '?'}
                   </div>
-                  <div className="flex-1 bg-gray-50 p-3 rounded-lg rounded-tl-none border border-gray-100">
+                  <div className="flex-1 bg-[#050b14] p-3 rounded-lg rounded-tl-none border border-white/5">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-semibold text-gray-900">{comment.authorName || 'Unknown'}</span>
-                      <span className="text-xs text-gray-500">{new Date(comment.date).toLocaleDateString()}</span>
+                      <span className="text-sm font-semibold text-white">{comment.authorName || 'Unknown'}</span>
+                      <span className="text-xs text-slate-500">{new Date(comment.date).toLocaleDateString()}</span>
                     </div>
-                    <p className="text-sm text-gray-700">{comment.text}</p>
+                    <p className="text-sm text-slate-300">{comment.text}</p>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="text-sm text-gray-500 italic">No comments yet.</div>
+              <div className="text-sm text-slate-500 italic">No comments yet.</div>
             )}
           </div>
 
@@ -296,7 +296,7 @@ export function TensionDetail({ tension: initialTension, currentUser, users, onB
                   onChange={(e) => setCommentText(e.target.value)}
                   placeholder="Write a comment..."
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm mb-2"
+                  className="w-full px-3 py-2 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm mb-2"
                 />
                 <button 
                   onClick={handlePostComment}
@@ -366,29 +366,29 @@ function AddEvidenceModal({ onClose, onAdd }: any) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-lg w-full">
+      <div className="bg-[#0b1221] rounded-xl shadow-xl max-w-lg w-full">
         <div className="px-6 py-4 border-b">
-          <h2 className="text-xl font-bold text-gray-900">Add Evidence</h2>
+          <h2 className="text-xl font-bold text-white">Add Evidence</h2>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-semibold mb-1 text-gray-700">Evidence Title *</label>
+            <label className="block text-sm font-semibold mb-1 text-slate-300">Evidence Title *</label>
             <input 
               type="text" 
               value={title} 
               onChange={(e) => setTitle(e.target.value)} 
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+              className="w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
               placeholder="e.g., Audit Report v1"
               required 
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold mb-1 text-gray-700">Description *</label>
+            <label className="block text-sm font-semibold mb-1 text-slate-300">Description *</label>
             <textarea 
               value={description} 
               onChange={(e) => setDescription(e.target.value)} 
               rows={3} 
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+              className="w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
               placeholder="Briefly describe this evidence..."
               required 
             />
@@ -396,7 +396,7 @@ function AddEvidenceModal({ onClose, onAdd }: any) {
           
           {/* CUSTOM FILE UPLOAD AREA */}
           <div>
-            <label className="block text-sm font-semibold mb-1 text-gray-700">Upload File</label>
+            <label className="block text-sm font-semibold mb-1 text-slate-300">Upload File</label>
             
             {/* Orijinal input'u gizliyoruz */}
             <input 
@@ -410,7 +410,7 @@ function AddEvidenceModal({ onClose, onAdd }: any) {
               type="button" 
               onClick={() => fileInputRef.current?.click()}
               className={`w-full flex items-center justify-center px-4 py-3 border-2 border-dashed rounded-lg transition-colors ${
-                file ? 'border-green-300 bg-green-50 text-green-700' : 'border-gray-300 bg-gray-50 text-gray-500 hover:bg-gray-100'
+                file ? 'border-green-300 bg-green-50 text-green-700' : 'border-white/20 bg-[#050b14] text-slate-500 hover:bg-[#0f172a]'
               }`}
             >
               {file ? (
@@ -428,8 +428,8 @@ function AddEvidenceModal({ onClose, onAdd }: any) {
             <p className="text-xs text-gray-400 mt-1">Supported formats: PDF, DOC, Images (Max 100MB)</p>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium">Cancel</button>
+          <div className="flex justify-end space-x-3 pt-4 border-t border-white/5">
+            <button type="button" onClick={onClose} className="px-4 py-2 text-slate-400 hover:text-white font-medium">Cancel</button>
             <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">Save Evidence</button>
           </div>
         </form>

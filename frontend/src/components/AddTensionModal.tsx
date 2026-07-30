@@ -131,13 +131,13 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
-          <h2 className="text-xl font-black text-gray-900 flex items-center">
-            <AlertTriangle className="h-5 w-5 text-gray-700 mr-2" />
+      <div className="bg-[#0b1221] rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-[#050b14]">
+          <h2 className="text-xl font-black text-white flex items-center">
+            <AlertTriangle className="h-5 w-5 text-slate-300 mr-2" />
             Add Ethical Tension
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button onClick={onClose} className="text-gray-400 hover:text-slate-400 transition-colors">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -151,18 +151,18 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
           />
 
           <div>
-            <label className="block text-sm font-bold mb-1 text-gray-700">Claim *</label>
+            <label className="block text-sm font-bold mb-1 text-slate-300">Claim *</label>
             <input type="text" value={claim} onChange={(e) => setClaim(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="State the core conflict briefly..." required />
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-1 text-gray-700">Argument *</label>
+            <label className="block text-sm font-bold mb-1 text-slate-300">Argument *</label>
             <textarea value={argument} onChange={(e) => setArgument(e.target.value)} rows={3} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Explain your reasoning..." required />
           </div>
 
           <div>
             <div className="mb-3">
-              <label className="block text-sm font-bold mb-1 text-gray-700">Evidence Type (Optional)</label>
+              <label className="block text-sm font-bold mb-1 text-slate-300">Evidence Type (Optional)</label>
               <select
                 value={evidenceType}
                 onChange={(e) => setEvidenceType(e.target.value)}
@@ -177,25 +177,25 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
                 <option value="Other">Other</option>
               </select>
             </div>
-            <label className="block text-sm font-bold mb-1 text-gray-700">Evidence (Optional)</label>
+            <label className="block text-sm font-bold mb-1 text-slate-300">Evidence (Optional)</label>
             <textarea value={evidence} onChange={(e) => setEvidence(e.target.value)} rows={2} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 mb-2" placeholder="Describe supporting evidence..." />
             
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-            <button type="button" onClick={() => fileInputRef.current?.click()} className={`flex items-center text-sm px-3 py-1.5 rounded-md border transition-colors ${selectedFile ? 'text-green-700 bg-green-50 border-green-200' : 'text-gray-600 hover:text-blue-600 bg-gray-50'}`}>
+            <button type="button" onClick={() => fileInputRef.current?.click()} className={`flex items-center text-sm px-3 py-1.5 rounded-md border transition-colors ${selectedFile ? 'text-green-700 bg-green-50 border-green-200' : 'text-slate-400 hover:text-blue-600 bg-[#050b14]'}`}>
               {selectedFile ? <><Check className="h-4 w-4 mr-2" />{selectedFile.name}</> : <><Upload className="h-4 w-4 mr-2" /> Upload File</>}
             </button>
           </div>
 
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <label className="block text-sm font-bold text-gray-700">Severity Level</label>
+              <label className="block text-sm font-bold text-slate-300">Severity Level</label>
               <div className="relative">
                 <button
                   type="button"
                   onMouseEnter={() => setShowSeverityTooltip(true)}
                   onMouseLeave={() => setShowSeverityTooltip(false)}
                   onClick={() => setShowSeverityTooltip(!showSeverityTooltip)}
-                  className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                  className="text-gray-400 hover:text-slate-400 focus:outline-none"
                 >
                   <Info className="h-4 w-4" />
                 </button>
@@ -207,7 +207,7 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
                 )}
               </div>
             </div>
-            <p className="text-xs text-gray-500 mb-3">Severity = impact magnitude (not likelihood)</p>
+            <p className="text-xs text-slate-500 mb-3">Severity = impact magnitude (not likelihood)</p>
             <div className="grid grid-cols-3 gap-4">
               {[1, 2, 3].map((level) => (
                 <button
@@ -217,7 +217,7 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
                   className={`py-3 px-4 rounded-lg border-2 flex flex-col items-center justify-center transition-all ${
                     severity === level 
                       ? (level === 1 ? 'border-green-500 bg-green-50 text-green-700' : level === 2 ? 'border-yellow-500 bg-yellow-50 text-yellow-700' : 'border-red-500 bg-red-50 text-red-700') + ' font-bold'
-                      : 'border-gray-200 text-gray-500'
+                      : 'border-white/10 text-slate-500'
                   }`}
                 >
                   <div className={`w-3 h-3 rounded-full mb-1 ${severity === level ? (level === 1 ? 'bg-green-500' : level === 2 ? 'bg-yellow-500' : 'bg-red-500') : 'bg-gray-300'}`} />
@@ -228,20 +228,20 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
           </div>
 
           {/* Impact & Stakeholders Section */}
-          <div className="border-t border-gray-200 pt-5">
+          <div className="border-t border-white/10 pt-5">
             <button
               type="button"
               onClick={() => setShowImpactSection(!showImpactSection)}
               className="w-full flex items-center justify-between text-left mb-4"
             >
-              <h3 className="text-lg font-bold text-gray-900">Impact & Stakeholders</h3>
-              {showImpactSection ? <ChevronUp className="h-5 w-5 text-gray-500" /> : <ChevronDown className="h-5 w-5 text-gray-500" />}
+              <h3 className="text-lg font-bold text-white">Impact & Stakeholders</h3>
+              {showImpactSection ? <ChevronUp className="h-5 w-5 text-slate-500" /> : <ChevronDown className="h-5 w-5 text-slate-500" />}
             </button>
             
             {showImpactSection && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-bold mb-2 text-gray-700">Impact Area *</label>
+                  <label className="block text-sm font-bold mb-2 text-slate-300">Impact Area *</label>
                   <div className="grid grid-cols-2 gap-2">
                     {impactAreaOptions.map((area) => (
                       <label key={area} className="flex items-center space-x-2 cursor-pointer">
@@ -249,16 +249,16 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
                           type="checkbox"
                           checked={impactAreas.includes(area)}
                           onChange={() => toggleImpactArea(area)}
-                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          className="w-4 h-4 text-blue-600 border-white/20 rounded focus:ring-blue-500"
                         />
-                        <span className="text-sm text-gray-700">{area}</span>
+                        <span className="text-sm text-slate-300">{area}</span>
                       </label>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold mb-2 text-gray-700">Affected Groups *</label>
+                  <label className="block text-sm font-bold mb-2 text-slate-300">Affected Groups *</label>
                   <div className="grid grid-cols-2 gap-2">
                     {affectedGroupOptions.map((group) => (
                       <label key={group} className="flex items-center space-x-2 cursor-pointer">
@@ -266,16 +266,16 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
                           type="checkbox"
                           checked={affectedGroups.includes(group)}
                           onChange={() => toggleAffectedGroup(group)}
-                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          className="w-4 h-4 text-blue-600 border-white/20 rounded focus:ring-blue-500"
                         />
-                        <span className="text-sm text-gray-700">{group}</span>
+                        <span className="text-sm text-slate-300">{group}</span>
                       </label>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold mb-1 text-gray-700">Impact Description (Optional)</label>
+                  <label className="block text-sm font-bold mb-1 text-slate-300">Impact Description (Optional)</label>
                   <textarea
                     value={impactDescription}
                     onChange={(e) => setImpactDescription(e.target.value)}
@@ -289,20 +289,20 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
           </div>
 
           {/* Mitigation / Resolution Section */}
-          <div className="border-t border-gray-200 pt-5">
+          <div className="border-t border-white/10 pt-5">
             <button
               type="button"
               onClick={() => setShowMitigationSection(!showMitigationSection)}
               className="w-full flex items-center justify-between text-left mb-4"
             >
-              <h3 className="text-lg font-bold text-gray-900">Mitigation / Resolution</h3>
-              {showMitigationSection ? <ChevronUp className="h-5 w-5 text-gray-500" /> : <ChevronDown className="h-5 w-5 text-gray-500" />}
+              <h3 className="text-lg font-bold text-white">Mitigation / Resolution</h3>
+              {showMitigationSection ? <ChevronUp className="h-5 w-5 text-slate-500" /> : <ChevronDown className="h-5 w-5 text-slate-500" />}
             </button>
             
             {showMitigationSection && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-bold mb-1 text-gray-700">Proposed Mitigations *</label>
+                  <label className="block text-sm font-bold mb-1 text-slate-300">Proposed Mitigations *</label>
                   <textarea
                     value={proposedMitigations}
                     onChange={(e) => setProposedMitigations(e.target.value)}
@@ -311,11 +311,11 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
                     placeholder="List proposed mitigations as bullet points…"
                     required
                   />
-                  <p className="text-xs text-gray-500 mt-1">e.g., add human review; add warnings; restrict use cases; improve dataset coverage…</p>
+                  <p className="text-xs text-slate-500 mt-1">e.g., add human review; add warnings; restrict use cases; improve dataset coverage…</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold mb-1 text-gray-700">Trade-off Decision *</label>
+                  <label className="block text-sm font-bold mb-1 text-slate-300">Trade-off Decision *</label>
                   <select
                     value={tradeoffDecision}
                     onChange={(e) => setTradeoffDecision(e.target.value)}
@@ -331,7 +331,7 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
 
                 {tradeoffDecision !== 'Undecided' && (
                   <div>
-                    <label className="block text-sm font-bold mb-1 text-gray-700">Trade-off Rationale *</label>
+                    <label className="block text-sm font-bold mb-1 text-slate-300">Trade-off Rationale *</label>
                     <textarea
                       value={tradeoffRationale}
                       onChange={(e) => setTradeoffRationale(e.target.value)}
@@ -346,8 +346,8 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
             )}
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100">
-            <button type="button" onClick={onClose} className="px-5 py-2.5 text-gray-600 hover:text-gray-900">Cancel</button>
+          <div className="flex justify-end space-x-3 pt-4 border-t border-white/5">
+            <button type="button" onClick={onClose} className="px-5 py-2.5 text-slate-400 hover:text-white">Cancel</button>
             <button type="submit" disabled={!principle1 || !principle2 || !claim || !argument || !proposedMitigations || (tradeoffDecision !== 'Undecided' && !tradeoffRationale)} className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">Save Tension</button>
           </div>
         </form>

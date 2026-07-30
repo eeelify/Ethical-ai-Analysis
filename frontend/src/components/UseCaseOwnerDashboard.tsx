@@ -17,12 +17,13 @@ interface UseCaseOwnerDashboardProps {
   projects: Project[];
   onCreateUseCase: (useCase: Partial<UseCase>) => void;
   onViewUseCase: (useCase: UseCase) => void;
+  onViewProject?: (project: Project) => void;
   onDeleteUseCase: (useCaseId: string) => void;
   onNavigate?: (view: string) => void;
   onLogout: () => void;
   onUpdateUser?: (user: User) => void;
   onOpenChat?: (project: Project, otherUser: User) => void;
-  dashboardSection?: 'projects' | 'ontology';
+  dashboardSection?: 'projects' | 'ontology' | 'reports';
 }
 
 const statusColors = {
@@ -49,6 +50,7 @@ export function UseCaseOwnerDashboard({
   onLogout,
   onUpdateUser,
   onOpenChat,
+  onViewProject,
   dashboardSection = 'projects'
 }: UseCaseOwnerDashboardProps) {
   const [showNewUseCaseModal, setShowNewUseCaseModal] = useState(false);
@@ -65,6 +67,8 @@ export function UseCaseOwnerDashboard({
   const [loadingUseCases, setLoadingUseCases] = useState(true);
   const [useCaseProgresses, setUseCaseProgresses] = useState<Record<string, number>>({});
   const [selectedOntologyProjectId, setSelectedOntologyProjectId] = useState('');
+  const [reports, setReports] = useState<any[]>([]);
+  const [loadingReports, setLoadingReports] = useState(false);
 
   // Fetch only this owner's use cases directly from backend (much faster)
   const fetchMyUseCases = React.useCallback(async () => {
@@ -164,6 +168,13 @@ export function UseCaseOwnerDashboard({
       return () => clearInterval(interval);
     }
   }, [myUseCases, projects, users]);
+
+  useEffect(() => {
+    if (dashboardSection === 'reports') {
+      const publishedProjects = projects.filter(p => p.reportsPublished === true);
+      setReports(publishedProjects);
+    }
+  }, [dashboardSection, projects]);
 
   // Find admin user
   const adminUser = users.find(u => u.role === 'admin');
@@ -426,7 +437,7 @@ export function UseCaseOwnerDashboard({
 
         <button
           onClick={() => setShowProfile(true)}
-          className="w-full px-6 py-4 border-b border-white/10 hover:bg-white/5 transition-colors text-left"
+          className="w-full px-6 py-4 border-b border-white/10 hover:bg-[#0b1221]/5 transition-colors text-left"
         >
           <div className="flex items-center">
             {(currentUser as any).profileImage ? (
@@ -453,7 +464,7 @@ export function UseCaseOwnerDashboard({
             className={`w-full px-4 py-3 mb-2 flex items-center rounded-lg ${
               dashboardSection === 'projects'
                 ? 'bg-cyan-500/10 text-cyan-400'
-                : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                : 'text-slate-400 hover:bg-[#0b1221]/5 hover:text-white'
             }`}
           >
             <FolderOpen className={`h-4 w-4 mr-3 ${dashboardSection === 'projects' ? 'text-cyan-400' : ''}`} />
@@ -464,16 +475,27 @@ export function UseCaseOwnerDashboard({
             className={`w-full px-4 py-3 mb-2 flex items-center rounded-lg ${
               dashboardSection === 'ontology'
                 ? 'bg-cyan-500/10 text-cyan-400'
-                : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                : 'text-slate-400 hover:bg-[#0b1221]/5 hover:text-white'
             }`}
           >
             <Database className={`h-4 w-4 mr-3 ${dashboardSection === 'ontology' ? 'text-cyan-400' : ''}`} />
             Ontology Chat
           </button>
+          <button
+            onClick={() => onNavigate?.("owner-reports")}
+            className={`w-full px-4 py-3 mb-2 flex items-center rounded-lg ${
+              dashboardSection === 'reports'
+                ? 'bg-cyan-500/10 text-cyan-400'
+                : 'text-slate-400 hover:bg-[#0b1221]/5 hover:text-white'
+            }`}
+          >
+            <FileText className={`h-4 w-4 mr-3 ${dashboardSection === 'reports' ? 'text-cyan-400' : ''}`} />
+            Reports
+          </button>
           {adminUser && (
             <button
               onClick={handleContactAdmin}
-              className="w-full px-4 py-3 mb-2 flex items-center text-slate-400 hover:bg-white/5 hover:text-white rounded-lg"
+              className="w-full px-4 py-3 mb-2 flex items-center text-slate-400 hover:bg-[#0b1221]/5 hover:text-white rounded-lg"
             >
               <MessageSquare className="h-4 w-4 mr-3" />
               Contact Admin
@@ -505,6 +527,8 @@ export function UseCaseOwnerDashboard({
               <p className="text-slate-400">
                 {dashboardSection === 'ontology'
                   ? 'Describe and assess your project with ontology-based reasoning'
+                  : dashboardSection === 'reports'
+                  ? 'View reports generated and approved by admins for your projects'
                   : 'Upload and monitor your AI system use cases'}
               </p>
             </div>
@@ -523,7 +547,7 @@ export function UseCaseOwnerDashboard({
               <div className="relative" ref={notificationRef}>
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className="relative p-2 text-gray-600 hover:text-white"
+                  className="relative p-2 text-slate-400 hover:text-white"
                 >
                   <MessageSquare className="h-5 w-5" />
                   {unreadCount > 0 && (
@@ -544,28 +568,28 @@ export function UseCaseOwnerDashboard({
                       maxHeight: 'calc(100vh - 120px)',
                     }}
                   >
-                    <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
+                    <div className="p-4 border-b border-white/10 flex items-center justify-between flex-shrink-0">
                       <h3 className="font-semibold text-white">Notifications</h3>
                       <button
                         onClick={() => setShowNotifications(false)}
-                        className="p-1 hover:bg-gray-100 rounded-full"
+                        className="p-1 hover:bg-[#0b1221]/10 rounded-full"
                       >
-                        <X className="h-4 w-4 text-gray-500" />
+                        <X className="h-4 w-4 text-slate-400" />
                       </button>
                     </div>
                     <div className="overflow-y-auto flex-1 min-h-0">
                       {unreadConversations.length === 0 ? (
-                        <div className="p-6 text-center text-gray-500">
-                          <Bell className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                        <div className="p-6 text-center text-slate-500">
+                          <Bell className="h-8 w-8 text-slate-600 mx-auto mb-2" />
                           <p className="text-sm">No unread messages</p>
                         </div>
                       ) : (
-                        <div className="divide-y divide-gray-200">
+                        <div className="divide-y divide-white/10">
                           {unreadConversations.map((conv, idx) => (
                             <button
                               key={idx}
                               onClick={() => handleNotificationClick(conv)}
-                              className="w-full p-4 text-left hover:bg-gray-50 transition-colors"
+                              className="w-full p-4 text-left hover:bg-[#0b1221]/5 transition-colors"
                             >
                               <div className="flex items-start justify-between">
                                 <div className="flex-1 min-w-0">
@@ -577,7 +601,7 @@ export function UseCaseOwnerDashboard({
                                       {conv.fromUserName}
                                     </div>
                                   </div>
-                                  <div className="text-xs text-gray-500 line-clamp-2">
+                                  <div className="text-xs text-slate-400 line-clamp-2">
                                     {String(conv.lastMessage || '').startsWith('[NOTIFICATION]')
                                       ? String(conv.lastMessage).replace(/^\[NOTIFICATION\]\s*/, '')
                                       : conv.lastMessage}
@@ -619,6 +643,57 @@ export function UseCaseOwnerDashboard({
                 project={selectedOntologyProject}
                 currentUser={currentUser}
               />
+            </div>
+          ) : dashboardSection === 'reports' ? (
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-white mb-6">Generated Reports</h2>
+              {loadingReports ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-slate-400">Loading reports...</div>
+                </div>
+              ) : reports.length === 0 ? (
+                <div className="text-center py-12 bg-[#0b1221]/5 border border-white/10 rounded-lg">
+                  <p className="text-slate-400 mb-2">No reports available yet</p>
+                  <p className="text-sm text-slate-500">Reports generated by admins for your projects will appear here</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {reports.map((project: any) => {
+                    const projectId = project._id || project.id;
+                    const projectTitle = project.title || 'Unknown Project';
+                    const generatedAt = new Date(project.updatedAt || Date.now()).toLocaleString('en-US');
+                    return (
+                      <div key={projectId} className="bg-[#050b14]/50 border border-white/10 rounded-lg p-5 hover:shadow-[0_0_15px_rgba(34,211,238,0.1)] hover:border-cyan-500/30 transition-shadow">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 cursor-pointer" onClick={() => {
+                            window.open(api(`/api/projects/${projectId}/reports/expert/download-pdf?userId=${currentUser.id || (currentUser as any)._id}`), '_blank');
+                          }}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-xs text-slate-500">Generated: {generatedAt}</span>
+                            </div>
+                            <h3 className="text-white font-semibold text-lg mb-1">
+                              {projectTitle}
+                            </h3>
+                          </div>
+                          <div className="flex items-center gap-2 ml-4">
+                            <button
+                              onClick={(e) => { 
+                                e.stopPropagation(); 
+                                window.open(api(`/api/projects/${projectId}/reports/expert/download-pdf?userId=${currentUser.id || (currentUser as any)._id}`), '_blank');
+                              }}
+                              className="flex items-center gap-2 p-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg transition-colors border border-rose-500/20"
+                              title="Download PDF"
+                            >
+                              <Download className="w-5 h-5" />
+                              <span className="text-sm font-medium pr-1 hidden sm:inline">PDF</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           ) : (
             <>
@@ -696,7 +771,7 @@ export function UseCaseOwnerDashboard({
                         <span className="text-xs text-slate-400">Progress</span>
                         <span className="text-xs text-white">{displayProgress}%</span>
                       </div>
-                      <div className="w-full bg-white/10 rounded-full h-2">
+                      <div className="w-full bg-[#0b1221]/10 rounded-full h-2">
                         <div
                           className="bg-cyan-500 h-2 rounded-full transition-all shadow-[0_0_10px_rgba(34,211,238,0.5)]"
                           style={{ width: `${displayProgress}%` }}
@@ -705,7 +780,7 @@ export function UseCaseOwnerDashboard({
                     </div>
 
                     {/* Metadata + Experts */}
-                    <div className="px-6 py-4 bg-white/5">
+                    <div className="px-6 py-4 bg-[#0b1221]/5">
                       <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
                         <div className="flex items-center">
                           <Clock className="h-3 w-3 mr-1" />
@@ -728,7 +803,7 @@ export function UseCaseOwnerDashboard({
                               </div>
                             ))}
                             {useCase.assignedExperts.length > 3 && (
-                              <div className="w-6 h-6 rounded-full bg-gray-300 border-2 border-white flex items-center justify-center text-gray-600 text-xs">
+                              <div className="w-6 h-6 rounded-full bg-[#0b1221]/20 border-2 border-[#050b14] flex items-center justify-center text-slate-400 text-xs">
                                 +{useCase.assignedExperts.length - 3}
                               </div>
                             )}
@@ -738,7 +813,7 @@ export function UseCaseOwnerDashboard({
 
                       <button
                         onClick={() => onViewUseCase(useCase)}
-                        className="w-full px-4 py-2 bg-white/5 border border-white/10 text-white rounded-lg hover:bg-white/10 hover:border-white/20 transition-all text-sm flex items-center justify-center"
+                        className="w-full px-4 py-2 bg-[#0b1221]/5 border border-white/10 text-white rounded-lg hover:bg-[#0b1221]/10 hover:border-white/20 transition-all text-sm flex items-center justify-center"
                       >
                         <Eye className="h-4 w-4 mr-2" />
                         View Details
@@ -1169,14 +1244,14 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
       <div className="max-w-5xl mx-auto">
 
         {/* HEADER */}
-        <div className="sticky top-0 bg-[#050b14] border-b border-white/10 shadow-sm z-10">
+        <div className="sticky top-0 bg-[#050b14] border-b border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)] z-10">
           <div className="px-6 py-4 flex items-center justify-between">
             <h2 className="text-xl text-white">Create New Use Case</h2>
             <div className="flex items-center space-x-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-slate-400 hover:text-white rounded-lg border border-white/10 hover:bg-white/5"
+                className="px-4 py-2 text-slate-400 hover:text-white rounded-lg border border-white/10 hover:bg-[#0b1221]/5"
               >
                 Cancel
               </button>
@@ -1248,7 +1323,7 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
                 onDragOver={handleDrag}
                 onDragLeave={handleDrag}
                 onDrop={handleDrop}
-                className={`border-2 border-dashed rounded-lg p-4 text-center ${dragActive ? 'border-green-400 bg-green-50' : 'border-gray-200'}`}
+                className={`border-2 border-dashed rounded-lg p-4 text-center ${dragActive ? 'border-green-400 bg-[#0b1221]/5' : 'border-white/10'}`}
               >
                 <input
                   type="file"
@@ -1257,7 +1332,7 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
                   className="hidden"
                   id="usecase-file-upload"
                 />
-                <label htmlFor="usecase-file-upload" className="cursor-pointer text-sm text-green-700 hover:underline flex items-center justify-center space-x-2">
+                <label htmlFor="usecase-file-upload" className="cursor-pointer text-sm text-cyan-400 hover:underline flex items-center justify-center space-x-2">
                   <Upload className="w-4 h-4" />
                   <span>Click to upload or drag files here</span>
                 </label>
@@ -1266,10 +1341,10 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
               {files.length > 0 && (
                 <div className="mt-3 space-y-2">
                   {files.map((file) => (
-                    <div key={file.name} className="flex items-center justify-between text-sm bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+                    <div key={file.name} className="flex items-center justify-between text-sm bg-[#0b1221]/5 border border-white/10 rounded-lg px-3 py-2">
                       <div className="flex items-center space-x-2">
                         <FileText className="w-4 h-4 text-slate-400" />
-                        <span className="text-gray-800">{file.name}</span>
+                        <span className="text-white">{file.name}</span>
                       </div>
                       <button
                         type="button"
@@ -1289,7 +1364,7 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
           <div className="bg-[#050b14]/50 rounded-lg border border-white/10 p-6 space-y-6">
             <div>
               <h3 className="text-lg text-white mb-4">📋 Use Case Questions</h3>
-              <p className="text-sm text-gray-600 mb-6">Please answer the following questions about your AI system use case.</p>
+              <p className="text-sm text-slate-400 mb-6">Please answer the following questions about your AI system use case.</p>
             </div>
 
             {/* AI System Link (optional) */}
@@ -1340,7 +1415,7 @@ function NewUseCaseModal({ onClose, onSubmit, currentUser }: NewUseCaseModalProp
             ) : (
               <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2">
                 {questions.map((question) => (
-                  <div key={question.id || question.key} className="border-b border-gray-100 pb-6 last:border-b-0">
+                  <div key={question.id || question.key} className="border-b border-white/5 pb-6 last:border-b-0">
                     {/* Tag badge */}
                     {question.tag && (
                       <div className="mb-2">

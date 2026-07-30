@@ -36,20 +36,20 @@ export function OntologyViewerTab() {
   const fgRef        = useRef<any>(null);
   const rawData      = useRef<{ nodes: any[]; links: any[] } | null>(null);
 
-  // Auto-resize
+  // Auto-resize using ResizeObserver
   useEffect(() => {
-    const update = () => {
-      if (containerRef.current) {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
         setDimensions({
-          width:  containerRef.current.clientWidth,
-          height: containerRef.current.clientHeight || 500
+          width: entry.contentRect.width,
+          height: entry.contentRect.height || 500
         });
       }
-    };
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, [graphData]);
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   // Physics
   useEffect(() => {
@@ -142,7 +142,7 @@ export function OntologyViewerTab() {
   const keywordCount = rawData.current ? rawData.current.nodes.filter(n => n.group === 'Keyword').length : 0;
 
   return (
-    <div className="flex-1 h-full flex flex-col bg-[#050b14] overflow-hidden">
+    <div className="flex-1 w-full h-full max-w-full max-h-full flex flex-col bg-[#050b14] overflow-hidden min-w-0 min-h-0">
 
       {/* Header */}
       <div className="px-6 py-4 border-b border-white/10 shrink-0 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -156,13 +156,13 @@ export function OntologyViewerTab() {
         {graphData && (
           <div className="flex flex-wrap items-center gap-3 shrink-0">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400 bg-white/5 border border-white/10 px-2 py-1 rounded">
+              <span className="text-xs text-slate-400 bg-[#0b1221]/5 border border-white/10 px-2 py-1 rounded">
                 <strong className="text-white">{graphData.nodes.length}</strong> nodes
               </span>
-              <span className="text-xs text-slate-400 bg-white/5 border border-white/10 px-2 py-1 rounded">
+              <span className="text-xs text-slate-400 bg-[#0b1221]/5 border border-white/10 px-2 py-1 rounded">
                 <strong className="text-white">{graphData.links.length}</strong> connections
               </span>
-              <span className="text-xs text-slate-400 bg-white/5 border border-white/10 px-2 py-1 rounded">
+              <span className="text-xs text-slate-400 bg-[#0b1221]/5 border border-white/10 px-2 py-1 rounded">
                 <strong className="text-white">36</strong> SWRL rules
               </span>
             </div>
@@ -177,11 +177,11 @@ export function OntologyViewerTab() {
         )}
       </div>
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex w-full max-w-full overflow-hidden min-w-0 min-h-0 relative">
 
         {/* ─── Graph Area ─── */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div ref={containerRef} className="flex-1 relative bg-[#050b14]">
+        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+          <div ref={containerRef} className="flex-1 relative bg-[#050b14] min-w-0 min-h-0">
 
             {!graphData ? (
               /* Landing */
@@ -331,9 +331,9 @@ export function OntologyViewerTab() {
 
         </div>
 
-        {/* ─── Side Panel ─── */}
+        {/* ─── Side Panel (Absolute Overlay) ─── */}
         {selectedNode && (
-          <div className="w-72 shrink-0 border-l border-white/10 bg-[#080f1f] flex flex-col overflow-hidden">
+          <div className="absolute right-0 top-0 bottom-0 w-72 border-l border-white/10 bg-[#080f1f] flex flex-col shadow-2xl z-50">
 
             {/* Node header */}
             <div className="p-5 border-b border-white/10">
@@ -353,7 +353,7 @@ export function OntologyViewerTab() {
             {/* Description */}
             {NODE_TYPES[selectedNode.group]?.description && (
               <div className="px-5 pt-4">
-                <div className="p-3 bg-white/5 rounded-lg border border-white/10 flex gap-2">
+                <div className="p-3 bg-[#0b1221]/5 rounded-lg border border-white/10 flex gap-2">
                   <Info className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
                   <p className="text-xs text-slate-300 leading-relaxed">{NODE_TYPES[selectedNode.group].description}</p>
                 </div>
@@ -371,7 +371,7 @@ export function OntologyViewerTab() {
                   .sort((a: any, b: any) => (b.degree || 0) - (a.degree || 0))
                   .map((n: any, i) => (
                     <button key={i} onClick={() => handleNodeClick(n)}
-                      className="flex items-center gap-2.5 px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-left transition-all group">
+                      className="flex items-center gap-2.5 px-3 py-2 bg-[#0b1221]/5 hover:bg-[#0b1221]/10 rounded-lg text-left transition-all group">
                       <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: getNodeColor(n.group) }} />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-white truncate font-medium">{n.name}</p>

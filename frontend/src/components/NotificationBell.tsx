@@ -282,7 +282,7 @@ export function NotificationBell({ currentUser, onNotificationClick, onNavigate 
             e.stopPropagation();
             setShowDropdown(!showDropdown);
           }}
-          className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors"
+          className="relative p-2 text-slate-400 hover:text-white transition-colors"
           aria-label="Notifications"
           type="button"
         >
@@ -298,7 +298,7 @@ export function NotificationBell({ currentUser, onNotificationClick, onNavigate 
       {showDropdown && dropdownPosition && createPortal(
         <div
           ref={dropdownRef}
-          className="fixed bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden flex flex-col z-[9999]"
+          className="fixed bg-[#0b1221] rounded-lg shadow-lg border border-white/10 overflow-hidden flex flex-col z-[9999]"
           style={{
             top: `${dropdownPosition.top}px`,
             left: `${dropdownPosition.left}px`,
@@ -309,8 +309,8 @@ export function NotificationBell({ currentUser, onNotificationClick, onNavigate 
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
-            <h3 className="font-semibold text-gray-900">Notifications</h3>
+          <div className="p-4 border-b border-white/10 flex items-center justify-between flex-shrink-0">
+            <h3 className="font-semibold text-white">Notifications</h3>
             <div className="flex items-center gap-2">
               {unreadCount > 0 && (
                 <button
@@ -322,9 +322,9 @@ export function NotificationBell({ currentUser, onNotificationClick, onNavigate 
               )}
               <button
                 onClick={() => setShowDropdown(false)}
-                className="p-1 hover:bg-gray-100 rounded-full"
+                className="p-1 hover:bg-[#0f172a] rounded-full"
               >
-                <X className="h-4 w-4 text-gray-500" />
+                <X className="h-4 w-4 text-slate-500" />
               </button>
             </div>
           </div>
@@ -332,12 +332,12 @@ export function NotificationBell({ currentUser, onNotificationClick, onNavigate 
           {/* Notifications List */}
           <div className="overflow-y-auto flex-1 min-h-0" style={{ maxHeight: 'calc(420px - 60px)' }}>
             {loading ? (
-              <div className="p-6 text-center text-gray-500">
+              <div className="p-6 text-center text-slate-500">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
                 <p className="text-sm mt-2">Loading...</p>
               </div>
             ) : notifications.length === 0 ? (
-              <div className="p-6 text-center text-gray-500">
+              <div className="p-6 text-center text-slate-500">
                 <Bell className="h-8 w-8 text-gray-300 mx-auto mb-2" />
                 <p className="text-sm">No notifications</p>
               </div>
@@ -347,7 +347,7 @@ export function NotificationBell({ currentUser, onNotificationClick, onNavigate 
                   <button
                     key={notification._id}
                     onClick={() => handleNotificationClick(notification)}
-                    className={`w-full p-4 text-left hover:bg-gray-50 transition-colors ${
+                    className={`w-full p-4 text-left hover:bg-[#050b14] transition-colors ${
                       !notification.isRead ? 'bg-blue-50' : ''
                     }`}
                   >
@@ -359,15 +359,15 @@ export function NotificationBell({ currentUser, onNotificationClick, onNavigate 
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className={`text-sm font-medium ${
-                              !notification.isRead ? 'text-gray-900' : 'text-gray-700'
+                              !notification.isRead ? 'text-white' : 'text-slate-300'
                             }`}>
                               {notification.title}
                             </div>
-                            <div className="text-xs text-gray-600 mt-1 line-clamp-2">
+                            <div className="text-xs text-slate-400 mt-1 line-clamp-2">
                               {notification.message}
                             </div>
                             {notification.projectId && (
-                              <div className="text-xs text-gray-500 mt-1">
+                              <div className="text-xs text-slate-500 mt-1">
                                 {notification.projectId.title}
                               </div>
                             )}
@@ -381,7 +381,7 @@ export function NotificationBell({ currentUser, onNotificationClick, onNavigate 
                             {formatTime(notification.createdAt)}
                           </div>
                           {notification.actorId && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-slate-500">
                               {notification.actorId.name} ({notification.actorId.role})
                             </div>
                           )}

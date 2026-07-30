@@ -17,7 +17,8 @@ const NotificationSchema = new mongoose.Schema({
       'project_assigned',
       'evaluation_completed',
       'project_all_completed',
-      'report_commented'
+      'report_commented',
+      'report_published'
     ],
     required: true
   },

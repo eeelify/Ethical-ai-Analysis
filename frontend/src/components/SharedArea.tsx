@@ -251,9 +251,9 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
     : messages.filter(msg => msg.relatedProject === selectedProject || msg.isPinned);
 
   return (
-    <div className="min-h-screen bg-[#0a1122]">
+    <div className="flex-1 min-h-0 flex flex-col w-full bg-[#0a1122] rounded-lg overflow-hidden border border-white/10">
       {/* Header */}
-      <div className="bg-[#050b14] shadow-sm border-b">
+      <div className="bg-[#050b14] shadow-[0_0_15px_rgba(0,0,0,0.5)] border-b">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -284,7 +284,7 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-col h-[calc(100vh-73px)]">
+      <div className="flex-1 flex flex-col min-h-0">
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto px-6 py-6">
           {loading ? (
@@ -302,7 +302,7 @@ export function SharedArea({ currentUser, projects, users, onBack }: SharedAreaP
                 const userColor = user ? roleColors[user.role as keyof typeof roleColors] : '#6B7280';
 
               return (
-                <div key={message.id} className={`${message.isPinned ? 'bg-yellow-900/30 border border-yellow-700/50' : 'bg-[#050b14] border'} rounded-lg p-4 shadow-sm`}>
+                <div key={message.id} className={`${message.isPinned ? 'bg-yellow-900/30 border border-yellow-700/50' : 'bg-[#050b14] border'} rounded-lg p-4 shadow-[0_0_15px_rgba(0,0,0,0.5)]`}>
                   <div className="flex items-start space-x-3">
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm flex-shrink-0"

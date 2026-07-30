@@ -333,6 +333,40 @@ router.post('/:projectId/admin-reports/approve', requireAdmin, async (req, res) 
       return res.status(404).json({ success: false, error: 'Project not found' });
     }
 
+    const Notification = mongoose.models.Notification || require('../models/Notification');
+    const adminId = req.body?.userId || req.headers['x-user-id'] || req.query?.userId;
+    const recipients = new Set();
+    
+    if (updatedProject.createdBy && updatedProject.createdBy.toString() !== String(adminId)) {
+      recipients.add(updatedProject.createdBy.toString());
+    }
+    
+    if (Array.isArray(updatedProject.assignedUsers)) {
+      updatedProject.assignedUsers.forEach(userId => {
+        if (userId && userId.toString() !== String(adminId)) {
+          recipients.add(userId.toString());
+        }
+      });
+    }
+
+    const notifications = Array.from(recipients).map(recipientId => ({
+      recipientId,
+      projectId,
+      entityType: 'report',
+      entityId: projectId,
+      type: 'report_published',
+      title: 'Report Published',
+      message: `The AI analysis report for "${updatedProject.title || 'Project'}" has been approved and published by admin.`,
+      actorId: adminId || updatedProject.createdBy, // fallback if adminId missing
+      url: '/', // general dashboard url
+      metadata: { projectTitle: updatedProject.title },
+      dedupeKey: `report_publish_${projectId}_${recipientId}_${Date.now()}`
+    }));
+
+    if (notifications.length > 0) {
+      await Notification.insertMany(notifications);
+    }
+
     res.json({ success: true, message: 'Reports successfully approved and published', project: updatedProject });
 
   } catch (error) {

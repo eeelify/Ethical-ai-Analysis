@@ -11,9 +11,9 @@ interface UseCaseDetailProps {
 }
 
 const statusColors = {
-  'assigned': { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-200' },
-  'in-review': { bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-200' },
-  'completed': { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-200' }
+  'assigned': { bg: 'bg-blue-900/40', text: 'text-blue-400', border: 'border-blue-500/30' },
+  'in-review': { bg: 'bg-yellow-900/40', text: 'text-yellow-400', border: 'border-yellow-500/30' },
+  'completed': { bg: 'bg-green-900/40', text: 'text-green-400', border: 'border-green-500/30' }
 };
 
 const statusLabels = {
@@ -384,14 +384,14 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#050b14]">
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm">
+      <div className="sticky top-0 z-30 bg-[#0b1221] border-b border-gray-800 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
         <div className="px-8 py-4">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <h1 className="text-2xl text-gray-900 mb-2">{uc.title}</h1>
-              <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <h1 className="text-2xl text-white mb-2">{uc.title}</h1>
+              <div className="flex items-center space-x-4 text-sm text-gray-400">
                 <span className="flex items-center">
                   <Clock className="h-4 w-4 mr-1" />
                   Last updated: {new Date(uc.updatedAt).toLocaleDateString()}
@@ -401,12 +401,12 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
                 >
                   {statusLabels[displayStatus] || statusLabels['assigned']}
                 </span>
-                {loadingDetails && <span className="text-xs text-gray-500">(Loading details...)</span>}
+                {loadingDetails && <span className="text-xs text-slate-500">(Loading details...)</span>}
               </div>
             </div>
             <div className="text-right">
-              <div className="text-sm text-gray-600 mb-1">Progress</div>
-              <div className="text-3xl text-gray-900">{calculatedProgress}%</div>
+              <div className="text-sm text-gray-400 mb-1">Progress</div>
+              <div className="text-3xl text-white">{calculatedProgress}%</div>
             </div>
           </div>
         </div>
@@ -418,9 +418,9 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Progress Bar */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-lg text-gray-900 mb-4">Evaluation Progress</h3>
-              <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
+            <div className="bg-[#0b1221] rounded-lg border border-gray-800 p-6">
+              <h3 className="text-lg text-white mb-4">Evaluation Progress</h3>
+              <div className="w-full bg-gray-800 rounded-full h-4 mb-2">
                 <div
                   className="bg-green-600 h-4 rounded-full transition-all flex items-center justify-end pr-2"
                   style={{ width: `${calculatedProgress}%` }}
@@ -430,7 +430,7 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
                   )}
                 </div>
               </div>
-              <div className="flex justify-between text-xs text-gray-600 mt-2">
+              <div className="flex justify-between text-xs text-gray-400 mt-2">
                 <span>Start</span>
                 <span>In Progress</span>
                 <span>Complete</span>
@@ -438,19 +438,19 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
             </div>
 
             {/* Description */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-lg text-gray-900 mb-4">Description</h3>
-              <p className="text-gray-700 leading-relaxed">{uc.description}</p>
+            <div className="bg-[#0b1221] rounded-lg border border-gray-800 p-6">
+              <h3 className="text-lg text-white mb-4">Description</h3>
+              <p className="text-gray-300 leading-relaxed">{uc.description}</p>
 
-              <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="mt-4 pt-4 border-t border-gray-800/50">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <div className="text-gray-600 mb-1">Category</div>
-                    <div className="text-gray-900">{uc.aiSystemCategory}</div>
+                    <div className="text-gray-400 mb-1">Category</div>
+                    <div className="text-white">{uc.aiSystemCategory}</div>
                   </div>
                   <div>
-                    <div className="text-gray-600 mb-1">Created</div>
-                    <div className="text-gray-900">{new Date(uc.createdAt).toLocaleDateString()}</div>
+                    <div className="text-gray-400 mb-1">Created</div>
+                    <div className="text-white">{new Date(uc.createdAt).toLocaleDateString()}</div>
                   </div>
                 </div>
               </div>
@@ -458,27 +458,27 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
 
             {/* Questions and Answers */}
             {questions && questions.length > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg text-gray-900 mb-4">Questions & Answers</h3>
+              <div className="bg-[#0b1221] rounded-lg border border-gray-800 p-6">
+                <h3 className="text-lg text-white mb-4">Questions & Answers</h3>
                 <div className="space-y-6">
                   {questions.map((q) => (
-                    <div key={q.id || q._id} className="border-b border-gray-100 pb-4 last:border-b-0">
+                    <div key={q.id || q._id} className="border-b border-gray-800/50 pb-4 last:border-b-0">
                       {/* Tag badge */}
                       {q.tag && (
                         <div className="mb-2">
-                          <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">
+                          <span className="px-2 py-1 bg-blue-100 text-blue-300 text-xs font-medium rounded">
                             {q.tag}
                           </span>
                         </div>
                       )}
                       {/* Question text */}
                       <div className="mb-2">
-                        <div className="text-sm font-bold text-gray-900">
+                        <div className="text-sm font-bold text-white">
                           {q.questionEn}
                         </div>
                       </div>
                       {/* Answer */}
-                      <div className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg mt-2">
+                      <div className="text-sm text-gray-300 bg-[#050b14] p-3 rounded-lg mt-2">
                         {q.answer || <span className="text-gray-400 italic">No answer provided</span>}
                       </div>
                       {/* Helper text (shown when no answer or as hint) */}
@@ -495,19 +495,19 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
 
             {/* Supporting Files */}
             {uc.supportingFiles && uc.supportingFiles.length > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg text-gray-900 mb-4">Supporting Files</h3>
+              <div className="bg-[#0b1221] rounded-lg border border-gray-800 p-6">
+                <h3 className="text-lg text-white mb-4">Supporting Files</h3>
                 <div className="space-y-2">
                   {uc.supportingFiles.map((file, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div key={idx} className="flex items-center justify-between p-3 bg-[#050b14] rounded-lg">
                       <div className="flex items-center">
                         <FileText className="h-5 w-5 text-gray-400 mr-3" />
-                        <span className="text-sm text-gray-900">{file.name}</span>
+                        <span className="text-sm text-white">{file.name}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleDownload(file)}
-                          className="inline-flex items-center justify-center p-2 rounded-lg text-blue-700 hover:text-blue-900 hover:bg-blue-50 transition-colors"
+                          className="inline-flex items-center justify-center p-2 rounded-lg text-blue-300 hover:text-blue-900 hover:bg-blue-50 transition-colors"
                           title="Download"
                           aria-label="Download"
                         >
@@ -516,7 +516,7 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
                         {isOwner && (
                           <button
                             onClick={() => handleDeleteSupportingFile(file)}
-                            className="inline-flex items-center justify-center p-2 rounded-lg text-red-600 hover:text-red-800 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="inline-flex items-center justify-center p-2 rounded-lg text-red-400 hover:text-red-800 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Delete"
                             aria-label="Delete"
                             disabled={uploading || (deletingFileName && deletingFileName === file?.name)}
@@ -533,8 +533,8 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
 
             {/* Upload area for owner */}
             {isOwner && (
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg text-gray-900 mb-4">Upload Supporting Files</h3>
+              <div className="bg-[#0b1221] rounded-lg border border-gray-800 p-6">
+                <h3 className="text-lg text-white mb-4">Upload Supporting Files</h3>
                 <div className="space-y-2">
                   <input
                     id="usecase-supporting-files-input"
@@ -547,24 +547,24 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
                   <label
                     htmlFor="usecase-supporting-files-input"
                     className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${uploading
-                        ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 cursor-pointer'
+                        ? 'bg-gray-800 text-gray-400 border-gray-800 cursor-not-allowed'
+                        : 'bg-[#0b1221] text-gray-300 border-gray-700 hover:bg-[#050b14] cursor-pointer'
                       }`}
                     aria-disabled={uploading}
                   >
                     <Upload className="w-4 h-4" />
                     Upload Files
                   </label>
-                  <div className="text-xs text-gray-500">Accepted: PDFs, images, docs. Max size configured server-side.</div>
+                  <div className="text-xs text-slate-500">Accepted: PDFs, images, docs. Max size configured server-side.</div>
                 </div>
               </div>
             )}
 
             {/* Expert Feedback */}
             {useCase.feedback && useCase.feedback.length > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg text-gray-900 mb-4 flex items-center">
-                  <MessageCircle className="h-5 w-5 mr-2 text-blue-600" />
+              <div className="bg-[#0b1221] rounded-lg border border-gray-800 p-6">
+                <h3 className="text-lg text-white mb-4 flex items-center">
+                  <MessageCircle className="h-5 w-5 mr-2 text-blue-400" />
                   Expert Feedback
                 </h3>
                 <div className="space-y-4">
@@ -572,9 +572,9 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
                     <div key={idx} className="p-4 bg-blue-50 border border-blue-100 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-blue-900">{fb.from}</span>
-                        <span className="text-xs text-blue-700">{new Date(fb.timestamp).toLocaleDateString()}</span>
+                        <span className="text-xs text-blue-300">{new Date(fb.timestamp).toLocaleDateString()}</span>
                       </div>
-                      <p className="text-sm text-gray-700">{fb.text}</p>
+                      <p className="text-sm text-gray-300">{fb.text}</p>
                     </div>
                   ))}
                 </div>
@@ -583,9 +583,9 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
 
             {/* Admin Reflections (visible to experts) */}
             {useCase.adminReflections && useCase.adminReflections.length > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg text-gray-900 mb-4 flex items-center">
-                  <CheckCircle className="h-5 w-5 mr-2 text-green-600" />
+              <div className="bg-[#0b1221] rounded-lg border border-gray-800 p-6">
+                <h3 className="text-lg text-white mb-4 flex items-center">
+                  <CheckCircle className="h-5 w-5 mr-2 text-green-400" />
                   Admin Notes
                 </h3>
                 <div className="space-y-4">
@@ -595,11 +595,11 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
                       <div key={reflection.id} className="p-4 bg-green-50 border border-green-100 rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-sm text-green-900">Admin</span>
-                          <span className="text-xs text-green-700">
+                          <span className="text-xs text-green-300">
                             {new Date(reflection.createdAt).toLocaleDateString()}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-700">{reflection.text}</p>
+                        <p className="text-sm text-gray-300">{reflection.text}</p>
                       </div>
                     ))}
                 </div>
@@ -611,8 +611,8 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
           <div className="space-y-6">
             {/* Assigned Experts */}
             {assignedExperts.length > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg text-gray-900 mb-4 flex items-center">
+              <div className="bg-[#0b1221] rounded-lg border border-gray-800 p-6">
+                <h3 className="text-lg text-white mb-4 flex items-center">
                   <Users className="h-5 w-5 mr-2" />
                   Assigned Experts
                 </h3>
@@ -623,8 +623,8 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
                         {expert.name.charAt(0)}
                       </div>
                       <div>
-                        <div className="text-sm text-gray-900">{expert.name}</div>
-                        <div className="text-xs text-gray-600 capitalize">{expert.role.replace('-', ' ')}</div>
+                        <div className="text-sm text-white">{expert.name}</div>
+                        <div className="text-xs text-gray-400 capitalize">{expert.role.replace('-', ' ')}</div>
                       </div>
                     </div>
                   ))}
@@ -633,8 +633,8 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
             )}
 
             {/* Status Info */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-lg text-gray-900 mb-4">Status Information</h3>
+            <div className="bg-[#0b1221] rounded-lg border border-gray-800 p-6">
+              <h3 className="text-lg text-white mb-4">Status Information</h3>
               <div className="space-y-3">
                 <div className="flex items-start">
                   <div className={`w-2 h-2 rounded-full mt-1.5 mr-3 ${displayStatus === 'completed' ? 'bg-green-500' :
@@ -642,12 +642,12 @@ export function UseCaseDetail({ useCase, currentUser, users, onBack }: UseCaseDe
                         'bg-blue-500'
                     }`} />
                   <div>
-                    <div className="text-sm text-gray-900">
+                    <div className="text-sm text-white">
                       {displayStatus === 'completed' ? 'Evaluation Complete' :
                         displayStatus === 'in-review' ? 'Under Expert Review' :
                           'Awaiting Assignment'}
                     </div>
-                    <div className="text-xs text-gray-600 mt-1">
+                    <div className="text-xs text-gray-400 mt-1">
                       {displayStatus === 'completed' ? 'Your use case has been approved' :
                         displayStatus === 'in-review' ? 'Experts are currently reviewing your submission' :
                           'Your use case will be assigned to experts soon'}

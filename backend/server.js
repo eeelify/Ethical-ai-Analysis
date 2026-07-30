@@ -143,6 +143,7 @@ const ProjectSchema = new mongoose.Schema({
   },
   adminReviewComment: { type: String, default: null }, // Admin's final review on reports
   reportsPublished: { type: Boolean, default: false }, // Whether reports are visible to experts/owner
+  geminiChatHistory: { type: Array, default: [] }, // Persisted chat history for Admin
   createdAt: { type: Date, default: Date.now }
 });
 const Project = mongoose.model('Project', ProjectSchema);
@@ -4958,6 +4959,25 @@ app.get('/api/projects/:projectId/reports/latest', async (req, res) => {
   }
 });
 
+// GET /api/projects/:projectId/reports/expert/download-pdf - Direct download for expert report by project ID
+app.get('/api/projects/:projectId/reports/expert/download-pdf', async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const mongoose = require('mongoose');
+    const Report = mongoose.model('Report');
+    const report = await Report.findOne({ projectId }).sort({ createdAt: -1, generatedAt: -1 }).lean();
+    if (!report) {
+      return res.status(404).send('Expert report not found for this project');
+    }
+    // Redirect to the actual report download endpoint
+    const userId = req.query.userId || '';
+    res.redirect(`/api/reports/${report._id}/download-pdf?userId=${userId}`);
+  } catch (err) {
+    console.error('Error in direct expert report download:', err);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 // GET /api/projects/:projectId/unified-reports - Fetch both Expert and Ontology reports for a project
 app.get('/api/projects/:projectId/unified-reports', async (req, res) => {
   try {
@@ -5005,6 +5025,154 @@ app.get('/api/projects/:projectId/unified-reports', async (req, res) => {
   } catch (err) {
     console.error('Error in /api/projects/:projectId/unified-reports:', err);
     res.status(500).json({ error: err.message || 'Failed to fetch unified reports' });
+  }
+});
+
+// GET /api/projects/:projectId/reports/chat-with-ai - Get chat history
+app.get('/api/projects/:projectId/reports/chat-with-ai', async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const mongoose = require('mongoose');
+    const Project = mongoose.model('Project');
+    const project = await Project.findById(projectId).select('geminiChatHistory').lean();
+    
+    if (!project) return res.status(404).json({ success: false, error: 'Project not found' });
+    
+    // Authorization check: Only admins can view the AI report chat history
+    const userId = req.headers['x-user-id'] || req.query.userId;
+    if (userId) {
+      const User = mongoose.model('User');
+      const user = await User.findById(userId).lean();
+      if (!user || user.role !== 'admin') {
+        return res.status(403).json({ success: false, error: 'Only administrators can view the AI report chat' });
+      }
+    } else {
+      return res.status(401).json({ success: false, error: 'User ID is required' });
+    }
+
+    res.json({ success: true, history: project.geminiChatHistory || [] });
+  } catch (err) {
+    console.error('Error fetching chat history:', err);
+    res.status(500).json({ error: err.message || 'Failed to fetch chat history' });
+  }
+});
+
+// POST /api/projects/:projectId/reports/chat-with-ai - Interactive chat with Gemini about the unified report
+app.post('/api/projects/:projectId/reports/chat-with-ai', async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { messages } = req.body;
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ success: false, error: 'Messages array is required' });
+    }
+
+    const mongoose = require('mongoose');
+    const Project = mongoose.model('Project');
+    const project = await Project.findById(projectId).lean();
+    if (!project) return res.status(404).json({ success: false, error: 'Project not found' });
+
+    // Authorization check: Only admins can chat with AI about reports
+    const userId = req.headers['x-user-id'] || req.body.userId || req.query.userId;
+    if (userId) {
+      const User = mongoose.model('User');
+      const user = await User.findById(userId).lean();
+      if (!user || user.role !== 'admin') {
+        return res.status(403).json({ success: false, error: 'Only administrators can use the AI report chat' });
+      }
+    } else {
+      return res.status(401).json({ success: false, error: 'User ID is required' });
+    }
+
+    const Report = mongoose.model('Report');
+    const expertReport = await Report.findOne({ projectId }).sort({ createdAt: -1, generatedAt: -1 }).lean();
+
+    const { GoogleGenerativeAI } = require('@google/generative-ai');
+    
+    async function executeGeminiWithRetry(fn) {
+      const CANDIDATE_MODELS = [
+        'gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite',
+        'models/gemini-3.6-flash', 'models/gemini-2.5-flash', 'models/gemini-2.0-flash'
+      ];
+      let lastError = null;
+      for (const modelName of CANDIDATE_MODELS) {
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          try {
+            const result = await fn(modelName);
+            if (result) return result;
+          } catch (err) {
+            lastError = err;
+            if (err?.message?.includes('429') || err?.message?.includes('503')) {
+              await new Promise(r => setTimeout(r, 2000 * attempt));
+            } else {
+              break; // Don't retry for non-transient errors like 404 (model not found)
+            }
+          }
+        }
+      }
+      throw lastError || new Error('Failed to execute Gemini AI after retries on all models.');
+    }
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return res.status(500).json({ success: false, error: 'GEMINI_API_KEY is not configured on the server' });
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+
+    const sanitizeReport = (r) => {
+      const c = {...r};
+      delete c.htmlReport; delete c.markdownReport; delete c.professionalHtml;
+      return c;
+    };
+
+    const systemInstruction = `
+You are an expert AI Ethicist and AI Auditor assisting the project stakeholders.
+Below is the Expert Questionnaire Report generated for the AI project:
+${expertReport ? JSON.stringify(sanitizeReport(expertReport)) : 'Not available'}
+
+Answer the user's questions about this report concisely and professionally in a highly understandable and non-technical language. 
+IMPORTANT: 
+1. Keep your answers short and direct.
+2. DO NOT use markdown formatting like **bold** or italics. Use plain text.
+3. Explicitly reference ISO 42001 clauses and EU AI Act Risk Tiers when relevant, but explain them simply.
+4. If the user asks in Turkish, answer in Turkish. If English, answer in English.
+`;
+
+    const geminiHistory = [];
+    geminiHistory.push({ role: 'user', parts: [{ text: systemInstruction }] });
+    geminiHistory.push({ role: 'model', parts: [{ text: 'Understood. How can I help you analyze the AI report today?' }] });
+
+    const recentMessages = messages.slice(-6);
+    for (let i = 0; i < recentMessages.length - 1; i++) {
+      const msg = recentMessages[i];
+      geminiHistory.push({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.content }] });
+    }
+    const lastMessage = recentMessages[recentMessages.length - 1].content;
+    let responseText;
+    try {
+      responseText = await executeGeminiWithRetry(async (modelName) => {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const chat = model.startChat({ history: geminiHistory });
+        const result = await chat.sendMessage(lastMessage);
+        return result.response.text();
+      });
+    } catch (apiError) {
+      console.warn("Gemini API error during chat (all attempts/models failed), using fallback:", apiError?.message);
+      let errorReason = apiError?.message || 'Quota/Network issue';
+      responseText = `*(Fallback)* As an AI Ethicist, based on the ISO 42001 and EU AI Act standards, there are items to review. (Note: AI service error: ${errorReason})`;
+    }
+    
+    // Save to database
+    try {
+      const chatHistory = project.geminiChatHistory || [];
+      chatHistory.push({ role: 'user', content: lastMessage });
+      chatHistory.push({ role: 'model', content: responseText });
+      await Project.findByIdAndUpdate(projectId, { $set: { geminiChatHistory: chatHistory } });
+    } catch (dbErr) {
+      console.error('Failed to save chat history to db:', dbErr);
+    }
+
+    res.json({ success: true, response: responseText });
+  } catch (err) {
+    console.error('Error in chat-with-ai:', err);
+    res.status(500).json({ error: err.message || 'Failed to process chat' });
   }
 });
 

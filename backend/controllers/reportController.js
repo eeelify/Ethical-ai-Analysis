@@ -813,7 +813,7 @@ exports.generateReport = async (req, res) => {
         ],
         principleFindings: Object.keys(reportMetrics?.scoring?.byPrincipleOverall || {}).map(p => {
           const pData = reportMetrics.scoring.byPrincipleOverall[p];
-          const avgRisk = pData?.averageRisk || 0;
+          const avgRisk = pData?.averageRisk !== undefined ? pData.averageRisk : (pData?.avg || 0);
           const label = pData?.normalizedLabel || 'N/A';
           return {
             principleName: p,

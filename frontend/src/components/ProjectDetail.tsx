@@ -11,7 +11,7 @@ import { ChatPanel } from './ChatPanel';
 import { fetchUserProgress } from '../utils/userProgress';
 import { api } from '../api';
 import { Spinner } from './Spinner';
-import { OntologyReportViewer } from './OntologyReportViewer';
+
 import { UnifiedReportViewer } from './UnifiedReportViewer';
 
 interface ProjectDetailProps {
@@ -73,7 +73,7 @@ export function ProjectDetail({
   // Chat panel state
   const [chatPanelOpen, setChatPanelOpen] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
-  const [ontologyReportData, setOntologyReportData] = useState<any>(null);
+
   const [chatOtherUser, setChatOtherUser] = useState<User | null>(null);
   const [chatProject, setChatProject] = useState<Project | null>(null);
   const [userProgress, setUserProgress] = useState<number>(project.progress || 0);
@@ -572,38 +572,7 @@ export function ProjectDetail({
     }
   };
 
-  // Generate Ontology report for a project
-  const handleGenerateReport = async () => {
-    try {
-      setGenerating(true);
-      const projectId = project.id || (project as any)._id;
-      const response = await fetch(api('/api/ontology/report'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          projectId: projectId,
-          userId: currentUser?.id || (currentUser as any)?._id
-        })
-      });
 
-      if (response.ok) {
-        const result = await response.json();
-        alert('✅ Ontology Report generated successfully!');
-        setReportRefreshTrigger(prev => prev + 1);
-        if (result.report) {
-          setOntologyReportData(result.report);
-        }
-      } else {
-        const errorData = await response.json();
-        alert(`❌ Failed to generate ontology report: ${errorData.error || 'Unknown error'}`);
-      }
-    } catch (error) {
-      console.error('Error generating report:', error);
-      alert('Could not connect to the server.');
-    } finally {
-      setGenerating(false);
-    }
-  };
 
   // Generate Expert (Z-Inspection) report for a project
   const handleGenerateExpertReport = async () => {
@@ -712,14 +681,11 @@ export function ProjectDetail({
     }
   };
 
-  // If ontology report is available, render the viewer directly instead of ProjectDetail tabs
-  if (ontologyReportData) {
-    return <OntologyReportViewer report={ontologyReportData} onBack={() => setOntologyReportData(null)} />;
-  }
+
 
   return (
     <div className="min-h-screen bg-[#0a1122]">
-      <div className="bg-[#050b14] shadow-sm border-b">
+      <div className="bg-[#050b14] shadow-[0_0_15px_rgba(0,0,0,0.5)] border-b">
         <div className="px-6 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <div>
@@ -751,21 +717,6 @@ export function ProjectDetail({
                     {generatingExpert ? 'Generating...' : 'Generate Expert Report'}
                   </button>
 
-                  {/* Generate Ontology Report */}
-                  <button
-                    onClick={handleGenerateReport}
-                    disabled={!isComplete2 || generating}
-                    className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
-                      !isComplete2 || generating
-                        ? 'bg-gray-300 text-slate-400 cursor-not-allowed'
-                        : 'bg-purple-600 text-white hover:bg-purple-700'
-                    }`}
-                    title={!isComplete2 ? 'Project must be 100% complete' : 'Generate AI Ontology Report'}
-                  >
-                    <Cpu className="w-4 h-4" />
-                    {generating ? 'Generating...' : 'Generate Ontology Report'}
-                  </button>
-
                   {/* Show Reports */}
                   {currentUser.role !== 'admin' && !project.reportsPublished ? (
                     <button
@@ -786,7 +737,7 @@ export function ProjectDetail({
                       title="View Assessment Reports"
                     >
                       <BarChart3 className="w-4 h-4" />
-                      Show Reports
+                      Show Report
                     </button>
                   )}
                 </div>
@@ -832,7 +783,7 @@ export function ProjectDetail({
           return (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               {/* Target Date Card */}
-              <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border flex items-center">
+              <div className="bg-[#050b14] p-4 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border flex items-center">
                 <TargetDateIcon className={`h-5 w-5 ${cardThemes.targetDate.color} mr-3`} />
                 <div>
                   <div className={`text-sm font-semibold ${cardThemes.targetDate.color}`}>Target Date</div>
@@ -841,7 +792,7 @@ export function ProjectDetail({
               </div>
 
               {/* Team Card */}
-              <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border flex items-center">
+              <div className="bg-[#050b14] p-4 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border flex items-center">
                 <TeamIcon className={`h-5 w-5 ${cardThemes.team.color} mr-3`} />
                 <div>
                   <div className={`text-sm font-semibold ${cardThemes.team.color}`}>Team</div>
@@ -850,7 +801,7 @@ export function ProjectDetail({
               </div>
 
               {/* Progress Card */}
-              <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border flex items-center">
+              <div className="bg-[#050b14] p-4 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border flex items-center">
                 <ProgressIcon className={`h-5 w-5 ${cardThemes.progress.color} mr-3`} />
                 <div>
                   <div className={`text-sm font-semibold ${cardThemes.progress.color}`}>Progress</div>
@@ -861,7 +812,7 @@ export function ProjectDetail({
               </div>
 
               {/* Tensions Card */}
-              <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border flex items-center">
+              <div className="bg-[#050b14] p-4 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border flex items-center">
                 <TensionsIcon className={`h-5 w-5 ${cardThemes.tensions.color} mr-3`} />
                 <div>
                   <div className={`text-sm font-semibold ${cardThemes.tensions.color}`}>Tensions</div>
@@ -873,7 +824,7 @@ export function ProjectDetail({
         })()}
 
         {/* Assigned Members with Contact button */}
-        <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border mb-6">
+        <div className="bg-[#050b14] p-4 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border mb-6">
           <h4 className="text-sm font-medium text-slate-300 mb-3">Assigned Members</h4>
           <div className="space-y-2">
             {assignedUserDetails.length > 0 ? (
@@ -936,7 +887,7 @@ export function ProjectDetail({
           </div>
         </div>
 
-        <div className="bg-[#050b14] rounded-lg shadow-sm border">
+        <div className="bg-[#050b14] rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border">
           <div className="border-b border-white/10 flex">
             {['evaluation', 'tensions', 'usecase', 'reports', 'owners'].map((tab) => {
               if (tab === 'owners' && !canViewOwners) return null;
@@ -944,7 +895,7 @@ export function ProjectDetail({
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab as any)}
-                  className={`px-6 py-3 text-sm capitalize flex items-center transition-colors ${activeTab === tab ? 'border-b-2 border-blue-500 text-blue-400 bg-blue-500/10' : 'text-slate-400 hover:text-slate-300 hover:bg-white/5'}`}
+                  className={`px-6 py-3 text-sm capitalize flex items-center transition-colors ${activeTab === tab ? 'border-b-2 border-blue-500 text-blue-400 bg-blue-500/10' : 'text-slate-400 hover:text-slate-300 hover:bg-[#0b1221]/5'}`}
                 >
                   {tab === 'tensions' ? `Tensions (${tensions.length})` : tab === 'dashboard' ? 'Analytics' : tab}
                 </button>
@@ -976,7 +927,7 @@ export function ProjectDetail({
                         {Math.round(averageProgressDisplay)}%
                       </div>
                       <div className="max-w-md mx-auto">
-                        <div className="w-full bg-white/5 rounded-full h-1.5">
+                        <div className="w-full bg-[#0b1221]/5 rounded-full h-1.5">
                           <div
                             className={
                               averageProgressDisplay === 0
@@ -1029,7 +980,7 @@ export function ProjectDetail({
                   {canManageTensions && (
                     <button
                       onClick={() => setShowAddTension(true)}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center shadow-sm"
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center shadow-[0_0_15px_rgba(0,0,0,0.5)]"
                     >
                       <Plus className="h-4 w-4 mr-2" /> Add Tension
                     </button>
@@ -1115,7 +1066,7 @@ export function ProjectDetail({
                               document.body.removeChild(link);
                               URL.revokeObjectURL(url);
                             }}
-                            className="text-sm text-blue-400 hover:text-cyan-400 inline-flex items-center px-3 py-1.5 bg-[#0a1122] border border-white/10 rounded-lg hover:bg-white/5"
+                            className="text-sm text-blue-400 hover:text-cyan-400 inline-flex items-center px-3 py-1.5 bg-[#0a1122] border border-white/10 rounded-lg hover:bg-[#0b1221]/5"
                           >
                             <Download className="w-4 h-4 mr-1" />
                             Download Q&A as File
@@ -1191,11 +1142,8 @@ export function ProjectDetail({
               <UnifiedReportViewer
                 projectId={project.id || (project as any)._id}
                 userId={currentUser.id || (currentUser as any)._id}
-                onGenerateOntology={handleGenerateReport}
-                generating={generating}
                 refreshTrigger={reportRefreshTrigger}
                 onViewExpertReport={onViewReport}
-                onViewOntologyReport={() => setActiveTab('ontologyReport')}
                 currentUserRole={currentUser.role}
                 onReviewReports={onOpenAdminReview}
               />

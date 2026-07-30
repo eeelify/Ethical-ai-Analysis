@@ -13,7 +13,7 @@ export function SeveritySelector({ value, onChange }: SeveritySelectorProps) {
 
   return (
     <div>
-      <label className="block text-sm mb-3 text-gray-700 flex items-center">
+      <label className="block text-sm mb-3 text-slate-300 flex items-center">
         <AlertTriangle className="h-4 w-4 mr-2" />
         Tension Severity *
       </label>
@@ -30,7 +30,7 @@ export function SeveritySelector({ value, onChange }: SeveritySelectorProps) {
               className={`p-4 rounded-lg border-2 transition-all ${
                 isSelected
                   ? `${colors.border} ${colors.bg} ring-2 ring-offset-2 ring-${severity === 'high' ? 'red' : severity === 'medium' ? 'yellow' : 'green'}-500`
-                  : 'border-gray-200 hover:border-gray-300 bg-white'
+                  : 'border-white/10 hover:border-white/20 bg-[#0b1221]'
               }`}
             >
               <div className="flex flex-col items-center">
@@ -43,12 +43,12 @@ export function SeveritySelector({ value, onChange }: SeveritySelectorProps) {
                 </div>
                 <div
                   className={`text-sm ${
-                    isSelected ? colors.text : 'text-gray-700'
+                    isSelected ? colors.text : 'text-slate-300'
                   }`}
                 >
                   {getSeverityLabel(severity)}
                 </div>
-                <div className="text-xs text-gray-500 mt-1">
+                <div className="text-xs text-slate-500 mt-1">
                   {severity === 'high' && 'Critical concern'}
                   {severity === 'medium' && 'Moderate concern'}
                   {severity === 'low' && 'Minor concern'}

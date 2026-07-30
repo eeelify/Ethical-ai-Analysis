@@ -9,6 +9,8 @@ import { ExpertQuestionManager } from './ExpertQuestionManager';
 import { OntologyViewerTab } from './OntologyViewerTab';
 import { api } from '../api';
 import { UnifiedReportViewer } from './UnifiedReportViewer';
+import { SharedArea } from './SharedArea';
+import { OtherMembers } from './OtherMembers';
 
 interface AdminDashboardEnhancedProps {
   currentUser: User;
@@ -40,7 +42,7 @@ const stageLabels = {
 
 const useCaseStatusColors: Record<string, { bg: string; text: string }> = {
   'assigned': { bg: 'bg-green-100', text: 'text-green-800' },
-  'unassigned': { bg: 'bg-gray-100', text: 'text-gray-600' },
+  'unassigned': { bg: 'bg-[#0f172a]', text: 'text-slate-400' },
   'in-review': { bg: 'bg-yellow-100', text: 'text-yellow-800' },
   'completed': { bg: 'bg-emerald-100', text: 'text-emerald-800' }
 };
@@ -135,7 +137,7 @@ const ProjectCard: React.FC<{
               );
             default: // 'setup' or unknown
               return (
-                <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">
+                <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-[#0f172a] text-slate-400">
                   SETUP
                 </span>
               );
@@ -148,7 +150,7 @@ const ProjectCard: React.FC<{
           <span>Progress</span>
           <span className="font-medium text-white">{progressDisplay}%</span>
         </div>
-        <div className="w-full bg-white/10 rounded-full h-1.5">
+        <div className="w-full bg-[#0b1221]/10 rounded-full h-1.5">
           <div
             className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-1.5 rounded-full transition-all"
             style={{ width: `${progressDisplay}%`, minWidth: progressDisplay > 0 ? '8px' : '0' }}
@@ -574,7 +576,7 @@ export function AdminDashboardEnhanced({
 
         <button
           onClick={() => setShowProfile(true)}
-          className="w-full px-6 py-6 border-b border-white/10 hover:bg-white/5 transition-colors text-left"
+          className="w-full px-6 py-6 border-b border-white/10 hover:bg-[#0b1221]/5 transition-colors text-left"
         >
           <div className="flex items-center">
             {(currentUser as any).profileImage ? (
@@ -598,7 +600,7 @@ export function AdminDashboardEnhanced({
         <nav className="flex-1 overflow-y-auto px-3 py-6 space-y-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'dashboard' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'dashboard' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-[#0b1221]/5 hover:text-white'
               }`}
           >
             <Folder className="h-5 w-5 mr-3 text-blue-600" />
@@ -606,7 +608,7 @@ export function AdminDashboardEnhanced({
           </button>
           <button
             onClick={() => setActiveTab('use-case-assignments')}
-            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'use-case-assignments' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'use-case-assignments' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-[#0b1221]/5 hover:text-white'
               }`}
           >
             <UserPlus className="h-5 w-5 mr-3 text-orange-600" />
@@ -614,7 +616,7 @@ export function AdminDashboardEnhanced({
           </button>
           <button
             onClick={() => setActiveTab('project-creation')}
-            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'project-creation' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'project-creation' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-[#0b1221]/5 hover:text-white'
               }`}
           >
             <Plus className="h-5 w-5 mr-3 text-green-600" />
@@ -622,7 +624,7 @@ export function AdminDashboardEnhanced({
           </button>
           <button
             onClick={() => setActiveTab('created-reports')}
-            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'created-reports' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'created-reports' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-[#0b1221]/5 hover:text-white'
               }`}
           >
             <FileText className="h-5 w-5 mr-3 text-purple-600" />
@@ -630,31 +632,31 @@ export function AdminDashboardEnhanced({
           </button>
           <button
             onClick={() => setActiveTab('expert-questions')}
-            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'expert-questions' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'expert-questions' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-[#0b1221]/5 hover:text-white'
               }`}
           >
             <FileText className="h-5 w-5 mr-3 text-pink-600" />
             Expert Questions
           </button>
           <button
-            onClick={() => onNavigate('other-members')}
-            className="w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
+            onClick={() => setActiveTab('other-members')}
+            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'other-members' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-[#0b1221]/5 hover:text-white'
+              }`}
           >
             <Users className="h-5 w-5 mr-3 text-teal-600" />
             Members
           </button>
           <button
-            onClick={() => {
-              onNavigate('shared-area');
-            }}
-            className="w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
+            onClick={() => setActiveTab('shared-area')}
+            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'shared-area' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-[#0b1221]/5 hover:text-white'
+              }`}
           >
             <MessageSquare className="h-5 w-5 mr-3 text-indigo-600" />
             Shared Area
           </button>
           <button
             onClick={() => setActiveTab('ontology')}
-            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'ontology' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'ontology' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-[#0b1221]/5 hover:text-white'
               }`}
           >
             <Database className="h-5 w-5 mr-3 text-pink-600" />
@@ -662,7 +664,7 @@ export function AdminDashboardEnhanced({
           </button>
           <button
             onClick={() => setActiveTab('platform-info')}
-            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'platform-info' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            className={`w-full px-4 py-3 flex items-center rounded-lg text-sm font-medium transition-colors ${activeTab === 'platform-info' ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400 hover:bg-[#0b1221]/5 hover:text-white'
               }`}
           >
             <BarChart3 className="h-5 w-5 mr-3 text-amber-500" />
@@ -692,6 +694,8 @@ export function AdminDashboardEnhanced({
               {activeTab === 'project-creation' && 'Create Project'}
               {activeTab === 'created-reports' && 'Created Reports'}
               {activeTab === 'expert-questions' && 'Expert Questions'}
+              {activeTab === 'other-members' && 'Members'}
+              {activeTab === 'shared-area' && 'Shared Area'}
               {activeTab === 'chats' && 'Chats'}
               {activeTab === 'ontology' && 'Ontology'}
               {activeTab === 'platform-info' && 'Platform Info'}
@@ -726,7 +730,7 @@ export function AdminDashboardEnhanced({
                     <h3 className="font-semibold text-white">Messages</h3>
                     <button
                       onClick={() => setShowMessageNotifications(false)}
-                      className="p-1 hover:bg-gray-100 rounded-full"
+                      className="p-1 hover:bg-[#0f172a] rounded-full"
                     >
                       <X className="h-4 w-4 text-slate-400" />
                     </button>
@@ -743,7 +747,7 @@ export function AdminDashboardEnhanced({
                           <button
                             key={idx}
                             onClick={() => handleNotificationClick(conv)}
-                            className="w-full p-4 text-left hover:bg-gray-50 transition-colors"
+                            className="w-full p-4 text-left hover:bg-[#050b14] transition-colors"
                           >
                             <div className="flex items-start justify-between">
                               <div className="flex-1 min-w-0">
@@ -802,7 +806,7 @@ export function AdminDashboardEnhanced({
                     <h3 className="font-semibold text-white">Notifications</h3>
                     <button
                       onClick={() => setShowNotifications(false)}
-                      className="p-1 hover:bg-gray-100 rounded-full"
+                      className="p-1 hover:bg-[#0f172a] rounded-full"
                     >
                       <X className="h-4 w-4 text-slate-400" />
                     </button>
@@ -811,7 +815,7 @@ export function AdminDashboardEnhanced({
                   <div className="flex border-b border-white/10 flex-shrink-0">
                     <button
                       onClick={() => setShowNotificationHistory(false)}
-                      className={`flex-1 py-2 text-sm font-medium ${!showNotificationHistory ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-400 hover:text-gray-700'}`}
+                      className={`flex-1 py-2 text-sm font-medium ${!showNotificationHistory ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-400 hover:text-slate-300'}`}
                     >
                       Unread ({unreadCount})
                     </button>
@@ -820,7 +824,7 @@ export function AdminDashboardEnhanced({
                         setShowNotificationHistory(true);
                         fetchAllNotifications();
                       }}
-                      className={`flex-1 py-2 text-sm font-medium ${showNotificationHistory ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-400 hover:text-gray-700'}`}
+                      className={`flex-1 py-2 text-sm font-medium ${showNotificationHistory ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-400 hover:text-slate-300'}`}
                     >
                       History
                     </button>
@@ -839,7 +843,7 @@ export function AdminDashboardEnhanced({
                             <button
                               key={idx}
                               onClick={() => handleNotificationClick(conv)}
-                              className="w-full p-4 text-left hover:bg-gray-50 transition-colors"
+                              className="w-full p-4 text-left hover:bg-[#050b14] transition-colors"
                             >
                               <div className="flex items-start justify-between">
                                 <div className="flex-1 min-w-0">
@@ -894,7 +898,7 @@ export function AdminDashboardEnhanced({
                                       <span className="bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded">New</span>
                                     )}
                                   </div>
-                                  <div className="text-sm font-medium text-gray-800 mb-0.5">{notif.title}</div>
+                                  <div className="text-sm font-medium text-gray-200 mb-0.5">{notif.title}</div>
                                   <div className="text-xs text-slate-400 line-clamp-2">{notif.message}</div>
                                   <div className="text-xs text-gray-400 mt-1">
                                     {notif.projectId?.title && <span className="mr-2">📁 {notif.projectId.title}</span>}
@@ -1031,7 +1035,7 @@ export function AdminDashboardEnhanced({
         </div>
 
         {/* Other Tabs */}
-        <div className={`flex-1 min-h-0 ${activeTab === 'chats' ? 'hidden' : ''} ${activeTab === 'ontology' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`}>
+        <div className={`flex-1 w-full max-w-full min-w-0 min-h-0 ${activeTab === 'chats' ? 'hidden' : ''} ${['ontology', 'shared-area', 'other-members'].includes(activeTab) ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`}>
           {activeTab === 'expert-questions' && (
             <div className="flex-1 min-h-0 flex flex-col">
               <ExpertQuestionManager />
@@ -1111,6 +1115,28 @@ export function AdminDashboardEnhanced({
 
           {activeTab === 'platform-info' && (
             <AdminPlatformInfoTab />
+          )}
+
+          {activeTab === 'other-members' && (
+            <div className="flex-1 min-h-0 flex flex-col p-6">
+              <OtherMembers
+                currentUser={currentUser}
+                users={users}
+                projects={projects}
+                onBack={() => setActiveTab('dashboard')}
+              />
+            </div>
+          )}
+
+          {activeTab === 'shared-area' && (
+            <div className="flex-1 min-h-0 flex flex-col p-6">
+              <SharedArea
+                currentUser={currentUser}
+                projects={projects}
+                users={users}
+                onBack={() => setActiveTab('dashboard')}
+              />
+            </div>
           )}
         </div>
       </div>
@@ -1414,14 +1440,14 @@ function DashboardTab({ projects, users, searchQuery, setSearchQuery, onViewProj
           </div>
           <button
             onClick={onCreateNew}
-            className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 flex items-center shadow-sm"
+            className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 flex items-center shadow-[0_0_15px_rgba(0,0,0,0.5)]"
           >
             +Project
           </button>
         </div>
 
         <div className="relative max-w-md">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
           <input
             type="text"
             value={searchQuery}
@@ -1471,7 +1497,7 @@ function UseCaseAssignmentsTab({ useCases, projects, users, onAssignExperts, onD
       </div>
 
       <div className="px-8 py-6">
-        <div className="bg-[#050b14]/50 rounded-lg border border-white/10 overflow-hidden shadow-sm">
+        <div className="bg-[#050b14]/50 rounded-lg border border-white/10 overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.5)]">
           <table className="w-full">
             <thead className="bg-[#0a1122] border-b border-white/10">
               <tr>
@@ -1529,7 +1555,7 @@ function UseCaseAssignmentsTab({ useCases, projects, users, onAssignExperts, onD
                       <td className="px-6 py-4">
                         <div className="flex -space-x-2">
                           {assignedExperts.length === 0 ? (
-                            <span className="text-xs text-gray-500 italic">None</span>
+                            <span className="text-xs text-slate-500 italic">None</span>
                           ) : (
                             assignedExperts.map((expert: User) => (
                               <div
@@ -1547,7 +1573,7 @@ function UseCaseAssignmentsTab({ useCases, projects, users, onAssignExperts, onD
                         <div className="flex items-center justify-end space-x-2">
                           <button
                             onClick={() => onAssignExperts(project)}
-                            className="px-3 py-1.5 text-xs font-medium bg-white/5 border border-white/10 text-slate-300 rounded-lg hover:bg-white/10 hover:text-white transition-colors"
+                            className="px-3 py-1.5 text-xs font-medium bg-[#0b1221]/5 border border-white/10 text-slate-300 rounded-lg hover:bg-[#0b1221]/10 hover:text-white transition-colors"
                           >
                             Manage Team
                           </button>
@@ -1660,7 +1686,7 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
         </div>
         <button
           onClick={onClose}
-          className="p-2 text-gray-500 hover:text-slate-300 hover:bg-gray-800 rounded-lg transition-colors"
+          className="p-2 text-slate-500 hover:text-slate-300 hover:bg-gray-800 rounded-lg transition-colors"
           aria-label="Close"
         >
           <X className="h-5 w-5" />
@@ -1672,7 +1698,7 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
           <form onSubmit={handleSubmit} className="space-y-6">
 
             {/* 1. Project Info Section */}
-            <div className="bg-[#050b14]/50 p-6 rounded-xl border border-white/10 shadow-sm space-y-6">
+            <div className="bg-[#050b14]/50 p-6 rounded-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)] space-y-6">
 
               <div className="bg-[#050b14]/50 border-white/10 text-cyan-400">
                 <label className="block text-sm font-medium mb-2 text-cyan-400 flex items-center">
@@ -1765,7 +1791,7 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
             </div>
 
             {/* 2. Project Context and Scope Questions (7 Soru) */}
-            <div className="bg-[#050b14]/50 p-6 rounded-xl border border-white/10 shadow-sm space-y-6">
+            <div className="bg-[#050b14]/50 p-6 rounded-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)] space-y-6">
               <h2 className="text-lg font-bold text-white border-b border-white/10 pb-3 mb-4">Project Context and Scope</h2>
 
               {/* Soru 1: Who requested the inspection? */}
@@ -1858,7 +1884,7 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
 
 
             {/* 3. Assignment Section (Team Assignment) - Updated View */}
-            <div className="bg-[#050b14]/50 p-6 rounded-xl border border-white/10 shadow-sm space-y-6">
+            <div className="bg-[#050b14]/50 p-6 rounded-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)] space-y-6">
               <div>
                 <label className="block text-sm font-medium mb-3 text-slate-300">
                   Assign Evaluation Team (Experts & Owners) *
@@ -1871,7 +1897,7 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
                     experts.map((user: User) => (
                       <label
                         key={user.id}
-                        className={`flex items-center p-2 rounded cursor-pointer transition-colors ${selectedTeam.includes(user.id) ? 'bg-cyan-500/10 border border-blue-500/30' : 'hover:bg-white/5'
+                        className={`flex items-center p-2 rounded cursor-pointer transition-colors ${selectedTeam.includes(user.id) ? 'bg-cyan-500/10 border border-blue-500/30' : 'hover:bg-[#0b1221]/5'
                           }`}
                       >
                         <input
@@ -1881,7 +1907,7 @@ function ProjectCreationTab({ users, useCases = [], onCreateProject, onClose }: 
                           className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 mr-3"
                         />
                         <div className="flex items-center flex-1">
-                          <div className="w-8 h-8 rounded-full bg-[#1a2333] flex items-center justify-center text-sm text-slate-400 mr-3 font-medium border border-white/10 shadow-sm">
+                          <div className="w-8 h-8 rounded-full bg-[#1a2333] flex items-center justify-center text-sm text-slate-400 mr-3 font-medium border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
                             {user.name.charAt(0)}
                           </div>
                           <span className="text-sm text-white font-medium">{user.name}</span>
@@ -2085,7 +2111,7 @@ function CreatedReportsTab({ projects, currentUser, onViewProject }: any) {
           ) : reports.length === 0 ? (
             <div className="text-center py-12 bg-gray-900/30 rounded-lg">
               <p className="text-slate-400 mb-2">No reports created yet</p>
-              <p className="text-sm text-gray-500">You can create reports from the project detail page</p>
+              <p className="text-sm text-slate-500">You can create reports from the project detail page</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -2177,34 +2203,6 @@ function CreatedReportsTab({ projects, currentUser, onViewProject }: any) {
                           <Download className="h-4 w-4" />
                           Expert PDF
                         </button>
-                        <button
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            const btn = e.currentTarget;
-                            const originalText = btn.innerHTML;
-                            btn.innerHTML = '<span class="flex items-center gap-2">Downloading...</span>';
-                            try {
-                              const projId = report.projectId._id || report.projectId?.id || report.projectId;
-                              const res = await fetch(api(`/api/projects/${projId}/unified-reports`));
-                              const data = await res.json();
-                              const ontologyId = data.ontologyReport?._id || data.ontologyReport?.id;
-                              if (ontologyId) {
-                                window.open(api(`/api/ontology-reports/${ontologyId}/view-pdf?userId=${currentUser.id || (currentUser as any)._id}`), '_blank');
-                              } else {
-                                alert("Ontology report not generated yet.");
-                              }
-                            } catch (err) {
-                              alert("Failed to download ontology PDF.");
-                            } finally {
-                              btn.innerHTML = originalText;
-                            }
-                          }}
-                          className="px-3 py-1.5 text-sm text-purple-400 hover:bg-purple-900/20 rounded-lg transition-colors flex items-center gap-2"
-                          title="Download Ontology PDF"
-                        >
-                          <Download className="h-4 w-4" />
-                          Ontology PDF
-                        </button>
 
                         <button
                           onClick={(e) => handleDeleteReport(reportId, report.title, e)}
@@ -2244,7 +2242,7 @@ function CreatedReportsTab({ projects, currentUser, onViewProject }: any) {
               </div>
               <button
                 onClick={() => setSelectedReport(null)}
-                className="text-gray-500 hover:text-slate-300"
+                className="text-slate-500 hover:text-slate-300"
               >
                 <X className="h-6 w-6" />
               </button>
@@ -2308,7 +2306,7 @@ function ReportsTab({ projects, currentUser, users }: any) {
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState<string | null>(null);
-  const [generatingOntology, setGeneratingOntology] = useState<string | null>(null);
+
   const [showGeneratingMessage, setShowGeneratingMessage] = useState(false);
   const [selectedReport, setSelectedReport] = useState<any | null>(null);
   const [filterProjectId, setFilterProjectId] = useState<string>('');
@@ -2375,30 +2373,7 @@ function ReportsTab({ projects, currentUser, users }: any) {
     }
   };
 
-  // Generate Ontology report for a project
-  const handleGenerateOntologyReport = async (projectId: string) => {
-    try {
-      setGeneratingOntology(projectId);
-      const userId = currentUser?.id || currentUser?._id;
-      const response = await fetch(api('/api/ontology/report'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId, userId })
-      });
 
-      if (response.ok) {
-        alert('✅ Ontology Report generated successfully!');
-      } else {
-        const error = await response.json().catch(() => ({}));
-        alert('❌ Error: ' + (error.error || 'Failed to generate ontology report'));
-      }
-    } catch (error: any) {
-      console.error('Error generating ontology report:', error);
-      alert('❌ Error: ' + (error.message || 'Failed to generate ontology report'));
-    } finally {
-      setGeneratingOntology(null);
-    }
-  };
 
 
 
@@ -2575,19 +2550,7 @@ function ReportsTab({ projects, currentUser, users }: any) {
                         {generating === projectId ? 'Generating...' : 'Expert Report'}
                       </button>
 
-                      <button
-                        onClick={() => handleGenerateOntologyReport(projectId)}
-                        disabled={generatingOntology === projectId}
-                        className={`flex-1 px-2 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${
-                          generatingOntology === projectId
-                            ? 'bg-gray-800 text-slate-500 cursor-not-allowed'
-                            : 'bg-purple-700 text-white hover:bg-purple-600'
-                        }`}
-                        title="Generate AI Ontology Report"
-                      >
-                        <Database className="w-3 h-3" />
-                        {generatingOntology === projectId ? 'Generating...' : 'Ontology Report'}
-                      </button>
+
                     </div>
 
                     {/* Show Reports button */}
@@ -2596,7 +2559,7 @@ function ReportsTab({ projects, currentUser, users }: any) {
                       className="w-full px-2 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1 bg-blue-700/50 text-blue-300 hover:bg-blue-700 border border-blue-600/30"
                     >
                       <BarChart3 className="w-3 h-3" />
-                      {selectedProjectForReports === projectId ? 'Hide Reports' : 'Show Reports'}
+                      {selectedProjectForReports === projectId ? 'Hide Report' : 'Show Report'}
                     </button>
                   </div>
                 </div>
@@ -2614,7 +2577,7 @@ function ReportsTab({ projects, currentUser, users }: any) {
               </h2>
               <button
                 onClick={() => setSelectedProjectForReports(null)}
-                className="text-gray-500 hover:text-slate-300 text-sm flex items-center gap-1"
+                className="text-slate-500 hover:text-slate-300 text-sm flex items-center gap-1"
               >
                 <X className="w-4 h-4" /> Close
               </button>
@@ -2622,17 +2585,9 @@ function ReportsTab({ projects, currentUser, users }: any) {
             <UnifiedReportViewer
               projectId={selectedProjectForReports}
               userId={currentUser.id || (currentUser as any)._id}
-              onGenerateOntology={() => handleGenerateOntologyReport(selectedProjectForReports)}
-              generating={generatingOntology === selectedProjectForReports}
               onViewExpertReport={(reportId) => {
                 // Fetch the full report and open the modal
                 handleViewReport(reportId);
-              }}
-              onViewOntologyReport={() => {
-                const project = projects.find((p: any) => p.id === selectedProjectForReports || p._id === selectedProjectForReports);
-                if (project) {
-                  onViewProject({ ...project, openOntologyTab: true } as any);
-                }
               }}
               currentUserRole={currentUser.role}
               onReviewReports={() => {
@@ -2653,7 +2608,7 @@ function ReportsTab({ projects, currentUser, users }: any) {
           ) : reports.length === 0 ? (
             <div className="text-center py-12 bg-gray-900/30 rounded-lg">
               <p className="text-slate-400 mb-2">No reports created yet</p>
-              <p className="text-sm text-gray-500">You can create reports for the projects above</p>
+              <p className="text-sm text-slate-500">You can create reports for the projects above</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -2743,7 +2698,7 @@ function ReportsTab({ projects, currentUser, users }: any) {
               </div>
               <button
                 onClick={() => setSelectedReport(null)}
-                className="text-gray-500 hover:text-slate-300"
+                className="text-slate-500 hover:text-slate-300"
               >
                 <X className="h-6 w-6" />
               </button>
@@ -2838,7 +2793,7 @@ function AssignExpertsModal({ project, useCase, users, onClose, onAssign }: Assi
       <div className="bg-[#050b14] rounded-xl shadow-[0_0_15px_rgba(34,211,238,0.1)] border border-white/10 max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col">
         <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#0a1122] flex-shrink-0">
           <h2 className="text-lg font-bold text-white">Assign Evaluation Team</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-slate-300 transition-colors">
+          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -2867,7 +2822,7 @@ function AssignExpertsModal({ project, useCase, users, onClose, onAssign }: Assi
                       type="checkbox"
                       checked={selectedExperts.includes(expert.id)}
                       onChange={() => toggleExpert(expert.id)}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 mr-3 border-gray-300"
+                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 mr-3 border-white/20"
                     />
                     <div className="flex-1">
                       <div className="text-sm font-medium text-white">{expert.name}</div>
@@ -2894,13 +2849,13 @@ function AssignExpertsModal({ project, useCase, users, onClose, onAssign }: Assi
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-slate-400 hover:text-gray-800 text-sm font-medium"
+              className="px-4 py-2 text-slate-400 hover:text-gray-200 text-sm font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium shadow-sm transition-colors"
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-colors"
             >
               Confirm Assignment
             </button>
@@ -3105,7 +3060,7 @@ function AdminPlatformInfoTab() {
               <div className="flex justify-between"><span>Question</span><span className="text-slate-300">Biometric data without consent?</span></div>
               <div className="flex justify-between"><span>Answer Score</span><span className="text-rose-400">0.0 — non-compliant</span></div>
               <div className="flex justify-between"><span>Importance</span><span className="text-indigo-400">4 — critical</span></div>
-              <div className="h-px bg-white/5" />
+              <div className="h-px bg-[#0b1221]/5" />
               <div className="flex justify-between text-sm font-bold">
                 <span className="text-white">Risk Contribution</span>
                 <span className="text-rose-400">4 × (1 − 0.0) = 4.0</span>
@@ -3162,11 +3117,11 @@ function ArchDiagramArrow({ label, color = 'slate' }: { label: string, color?: s
   return (
     <div className="flex flex-col items-center justify-center h-24 relative mb-2">
       <div className={`w-[2px] h-full ${colorMap[color]} relative`}>
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-white" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#0b1221] animate-ping" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#0b1221]" />
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-r-[4px] border-t-[6px] border-l-transparent border-r-transparent border-t-white/80" />
       </div>
-      <div className="absolute bg-[#070e1a] px-3 py-1 rounded-full border border-white/5 text-[10px] text-slate-400 font-medium whitespace-nowrap shadow-sm backdrop-blur-md z-10">
+      <div className="absolute bg-[#070e1a] px-3 py-1 rounded-full border border-white/5 text-[10px] text-slate-400 font-medium whitespace-nowrap shadow-[0_0_15px_rgba(0,0,0,0.5)] backdrop-blur-md z-10">
         {label}
       </div>
     </div>
