@@ -10,6 +10,7 @@ const {
   buildGraphFactAssertions
 } = require('../services/ontologyChatAssessmentService');
 const { extractOntologyChatFactsWithGemini } = require('../services/ontologyChatGeminiExtractor');
+const { generateChatResponse } = require('../services/geminiService');
 
 const router = express.Router();
 
@@ -493,6 +494,15 @@ function logAssessmentState({ conversation, projectIdObj, priorMessagesLoaded, e
 
 async function applyAssessmentToConversation({ conversation, project, userIdObj, projectIdObj, priorMessagesLoaded, existingFactsLoaded }) {
   const assessment = await runOntologyAssessment(project, conversation, userIdObj);
+
+  const llmReply = await generateChatResponse(conversation.messages, assessment.ontologyResult);
+  if (llmReply) {
+    if (llmReply.includes("Rate Limit")) {
+      assessment.reply = llmReply + "\n\n" + assessment.reply;
+    } else {
+      assessment.reply = llmReply;
+    }
+  }
 
   conversation.status = assessment.status;
   conversation.ontologyResult = assessment.ontologyResult;

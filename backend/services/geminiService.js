@@ -1060,6 +1060,50 @@ When in doubt, choose the MORE CONSERVATIVE interpretation.
 }
 
 /* ============================================================
+   5. ONTOLOGY CHAT CONVERSATION (LLM)
+============================================================ */
+
+async function generateChatResponse(messages, ontologyResult) {
+  try {
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash", 
+      systemInstruction: `You are a helpful, conversational AI ethics and compliance assistant for the Z-Inspection platform.
+Your job is to answer user questions regarding AI ethics, data security, privacy, and the ontology of AI systems.
+You will be provided with the current conversation history. 
+If the user provides a system description, the backend will have performed an automatic ontology assessment (identifying risks, safeguards, etc.). The summary of this assessment will be provided to you.
+Incorporate the findings from the ontology assessment in a natural, conversational way into your response, IF it is relevant to the user's latest query. If the user just says "hello" or asks a general question, just answer the question normally without dumping the assessment.
+Respond in Turkish unless the user explicitly speaks to you in English. Be polite, concise, and structured.`,
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 2048
+      }
+    });
+
+    let promptText = "Conversation History:\n";
+    messages.forEach((msg, idx) => {
+      promptText += `[${msg.sender.toUpperCase()}]: ${msg.text}\n`;
+    });
+
+    if (ontologyResult && (ontologyResult.primaryRisks?.length > 0 || ontologyResult.recommendedActions?.length > 0)) {
+      promptText += `\n--- AUTOMATED ONTOLOGY ASSESSMENT ---\n`;
+      promptText += `Primary Risks: ${JSON.stringify(ontologyResult.primaryRisks.map(r => r.value || r.title))}\n`;
+      promptText += `Recommended Actions: ${JSON.stringify(ontologyResult.recommendedActions.map(a => a.value || a.action))}\n`;
+      promptText += `(Use this information to inform your response if the user's query is about their system description. Don't mention the 'Automated Ontology Assessment' explicitly, just use the facts.)\n`;
+    }
+
+    const result = await model.generateContent(promptText);
+    const text = result.response.text();
+    return text;
+  } catch (error) {
+    console.error('❌ Gemini Chat Generation Failed:', error.message);
+    if (error.message.includes('429') || error.message.includes('quota')) {
+      return "Üzgünüm, şu anda yapay zeka limitlerine (Rate Limit) takıldık. Lütfen 30 saniye bekleyip tekrar deneyin.\n\n(Geçici sistem değerlendirmesi ektedir.)";
+    }
+    return null; // Let the caller fallback to standard response
+  }
+}
+
+/* ============================================================
    EXPORTS
 ============================================================ */
 
@@ -1067,5 +1111,6 @@ module.exports = {
   generateReport,
   generateReportNarrative: generateReport, // ALIAS to fix pdfReportService import
   testApiKey,
-  analyzeQualitativeSeverity
+  analyzeQualitativeSeverity,
+  generateChatResponse
 };

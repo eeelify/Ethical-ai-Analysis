@@ -1748,13 +1748,25 @@ function assessOntologyChat({ project, messages = [], previousState = {}, newMes
   const hasContradictions = (state.contradictions || []).some((item) => item.status === 'needs_clarification');
   const status = hasContradictions || !hasFacts ? 'needs_more_information' : 'completed';
 
-  const reply = hasContradictions
-    ? 'I found a contradiction in the confirmed project facts. Please clarify it before I finalize the assessment.'
-    : status === 'completed'
-      ? getProjectId(project)
-        ? 'I updated the assessment using the selected project and the confirmed conversation facts. The concise evidence-based report is shown on the right.'
-        : 'I updated the assessment using the confirmed conversation facts. The concise evidence-based report is shown on the right.'
-      : 'I need more project information before I can produce an evidence-based assessment.';
+  let reply = '';
+  if (hasContradictions) {
+    reply = 'I found a contradiction in the confirmed project facts. Please clarify it before I finalize the assessment.';
+  } else if (status === 'completed') {
+    const risks = Array.isArray(ontologyResult.primaryRisks) ? ontologyResult.primaryRisks : [];
+    const actions = Array.isArray(ontologyResult.recommendedActions) ? ontologyResult.recommendedActions : [];
+    
+    const risksText = risks.length > 0
+      ? risks.map(r => `- **${r.title || r.value || 'Risk'}** (${r.severity || r.status || 'Unknown'}): ${r.reason || ''}`).join('\n')
+      : 'No major risks identified yet.';
+      
+    const actionsText = actions.length > 0
+      ? actions.map(a => `- ${a.value || a.action || a}`).join('\n')
+      : 'No specific actions required.';
+      
+    reply = `Based on your input, here is my assessment:\n\n### Main Risks\n${risksText}\n\n### Recommended Actions\n${actionsText}\n\nPlease let me know if you have any other questions or need further details.`;
+  } else {
+    reply = 'I need more project information before I can produce an evidence-based assessment. Could you provide more details about the system, users, or data?';
+  }
 
   return {
     status,

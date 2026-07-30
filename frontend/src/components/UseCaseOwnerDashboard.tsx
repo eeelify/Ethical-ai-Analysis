@@ -614,29 +614,6 @@ export function UseCaseOwnerDashboard({
         <div className="px-8 py-6">
           {dashboardSection === 'ontology' ? (
             <div className="space-y-4">
-              {ontologyProjects.length > 0 && (
-                <div className="rounded-lg border border-white/10 bg-[#0a1122] p-4">
-                  <label htmlFor="ontology-project-select" className="mb-2 block text-sm font-medium text-slate-300">
-                    Project context
-                  </label>
-                  <select
-                    id="ontology-project-select"
-                    value={selectedOntologyProjectId}
-                    onChange={(event) => setSelectedOntologyProjectId(event.target.value)}
-                    className="w-full rounded-lg border border-white/10 bg-[#050b14] px-4 py-3 text-sm text-white outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
-                  >
-                    <option value="">General ontology chat</option>
-                    {ontologyProjects.map((project: any) => {
-                      const optionProjectId = getOntologyProjectId(project);
-                      return (
-                        <option key={optionProjectId} value={optionProjectId}>
-                          {project.title || optionProjectId}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
-              )}
               <OntologyChatBox
                 key={selectedOntologyProject ? getOntologyProjectId(selectedOntologyProject) : 'general'}
                 project={selectedOntologyProject}
