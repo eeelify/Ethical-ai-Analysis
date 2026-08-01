@@ -10,7 +10,6 @@ const {
   buildGraphFactAssertions
 } = require('../services/ontologyChatAssessmentService');
 const { extractOntologyChatFactsWithGemini } = require('../services/ontologyChatGeminiExtractor');
-const { generateChatResponse } = require('../services/geminiService');
 
 const router = express.Router();
 
@@ -388,6 +387,15 @@ function buildOntologyResult({ analysis, trace, contextText, project, clarificat
 }
 
 function getConversationFactState(conversation) {
+  if (!conversation || (conversation.assessmentVersion && conversation.assessmentVersion !== ASSESSMENT_VERSION)) {
+    return {
+      confirmedFacts: {},
+      unknownFacts: {},
+      factEvidence: [],
+      contradictions: []
+    };
+  }
+
   return {
     confirmedFacts: conversation.confirmedFacts || {},
     unknownFacts: conversation.unknownFacts || {},
@@ -426,6 +434,7 @@ async function syncConversationFactsToGraph({ project, userId, state }) {
 
 async function runOntologyAssessment(project, conversation, userId) {
   const previousState = getConversationFactState(conversation);
+  const chatId = String(conversation._id);
   const geminiExtraction = await extractOntologyChatFactsWithGemini({
     messages: conversation.messages || [],
     previousState,
@@ -437,7 +446,8 @@ async function runOntologyAssessment(project, conversation, userId) {
     messages: conversation.messages || [],
     previousState,
     llmFacts: geminiExtraction.acceptedFacts || [],
-    geminiExtraction
+    geminiExtraction,
+    chatId
   });
 
   const graphSync = await syncConversationFactsToGraph({
@@ -474,9 +484,29 @@ function assertRequestProjectMatchesRoute(req, res, projectIdObj) {
   return true;
 }
 
-function logAssessmentState({ conversation, projectIdObj, priorMessagesLoaded, existingFactsLoaded, assessment }) {
+function extractLastQuestion(text) {
+  const matches = String(text || '').match(/[^.!?]*\?+/g) || [];
+  return matches.length ? matches[matches.length - 1].replace(/\s+/g, ' ').trim() : null;
+}
+
+function getPendingQuestionBeforeLatestReply(conversation) {
+  const systemMessages = (conversation?.messages || []).filter((message) => message.sender === 'system');
+  if (systemMessages.length < 2) return null;
+  return extractLastQuestion(systemMessages[systemMessages.length - 2]?.text);
+}
+
+function stateStorageKeyFor(conversation, userIdObj) {
+  return `ontology-chat:${String(userIdObj || conversation.userId || '')}:${String(conversation._id)}`;
+}
+
+function logAssessmentState({ conversation, userIdObj, projectIdObj, priorMessagesLoaded, existingFactsLoaded, assessment, stateSaveResult = null }) {
+  const contradictionDebug = assessment.raw?.contradictionDebug || {};
+  const stateLifecycle = assessment.raw?.stateLifecycle || {};
+  const stateStorageKey = stateStorageKeyFor(conversation, userIdObj);
+  const pendingQuestion = getPendingQuestionBeforeLatestReply(conversation) || stateLifecycle.pending_question || null;
   console.info('[ontology-chat] state merge', {
     conversationId: String(conversation._id),
+    currentChatId: String(conversation._id),
     projectId: String(projectIdObj || conversation.projectId || ''),
     priorMessagesLoaded,
     existingFactsLoaded,
@@ -490,19 +520,54 @@ function logAssessmentState({ conversation, projectIdObj, priorMessagesLoaded, e
     previousStateResetReason: assessment.raw?.stateMergeStats?.previousStateResetReason ?? null,
     mergedFactsUsed: assessment.raw?.stateMergeStats?.mergedFactsUsed ?? null
   });
+  console.info('[ontology-chat] state lifecycle', {
+    chat_id: String(conversation._id),
+    loaded_previous_state: stateLifecycle.loaded_previous_state || {},
+    latest_extracted_facts: stateLifecycle.latest_extracted_facts || [],
+    merged_state: stateLifecycle.merged_state || assessment.state?.confirmedFacts || {},
+    pending_question: pendingQuestion,
+    selected_next_question: stateLifecycle.selected_next_question || assessment.raw?.conversationalResponse?.follow_up_question || null,
+    state_storage_key: stateStorageKey,
+    state_save_result: stateSaveResult
+  });
+  console.info('[ontology-chat] contradiction detection', {
+    currentChatId: String(conversation._id),
+    previousExplicitFacts: contradictionDebug.previousExplicitFacts || [],
+    newlyExtractedFacts: contradictionDebug.newlyExtractedFacts || [],
+    normalizedFields: contradictionDebug.normalizedFields || [],
+    exactConflictingField: (contradictionDebug.conflicts || [])[0]?.exactConflictingField || null,
+    oldValue: (contradictionDebug.conflicts || [])[0]?.oldValue || null,
+    newValue: (contradictionDebug.conflicts || [])[0]?.newValue || null,
+    sourceMessageIds: (contradictionDebug.conflicts || [])[0]
+      ? [
+        (contradictionDebug.conflicts || [])[0].oldSourceMessageId,
+        (contradictionDebug.conflicts || [])[0].newSourceMessageId
+      ].filter(Boolean)
+      : []
+  });
+}
+
+function markOntologyConversationStateModified(conversation) {
+  if (!conversation || typeof conversation.markModified !== 'function') return;
+  [
+    'messages',
+    'ontologyResult',
+    'confirmedFacts',
+    'unknownFacts',
+    'factEvidence',
+    'contradictions',
+    'lastOntologyRaw'
+  ].forEach((path) => conversation.markModified(path));
 }
 
 async function applyAssessmentToConversation({ conversation, project, userIdObj, projectIdObj, priorMessagesLoaded, existingFactsLoaded }) {
   const assessment = await runOntologyAssessment(project, conversation, userIdObj);
-
-  const llmReply = await generateChatResponse(conversation.messages, assessment.ontologyResult);
-  if (llmReply) {
-    if (llmReply.includes("Rate Limit")) {
-      assessment.reply = llmReply + "\n\n" + assessment.reply;
-    } else {
-      assessment.reply = llmReply;
-    }
-  }
+  assessment.raw.llmNarrativeStatus = 'not_used';
+  assessment.ontologyResult.llmNarrative = null;
+  assessment.ontologyResult.llmGeneration = {
+    status: assessment.raw.llmNarrativeStatus,
+    note: 'Visible ontology chat replies are generated from stored conversation facts and ontology-derived signals; no supplemental LLM narrative is requested for the default chat answer.'
+  };
 
   conversation.status = assessment.status;
   conversation.ontologyResult = assessment.ontologyResult;
@@ -523,13 +588,28 @@ async function applyAssessmentToConversation({ conversation, project, userIdObj,
 
   logAssessmentState({
     conversation,
+    userIdObj,
     projectIdObj,
     priorMessagesLoaded,
     existingFactsLoaded,
-    assessment
+    assessment,
+    stateSaveResult: 'pending'
   });
 
-  await conversation.save();
+  markOntologyConversationStateModified(conversation);
+  const savedConversation = await conversation.save();
+  const saveResult = {
+    status: 'saved',
+    conversationId: String(savedConversation._id),
+    messageCount: (savedConversation.messages || []).length,
+    confirmedFactCount: Object.keys(savedConversation.confirmedFacts || {}).length,
+    updatedAt: savedConversation.updatedAt || null
+  };
+  console.info('[ontology-chat] state saved', {
+    chat_id: String(conversation._id),
+    state_storage_key: stateStorageKeyFor(conversation, userIdObj),
+    state_save_result: saveResult
+  });
   return assessment;
 }
 
@@ -714,6 +794,7 @@ router.post('/ontology-chat/:conversationId/messages', async (req, res) => {
         ontologyResult: null
       });
 
+      markOntologyConversationStateModified(conversation);
       await conversation.save();
 
       const projectLookup = await getProjectLookupForConversations([conversation]);
@@ -851,6 +932,7 @@ router.post('/:projectId/ontology-chat/:conversationId/messages', async (req, re
         ontologyResult: null
       });
 
+      markOntologyConversationStateModified(conversation);
       await conversation.save();
 
       const projectLookup = await getProjectLookupForConversations([conversation]);
@@ -964,10 +1046,10 @@ router.post('/:projectId/ontology-chat', async (req, res) => {
         });
       }
     } else {
-      conversation = await OntologyChatConversation.findOne({
-        projectId: context.projectIdObj,
-        userId: context.userIdObj
-      }).sort({ updatedAt: -1 });
+      conversation = await createOntologyConversation({
+        userIdObj: context.userIdObj,
+        project: context.project
+      });
     }
 
     if (!conversation) {
@@ -1015,6 +1097,7 @@ router.post('/:projectId/ontology-chat', async (req, res) => {
         ontologyResult: null
       });
 
+      markOntologyConversationStateModified(conversation);
       await conversation.save();
 
       const projectLookup = await getProjectLookupForConversations([conversation]);

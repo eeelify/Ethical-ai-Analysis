@@ -333,6 +333,15 @@ function addMappedListFact(target, seen, params) {
   addMappedFact(target, seen, { ...params, value });
 }
 
+function semanticSubjectLooksLikeSystemName(subjectValue) {
+  const value = normalizeWhitespace(subjectValue);
+  if (!value) return false;
+  if (/^(customers?|users?|students?|employees?|applicants?|candidates?|claimants?|patients?|citizens?|people|individuals|support agents?|agents?|officers?|claims?\s+officers?|hr staff|human resources|recruiters?|hiring managers?|managers?|reviewers?|specialists?|teachers?|counselors?|counsellors?|senior agents?)$/i.test(value)) {
+    return false;
+  }
+  return /\b(ai|artificial intelligence|system|tool|model|application|software|platform)\b/i.test(value);
+}
+
 function mapSemanticCandidateToFacts(candidate, { evidence, evidenceMessage, factLabels, seen }) {
   const facts = [];
   const status = normalizeSemanticPolarity(candidate);
@@ -362,7 +371,7 @@ function mapSemanticCandidateToFacts(candidate, { evidence, evidenceMessage, fac
       semanticCandidate: { ...candidate, kind, polarity: status }
     });
 
-  if (subjectValue && !/^(ai system|system|user|users|actor|claimants?|employees?|students?|affected people|claims?\s+officers?|managers?|counselors?|counsellors?)$/i.test(subjectValue)) {
+  if (kind === 'purpose' && semanticSubjectLooksLikeSystemName(subjectValue)) {
     addList('systemName', subjectValue, 0.74);
   }
 
@@ -395,7 +404,7 @@ function mapSemanticCandidateToFacts(candidate, { evidence, evidenceMessage, fac
   }
 
   if (['actor', 'primary_user'].includes(kind)) {
-    addList('primaryUsers', objectValue, 0.8);
+    addList('primaryUsers', subjectValue || objectValue, 0.8);
   }
   if (kind === 'affected_person') {
     addList('affectedPersons', objectValue, 0.82);
@@ -790,13 +799,16 @@ async function extractOntologyChatFactsWithGemini({ messages, previousState, fac
   }
 
   const prompt = buildPrompt({ userMessages, previousState, factLabels });
-  const preferredModelName = normalizeWhitespace(process.env.GEMINI_ONTOLOGY_CHAT_MODEL || process.env.GEMINI_MODEL || 'gemini-flash-latest');
+  const preferredModelName = normalizeWhitespace(process.env.GEMINI_ONTOLOGY_CHAT_MODEL || process.env.GEMINI_MODEL || 'gemini-flash-lite-latest');
   const modelNames = Array.from(new Set([
     preferredModelName,
+    'gemini-flash-lite-latest',
+    'gemini-3.5-flash-lite',
+    'gemini-3.1-flash-lite',
+    'gemini-3.6-flash',
     'gemini-flash-latest',
-    'gemini-2.5-flash',
-    'gemini-2.0-flash',
-    'gemini-1.5-flash'
+    'gemini-2.0-flash-lite',
+    'gemini-2.0-flash'
   ].filter(Boolean)));
   const { GoogleGenerativeAI } = require('@google/generative-ai');
   const genAI = new GoogleGenerativeAI(apiKey);
@@ -849,7 +861,7 @@ async function extractOntologyChatFactsWithGemini({ messages, previousState, fac
       lastError = error;
       const message = error.message || String(error);
       const modelUnavailable = /404|not found|not supported|not available/i.test(message);
-      const quotaExhausted = message.includes('429') || /quota|RESOURCE_EXHAUSTED/i.test(message);
+      const quotaExhausted = message.includes('429') || /quota|RESOURCE_EXHAUSTED|free_tier/i.test(message);
       // On unavailable model (404) or quota exhaustion (429) try the next model.
       if (!modelUnavailable && !quotaExhausted) break;
     }

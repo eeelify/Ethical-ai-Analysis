@@ -33,6 +33,27 @@ console.log(`✅ GEMINI_API_KEY yüklendi (uzunluk: ${GEMINI_API_KEY.length} kar
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
+const DEFAULT_GEMINI_MODEL_CANDIDATES = [
+  "gemini-flash-lite-latest",
+  "gemini-3.5-flash-lite",
+  "gemini-3.1-flash-lite",
+  "gemini-3.6-flash",
+  "gemini-flash-latest",
+  "gemini-2.0-flash-lite",
+  "gemini-2.0-flash"
+];
+
+function normalizeGeminiModelId(value) {
+  return String(value || "").trim().replace(/^models\//, "");
+}
+
+function geminiModelCandidates(...preferred) {
+  return Array.from(new Set([
+    ...preferred.map(normalizeGeminiModelId),
+    ...DEFAULT_GEMINI_MODEL_CANDIDATES
+  ].filter(Boolean)));
+}
+
 /* ============================================================
    2. GENERATION CONFIG
 ============================================================ */
@@ -50,9 +71,14 @@ const generationConfig = {
 ============================================================ */
 
 async function testApiKey() {
-  const modelsToTry = [
-    { id: "gemini-1.5-flash", names: ["models/gemini-1.5-flash", "gemini-1.5-flash"] }
-  ];
+  const modelsToTry = geminiModelCandidates(
+    process.env.GEMINI_MODEL,
+    process.env.GEMINI_CHAT_MODEL,
+    process.env.GEMINI_ONTOLOGY_CHAT_MODEL
+  ).map((id) => ({
+    id,
+    names: [`models/${id}`, id]
+  }));
 
   let lastError = null;
 
@@ -305,9 +331,7 @@ Return a RAW JSON OBJECT. No markdown formatting. No code blocks.
 `;
 
   const modelNamesToTry = [
-    "gemini-flash-lite-latest",
-    "gemini-1.5-pro",
-    "gemini-1.5-flash"
+    ...geminiModelCandidates(process.env.GEMINI_REPORT_MODEL, process.env.GEMINI_MODEL)
   ];
 
 
@@ -1038,28 +1062,37 @@ If a response is unclear, default to severity = 0.5.
 When in doubt, choose the MORE CONSERVATIVE interpretation.
 `;
 
-  try {
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-pro", // Use Pro for complex reasoning
-      systemInstruction: systemInstruction,
-      generationConfig: {
-        temperature: 0.2, // Low temperature for deterministic/strict output
-        maxOutputTokens: 8192,
-        responseMimeType: "application/json"
+  let lastError = null;
+  for (const modelName of geminiModelCandidates(process.env.GEMINI_QUALITATIVE_MODEL, process.env.GEMINI_MODEL)) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        systemInstruction: systemInstruction,
+        generationConfig: {
+          temperature: 0.2, // Low temperature for deterministic/strict output
+          maxOutputTokens: 8192,
+          responseMimeType: "application/json"
+        }
+      });
+
+      const result = await model.generateContent(`Process the following ${answers.length} items:\n\n${itemsText}`);
+      const responseText = result.response.text();
+
+      console.log(`🤖 Gemini Qualitative Analysis Complete (${modelName})`);
+      return JSON.parse(responseText);
+    } catch (error) {
+      lastError = error;
+      const message = error.message || String(error);
+      console.warn(`⚠️ Gemini Qualitative Analysis failed (${modelName}):`, message);
+      if (!/429|quota|RESOURCE_EXHAUSTED|free_tier|404|not found|no longer available|not supported/i.test(message)) {
+        break;
       }
-    });
-
-    const result = await model.generateContent(`Process the following ${answers.length} items:\n\n${itemsText}`);
-    const responseText = result.response.text();
-
-    console.log('🤖 Gemini Qualitative Analysis Complete');
-    return JSON.parse(responseText);
-
-  } catch (error) {
-    console.error('❌ Gemini Qualitative Analysis Failed:', error.message);
-    // Return empty array to allow graceful degradation (manual review required)
-    return [];
+    }
   }
+
+  console.error('❌ Gemini Qualitative Analysis Failed:', lastError?.message || 'All candidate models failed.');
+  // Return empty array to allow graceful degradation (manual review required)
+  return [];
 }
 
 /* ============================================================
@@ -1070,13 +1103,11 @@ When in doubt, choose the MORE CONSERVATIVE interpretation.
 // automatically fall back to other models if one is quota-exhausted (429) or
 // unavailable (404). "gemini-2.0-flash" is kept last because some API keys have
 // a free-tier limit of 0 for it.
-const CHAT_MODEL_CANDIDATES = Array.from(new Set([
+const CHAT_MODEL_CANDIDATES = geminiModelCandidates(
   process.env.GEMINI_CHAT_MODEL,
-  process.env.GEMINI_MODEL,
-  "gemini-flash-latest",
-  "gemini-2.5-flash",
-  "gemini-2.0-flash"
-].filter(Boolean)));
+  process.env.GEMINI_ONTOLOGY_CHAT_MODEL,
+  process.env.GEMINI_MODEL
+);
 
 async function generateChatResponse(messages, ontologyResult) {
   const systemInstruction = `You are a helpful, conversational AI ethics and compliance assistant for the Z-Inspection platform.
@@ -1121,7 +1152,7 @@ Respond in Turkish unless the user explicitly speaks to you in English. Be polit
       const message = error.message || String(error);
       console.error(`❌ Gemini Chat Generation Failed (model: ${modelName}):`, message);
 
-      const isQuota = message.includes('429') || /quota|RESOURCE_EXHAUSTED/i.test(message);
+      const isQuota = message.includes('429') || /quota|RESOURCE_EXHAUSTED|free_tier/i.test(message);
       const isUnavailable = /404|not found|no longer available|not supported/i.test(message);
 
       if (isQuota) sawQuotaError = true;
@@ -1136,7 +1167,7 @@ Respond in Turkish unless the user explicitly speaks to you in English. Be polit
 
   // All candidate models failed.
   if (sawQuotaError) {
-    return "Üzgünüm, şu anda yapay zeka limitlerine (Rate Limit) takıldık. Lütfen 30 saniye bekleyip tekrar deneyin.\n\n(Geçici sistem değerlendirmesi ektedir.)";
+    return null;
   }
   return null; // Let the caller fallback to standard response
 }

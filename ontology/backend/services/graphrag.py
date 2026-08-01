@@ -25,14 +25,13 @@ class NoGeminiModelAvailable(RuntimeError):
 
 def _default_model_candidates() -> List[str]:
     return [
-        "gemini-1.5-flash",
-        "gemini-1.5-flash-latest",
-        "gemini-2.5-flash",
+        "gemini-flash-lite-latest",
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-3.6-flash",
+        "gemini-flash-latest",
+        "gemini-2.0-flash-lite",
         "gemini-2.0-flash",
-        "gemini-1.5-flash-8b",
-        "gemini-1.5-pro-latest",
-        "gemini-1.5-pro",
-        "gemini-pro",
     ]
 
 def _model_candidates() -> List[str]:
@@ -64,6 +63,8 @@ def _should_try_next_model(exc: BaseException) -> bool:
     if "is not found" in msg:
         return True
     if "not supported for generatecontent" in msg:
+        return True
+    if "429" in msg or "resource_exhausted" in msg or "quota" in msg or "free_tier" in msg:
         return True
     return False
 
