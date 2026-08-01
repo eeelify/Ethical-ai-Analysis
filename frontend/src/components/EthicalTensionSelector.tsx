@@ -41,9 +41,9 @@ export function EthicalTensionSelector({
         <GitBranch className="h-4 w-4 mr-2" />
         Ethical Tension
       </label>
-      <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-start">
-        <Info className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
-        <p className="text-xs text-blue-800">
+      <div className="mb-3 p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg flex items-start">
+        <Info className="h-4 w-4 text-blue-400 mr-2 mt-0.5 flex-shrink-0" />
+        <p className="text-xs text-blue-300">
           Select two ethical principles that are in conflict. This helps identify the core ethical dilemma.
         </p>
       </div>
@@ -57,7 +57,7 @@ export function EthicalTensionSelector({
           <select
             value={principle1 || ''}
             onChange={(e) => onPrinciple1Change(e.target.value as EthicalPrinciple || undefined)}
-            className="w-full px-4 py-3 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+            className="w-full px-4 py-3 bg-[#0f172a] border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
             required
           >
             <option value="">Select a principle...</option>
@@ -81,7 +81,7 @@ export function EthicalTensionSelector({
           <select
             value={principle2 || ''}
             onChange={(e) => onPrinciple2Change(e.target.value as EthicalPrinciple || undefined)}
-            className="w-full px-4 py-3 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+            className="w-full px-4 py-3 bg-[#0f172a] border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
             required
           >
             <option value="">Select a principle...</option>
