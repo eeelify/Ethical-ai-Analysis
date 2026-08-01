@@ -11,11 +11,12 @@ const PROVENANCE_TYPES = Object.freeze([
   'KEYWORD_FALLBACK'
 ]);
 
-const ASSESSMENT_VERSION = 'ontology-chat-semantic-facts-v2';
+const ASSESSMENT_VERSION = 'ontology-chat-semantic-facts-v3';
 
 const FACT_LABELS = Object.freeze({
   systemName: 'System name',
   systemPurpose: 'System purpose',
+  userRole: 'User role',
   primaryUsers: 'Primary users',
   affectedPersons: 'Affected persons',
   deploymentContext: 'Deployment context',
@@ -23,6 +24,30 @@ const FACT_LABELS = Object.freeze({
   systemOutputs: 'System outputs',
   decisionsSupported: 'Decisions supported',
   humanRoleDescription: 'Human role description',
+  lessonPlanningPurpose: 'Lesson planning purpose',
+  assignmentEvaluationPurpose: 'Assignment evaluation purpose',
+  essayScoringPurpose: 'Essay scoring purpose',
+  feedbackSuggestionOnly: 'AI suggests feedback only',
+  teacherFinalGradeDecision: 'Teacher decides final grade',
+  processesStudentWork: 'Processes student work',
+  studentNamesUsed: 'Student names used',
+  studentNamesUseUnknown: 'Student names use unknown',
+  educationAdmissionsPurpose: 'Education admissions purpose',
+  applicantScoring: 'Applicant scoring',
+  recommendsAdmissionsOutcome: 'Admissions recommendation',
+  officersUsuallyFollowRecommendation: 'Human officers usually follow the recommendation',
+  noFormalAppealMechanism: 'No formal appeal mechanism',
+  noClearIndividualExplanation: 'No clear individual score explanation',
+  usesThirdPartyCloudProvider: 'Uses third-party cloud provider',
+  processesDemographicData: 'Processes demographic data',
+  processesDisabilityData: 'Processes disability data',
+  historicalBiasEvidence: 'Historical bias evidence',
+  dataFieldDisability: 'Disability data field',
+  dataFieldGender: 'Gender data field',
+  dataFieldAge: 'Age data field',
+  dataFieldRegion: 'Region data field',
+  dataFieldSocioeconomic: 'Socioeconomic data field',
+  dataFieldPreviousSchool: 'Previous school data field',
   educationContext: 'Education context',
   studentWellbeingPurpose: 'Student wellbeing purpose',
   providesMedicalDiagnosis: 'Provides medical diagnosis',
@@ -56,6 +81,16 @@ const FACT_LABELS = Object.freeze({
   usedForModelTraining: 'Used for model training',
   securityMeasuresDocumented: 'Security measures documented',
   employmentContext: 'Employment context',
+  employmentRecruitmentPurpose: 'Employment recruitment purpose',
+  applicantRankingPurpose: 'Applicant ranking purpose',
+  ranksJobApplicants: 'Ranks job applicants',
+  processesApplicantCVs: 'Processes applicant CVs',
+  processesApplicantEducation: 'Processes applicant education',
+  processesApplicantWorkExperience: 'Processes applicant work experience',
+  processesApplicantSkills: 'Processes applicant skills',
+  processesCoverLetters: 'Processes cover letters',
+  jobApplicantsAffected: 'Job applicants affected',
+  supportsHiringDecision: 'Supports hiring decision',
   manufacturingContext: 'Manufacturing context',
   workforceSchedulingPurpose: 'Workforce scheduling purpose',
   recommendsMonthlyShiftSchedule: 'Recommends monthly shift schedule',
@@ -107,6 +142,49 @@ const UNKNOWN_FACTS = Object.freeze({
   securityMeasuresDocumented: null
 });
 
+const APPENDABLE_FACTS = new Set([
+  'systemPurpose',
+  'primaryUsers',
+  'affectedPersons',
+  'systemInputs',
+  'systemOutputs',
+  'decisionsSupported'
+]);
+
+const COMPATIBLE_TEXT_FACTS = new Set([
+  'userRole',
+  'deploymentContext',
+  'humanRoleDescription'
+]);
+
+const FINAL_GRADE_FIELD = 'final_grade_assignment';
+
+const STRICT_BOOLEAN_CONTRADICTION_FACTS = new Set([
+  'appealMechanismAvailable',
+  'assignsAcademicGrade',
+  'challengeMechanismAvailable',
+  'correctionRightAvailable',
+  'decisionPublishedOnlyAfterHumanReview',
+  'explanationAvailable',
+  'fullyAutomatedDecision',
+  'humanCanModify',
+  'humanCanOverride',
+  'humanCanReject',
+  'humanReviewAvailable',
+  'manualReviewAvailable',
+  'makesDisciplinaryDecision',
+  'makesFinalClaimDecision',
+  'makesFiringDecision',
+  'makesHiringDecision',
+  'makesPromotionDecision',
+  'makesSalaryDecision',
+  'processesBiometricData',
+  'processesHealthData',
+  'studentNamesUsed',
+  'usesEmotionDetection',
+  'usesFacialRecognition'
+]);
+
 const DISPLAY_LABELS = Object.freeze({
   ProfilingAI: 'Profiling AI',
   MedicalDiagnosisAI: 'Medical diagnosis AI',
@@ -117,7 +195,15 @@ const DISPLAY_LABELS = Object.freeze({
   StudentWellbeing: 'Student wellbeing',
   RiskScoring: 'Risk scoring',
   DecisionSupport: 'Decision support',
+  EducationAdmissionsAccess: 'Education admissions or access assessment',
+  ApplicantScoring: 'Applicant scoring',
+  AdmissionsRecommendation: 'Admissions recommendation',
+  HighRiskEducationAccessAssessment: 'EU AI Act education access high-risk candidate',
+  HumanReviewEffectivenessRequiresVerification: 'Human review effectiveness requires verification',
+  ThirdPartyCloudProcessing: 'Third-party cloud processing',
   PersonalDataProcessing: 'Personal data processing',
+  DemographicDataProcessing: 'Demographic data processing',
+  DisabilityDataProcessing: 'Disability data processing',
   HealthRelatedDataProcessing: 'Health-related data processing',
   WearableDataProcessing: 'Wearable data processing',
   JournalTextProcessing: 'Journal text processing',
@@ -125,6 +211,11 @@ const DISPLAY_LABELS = Object.freeze({
   CounselorInterventionPrioritization: 'Counselor intervention prioritization',
   NonBindingRecommendation: 'Non-binding recommendation',
   Employment: 'Employment',
+  EmploymentRecruitment: 'Employment recruitment',
+  ApplicantRanking: 'Applicant ranking',
+  RecruitmentDecisionSupport: 'Recruitment decision support',
+  CandidateApplicationDataProcessing: 'Candidate application data processing',
+  HighRiskEmploymentRecruitmentAssessment: 'EU AI Act employment recruitment high-risk candidate',
   Manufacturing: 'Manufacturing',
   WorkforceScheduling: 'Workforce scheduling',
   ShiftRecommendation: 'Shift recommendation',
@@ -167,6 +258,136 @@ const includesAny = (text, patterns) => patterns.some((pattern) => pattern.test(
 
 const cleanEvidenceText = (sentence) => normalizeWhitespace(sentence).slice(0, 700);
 
+function cleanExtractedPhrase(value, maxLength = 180) {
+  return normalizeWhitespace(value)
+    .replace(/^(?:and\s+|their\s+|his\s+|her\s+|its\s+|an?\s+|the\s+)/i, '')
+    .replace(/\s+(?:please|thanks?|thank you)$/i, '')
+    .replace(/[.;!?]+$/g, '')
+    .slice(0, maxLength)
+    .trim();
+}
+
+function sentenceCase(value) {
+  const text = cleanExtractedPhrase(value);
+  if (!text) return text;
+  return `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
+}
+
+function extractGenericRole(normalizedSentence) {
+  const roleMatch = normalizedSentence.match(/\b(?:I am|I'm|As an?|As the)\s+(?:an?\s+|the\s+)?([A-Za-z][A-Za-z0-9 /&-]{2,70}?)(?=\.|,|\s+and\s+I\b|\s+who\b|\s+using\b|\s+with\b|$)/i);
+  const role = cleanExtractedPhrase(roleMatch?.[1] || '', 70);
+  if (!role || /^(using|use|an ai|ai|the ai|this system)$/i.test(role)) return null;
+  return sentenceCase(role);
+}
+
+function extractGenericPurpose(normalizedSentence) {
+  const patterns = [
+    /\b(?:I|we|our team|my team)\s+use[s]?\s+(?:an?\s+)?(?:AI[- ]based\s+)?(?:AI\s+)?(?:tool|system|model|application|software|platform)?\s*(?:to|for)\s+(.+?)(?=\s+based on\b|\s+using\b|\s+with\b|\s+from\b|[.;!?]|$)/i,
+    /\b(?:the\s+)?(?:AI[- ]based\s+)?(?:AI\s+)?(?:tool|system|model|application|software|platform)\s+(?:is used|is designed|helps|supports)\s+(?:to|for)\s+(.+?)(?=\s+based on\b|\s+using\b|\s+with\b|\s+from\b|[.;!?]|$)/i,
+    /\b(?:an?\s+|the\s+)?[A-Za-z0-9 /&-]{0,80}?\b(?:AI[- ]based\s+)?(?:AI\s+)?(?:tool|system|model|application|software|platform)\s+(?:designed|built|created|intended)\s+(?:to|for)\s+(.+?)(?=\s+based on\b|\s+using\b|\s+with\b|\s+from\b|[.;!?]|$)/i,
+    /\b(?:the\s+)?(?:AI[- ]based\s+)?(?:AI\s+)?(?:tool|system|model|application|software|platform)\s+(?:continuously\s+|automatically\s+)?(?:analyzes|analyses|processes)\s+.+?\s+to\s+(.+?)(?=[.;!?]|$)/i,
+    /\b(?:the\s+)?(?:AI[- ]based\s+)?(?:AI\s+)?(?:tool|system|model|application|software|platform)\s+(?:continuously\s+|automatically\s+)?(?:analyzes|analyses|processes)\s+.+?\s+and\s+(?:generates|produces|provides|creates|recommends)\s+(.+?)(?=[.;!?]|$)/i
+  ];
+
+  for (const pattern of patterns) {
+    const match = normalizedSentence.match(pattern);
+    const purpose = cleanExtractedPhrase(match?.[1] || '');
+    if (purpose && !/^(it|that|which)$/i.test(purpose)) return sentenceCase(purpose);
+  }
+
+  return null;
+}
+
+function extractGenericInputs(normalizedSentence) {
+  const inputs = [];
+  const inputPatterns = [
+    /\bbased on\s+(.+?)(?=[.;!?]|$)/i,
+    /\busing\s+(.+?)(?=\s+to\b|[.;!?]|$)/i,
+    /\b(?:analyzes|analyses|processes|uses|takes in)\s+(.+?)(?=\s+to\b|\s+and\s+(?:generates|produces|recommends|outputs|creates|provides|flags|ranks|scores)\b|[.;!?]|$)/i
+  ];
+
+  inputPatterns.forEach((pattern) => {
+    const match = normalizedSentence.match(pattern);
+    const raw = cleanExtractedPhrase(match?.[1] || '', 240);
+    if (!raw || /\bAI\s+(tool|system|model|application|software|platform)\b/i.test(raw)) return;
+    raw
+      .split(/\s*,\s*|\s+and\s+|\s+or\s+/i)
+      .map((item) => cleanExtractedPhrase(item, 80))
+      .filter(Boolean)
+      .forEach((item) => inputs.push(sentenceCase(item)));
+  });
+
+  return Array.from(new Set(inputs));
+}
+
+function extractGenericOutput(normalizedSentence) {
+  const s = normalizedSentence.toLowerCase();
+  if (includesAny(s, [/\b(rank|ranks|ranking|prioriti[sz]e|prioriti[sz]es)\b/])) return 'Ranking or prioritization';
+  if (includesAny(s, [/\b(score|scores|scoring|rate|rates|rating)\b/])) return 'Score or rating';
+  if (includesAny(s, [/\brefund recommendations?\b/])) return 'Refund recommendation';
+  if (includesAny(s, [/\bproduct recommendations?\b|\bpersonalized recommendations?\b/])) return 'Product recommendation';
+  if (includesAny(s, [/\bresponse drafts?\b|\bdraft responses?\b/])) return 'Response draft';
+  if (includesAny(s, [/\b(recommend|recommends|recommendation|recommendations|suggest|suggests|suggestion|suggestions)\b/])) return 'Recommendation';
+  if (includesAny(s, [/\b(flag|flags|detect|detects|classify|classifies|screen|screens)\b/])) return 'Flag, detection, or classification';
+  if (includesAny(s, [/\b(generate|generates|draft|drafts|create|creates|produce|produces|write|writes)\b/])) return 'Generated content';
+  if (includesAny(s, [/\b(approve|approves|reject|rejects|decide|decides|determine|determines)\b/])) return 'Decision output';
+  return null;
+}
+
+function extractPeopleGroupsFromText(normalizedSentence) {
+  const groups = [
+    ['student applicant', 'Student applicants'],
+    ['students', 'Students'],
+    ['student', 'Students'],
+    ['student applicants', 'Student applicants'],
+    ['job applicants', 'Job applicants'],
+    ['job applicant', 'Job applicants'],
+    ['applicants', 'Applicants'],
+    ['applicant', 'Applicants'],
+    ['candidates', 'Candidates'],
+    ['candidate', 'Candidates'],
+    ['employees', 'Employees'],
+    ['employee', 'Employees'],
+    ['workers', 'Workers'],
+    ['worker', 'Workers'],
+    ['patients', 'Patients'],
+    ['patient', 'Patients'],
+    ['customers', 'Customers'],
+    ['customer', 'Customers'],
+    ['clients', 'Clients'],
+    ['client', 'Clients'],
+    ['claimants', 'Claimants'],
+    ['claimant', 'Claimants'],
+    ['citizens', 'Citizens'],
+    ['citizen', 'Citizens'],
+    ['borrowers', 'Borrowers'],
+    ['borrower', 'Borrowers'],
+    ['tenants', 'Tenants'],
+    ['tenant', 'Tenants'],
+    ['users', 'Users'],
+    ['user', 'Users'],
+    ['people', 'People'],
+    ['person', 'People'],
+    ['individuals', 'Individuals']
+  ];
+  const s = normalizedSentence.toLowerCase();
+  return groups
+    .filter(([needle]) => new RegExp(`\\b${needle.replace(/\s+/g, '\\s+')}\\b`, 'i').test(s))
+    .map(([, label]) => label);
+}
+
+function genericPurposeLooksDecisionRelevant(value) {
+  return includesAny(normalizeWhitespace(value).toLowerCase(), [
+    /\b(rank|score|rate|prioriti[sz]e|screen|evaluate|assess|flag|detect|classify|recommend|approve|reject|decide|determine|predict)\w*\b/
+  ]);
+}
+
+function textMentionsPersonRelatedData(normalizedSentence) {
+  return includesAny(normalizedSentence.toLowerCase(), [
+    /\b(name|email|phone|address|location|ip address|profile|history|record|cv|resume|cover letter|application data|grade|health|biometric|financial|transaction|salary|performance|order|ticket|live chat|refund|purchase|browsing)\w*\b/
+  ]);
+}
+
 function createFactEvidence({ fact, value, sourceText, source, messageIndex, confidence = 0.95 }) {
   return {
     fact,
@@ -193,16 +414,243 @@ function addFact(facts, fact, value, sentence, source, messageIndex, confidence 
 
 function detectFactsInSentence(sentence, source, messageIndex) {
   const facts = [];
+  const normalizedSentence = normalizeWhitespace(sentence);
   const s = sentence.toLowerCase();
+
+  const namedSystemMatch = normalizedSentence.match(/^([A-Z][A-Za-z0-9_-]{2,})\s+is\s+(?:an?|the)\s+/);
+  if (namedSystemMatch?.[1] && !['this', 'there'].includes(namedSystemMatch[1].toLowerCase())) {
+    addFact(facts, 'systemName', namedSystemMatch[1], sentence, source, messageIndex, 0.9);
+  }
+
+  if (includesAny(s, [/\bhigh school teacher\b/])) {
+    addFact(facts, 'userRole', 'High school teacher', sentence, source, messageIndex, 0.94);
+    addFact(facts, 'primaryUsers', 'Teacher', sentence, source, messageIndex, 0.88);
+    addFact(facts, 'educationContext', true, sentence, source, messageIndex, 0.9);
+  }
+  if (includesAny(s, [/\b(i am|i'm|as a)\b.{0,40}\bteacher\b|\bteacher\b/])) {
+    addFact(facts, 'userRole', 'Teacher', sentence, source, messageIndex, 0.9);
+    addFact(facts, 'primaryUsers', 'Teacher', sentence, source, messageIndex, 0.88);
+    addFact(facts, 'educationContext', true, sentence, source, messageIndex, 0.86);
+  }
+  if (includesAny(s, [/\b(i am|i'm|as an?|as the)\b.{0,50}\b(hr specialist|human resources specialist|recruiter|hiring manager)\b|\bhr specialist\b|\bhuman resources specialist\b|\brecruiter\b|\bhiring manager\b/])) {
+    const role = includesAny(s, [/\brecruiter\b/])
+      ? 'Recruiter'
+      : includesAny(s, [/\bhiring manager\b/])
+        ? 'Hiring manager'
+        : 'HR specialist';
+    addFact(facts, 'userRole', role, sentence, source, messageIndex, 0.92);
+    addFact(facts, 'primaryUsers', 'HR or recruitment staff', sentence, source, messageIndex, 0.88);
+    addFact(facts, 'employmentContext', true, sentence, source, messageIndex, 0.9);
+  }
+
+  const genericRole = extractGenericRole(normalizedSentence);
+  if (genericRole) {
+    addFact(facts, 'userRole', genericRole, sentence, source, messageIndex, 0.72);
+    addFact(facts, 'primaryUsers', genericRole, sentence, source, messageIndex, 0.7);
+  }
+
+  const genericPurpose = extractGenericPurpose(normalizedSentence);
+  if (genericPurpose) {
+    addFact(facts, 'systemPurpose', genericPurpose, sentence, source, messageIndex, 0.76);
+    if (genericPurposeLooksDecisionRelevant(genericPurpose)) {
+      addFact(facts, 'decisionsSupported', `${genericPurpose} support`, sentence, source, messageIndex, 0.68);
+    }
+  }
+
+  const genericOutput = extractGenericOutput(normalizedSentence);
+  if (genericOutput) {
+    addFact(facts, 'systemOutputs', genericOutput, sentence, source, messageIndex, 0.68);
+  }
+
+  extractGenericInputs(normalizedSentence).forEach((input) => {
+    addFact(facts, 'systemInputs', input, sentence, source, messageIndex, 0.68);
+  });
+
+  const genericPeopleGroups = extractPeopleGroupsFromText(normalizedSentence);
+  genericPeopleGroups.forEach((group) => {
+    addFact(facts, 'affectedPersons', group, sentence, source, messageIndex, 0.68);
+  });
+  if (includesAny(s, [/\bsupport agents?\b|\bcustomer support agents?\b/])) {
+    addFact(facts, 'primaryUsers', 'Support agents', sentence, source, messageIndex, 0.72);
+  }
+  if (textMentionsPersonRelatedData(normalizedSentence)) {
+    addFact(facts, 'processesPersonalData', true, sentence, source, messageIndex, 0.62);
+  }
+  if (genericPeopleGroups.length && genericPurposeLooksDecisionRelevant(genericPurpose || normalizedSentence)) {
+    addFact(facts, 'profilesIndividualCharacteristic', true, sentence, source, messageIndex, 0.62);
+    if (includesAny(s, [/\b(rank|score|rate|prioriti[sz]e|screen|evaluate|assess|classify)\w*\b/])) {
+      addFact(facts, 'producesIndividualRiskScore', true, sentence, source, messageIndex, 0.6);
+    }
+  }
+  const negatesAutomatedDecision = textExplicitlyNegatesAutomatedDecision(s);
+  if (textExplicitlyAffirmsAutomatedDecision(s)) {
+    addFact(facts, 'fullyAutomatedDecision', true, sentence, source, messageIndex, 0.72);
+  }
+  if (negatesAutomatedDecision || includesAny(s, [
+    /\b(ai|system|tool|model)\b.{0,100}\b(cannot|can't|does not|doesn't|do not|don't|never|not)\b.{0,80}\b(make|decide|determine|approve|reject|assign|shortlist)\w*\b.{0,80}\b(final )?(decision|outcome|result|approval|rejection|applicants?|candidates?)\b/,
+    /\b(advisory only|recommendation only|suggestion only|does not make final decisions?|not a final decision)\b/,
+    /\b(i|we|human|person|people|staff|officer|manager|reviewer|specialist|team)\b.{0,100}\b(decide|decides|make|makes|determine|determines)\b.{0,80}\b(final )?(decision|outcome|result)\b/
+  ])) {
+    addFact(facts, 'fullyAutomatedDecision', false, sentence, source, messageIndex, 0.78);
+    addFact(facts, 'humanReviewAvailable', true, sentence, source, messageIndex, 0.72);
+  }
+  if (includesAny(s, [/\bstudents?\b/])) {
+    addFact(facts, 'affectedPersons', 'Students', sentence, source, messageIndex, 0.82);
+    addFact(facts, 'educationContext', true, sentence, source, messageIndex, 0.78);
+  }
+  if (includesAny(s, [/\blesson plans?\b|\bprepare lesson materials?\b|\bgenerate quiz questions?\b|\bquiz questions?\b/])) {
+    addFact(facts, 'lessonPlanningPurpose', true, sentence, source, messageIndex, 0.9);
+    addFact(facts, 'systemPurpose', includesAny(s, [/\bquiz questions?\b/]) ? 'Generate quiz questions or learning materials' : 'Generate lesson plans or learning materials', sentence, source, messageIndex, 0.86);
+    addFact(facts, 'systemOutputs', includesAny(s, [/\bquiz questions?\b/]) ? 'Quiz questions' : 'Lesson plans', sentence, source, messageIndex, 0.82);
+    addFact(facts, 'educationContext', true, sentence, source, messageIndex, 0.86);
+  }
+  if (includesAny(s, [/\b(assignments?|student assignments?|student work)\b.{0,80}\b(evaluat|assess|score|grade|feedback)\w*\b|\b(evaluat|assess|score|grade|feedback)\w*\b.{0,80}\b(assignments?|student work)\b/])) {
+    addFact(facts, 'assignmentEvaluationPurpose', true, sentence, source, messageIndex, 0.9);
+    addFact(facts, 'systemPurpose', 'Evaluate student assignments or student work', sentence, source, messageIndex, 0.84);
+    addFact(facts, 'processesStudentWork', true, sentence, source, messageIndex, 0.84);
+    addFact(facts, 'systemInputs', 'Student assignments or student work', sentence, source, messageIndex, 0.82);
+    addFact(facts, 'affectedPersons', 'Students', sentence, source, messageIndex, 0.86);
+    addFact(facts, 'educationContext', true, sentence, source, messageIndex, 0.88);
+  }
+  if (includesAny(s, [/\b(score|scores|scoring|grade|grades|grading)\b.{0,80}\b(essays?|student essays?)\b|\b(essays?|student essays?)\b.{0,80}\b(score|scores|scoring|grade|grades|grading)\b/])) {
+    addFact(facts, 'essayScoringPurpose', true, sentence, source, messageIndex, 0.92);
+    addFact(facts, 'assignmentEvaluationPurpose', true, sentence, source, messageIndex, 0.9);
+    addFact(facts, 'systemPurpose', 'Score or evaluate student essays', sentence, source, messageIndex, 0.88);
+    addFact(facts, 'processesStudentWork', true, sentence, source, messageIndex, 0.86);
+    addFact(facts, 'systemInputs', 'Student essays', sentence, source, messageIndex, 0.86);
+    addFact(facts, 'systemOutputs', 'Essay score or evaluation', sentence, source, messageIndex, 0.84);
+    addFact(facts, 'evaluatesLearningOutcome', true, sentence, source, messageIndex, 0.82);
+    addFact(facts, 'affectedPersons', 'Students', sentence, source, messageIndex, 0.86);
+    addFact(facts, 'educationContext', true, sentence, source, messageIndex, 0.9);
+  }
+  if (includesAny(s, [/\b(generate|draft|provide|create|suggest)\w*\b.{0,60}\bfeedback\b|\bfeedback\b.{0,60}\b(generate|draft|provide|create|suggest)\w*\b/])) {
+    addFact(facts, 'systemPurpose', 'Generate feedback for student work', sentence, source, messageIndex, 0.84);
+    addFact(facts, 'systemOutputs', 'Feedback generation', sentence, source, messageIndex, 0.84);
+    if (includesAny(s, [/\bstudents?|essays?|assignments?|student work\b/])) {
+      addFact(facts, 'assignmentEvaluationPurpose', true, sentence, source, messageIndex, 0.82);
+      addFact(facts, 'affectedPersons', 'Students', sentence, source, messageIndex, 0.8);
+      addFact(facts, 'educationContext', true, sentence, source, messageIndex, 0.82);
+    }
+  }
+  if (includesAny(s, [/\bonly\b.{0,40}\b(suggests?|recommend\w*)\b.{0,60}\bfeedback\b|\b(suggests?|recommend\w*)\b.{0,60}\bfeedback\b.{0,40}\bonly\b/])) {
+    addFact(facts, 'feedbackSuggestionOnly', true, sentence, source, messageIndex, 0.9);
+    addFact(facts, 'systemOutputs', 'Feedback suggestions', sentence, source, messageIndex, 0.86);
+    addFact(facts, 'fullyAutomatedDecision', false, sentence, source, messageIndex, 0.82);
+  }
+  if (includesAny(s, [/\b(i|teacher|human)\b.{0,80}\b(decide|decides|make|makes)\b.{0,60}\b(final )?(grade|grading decision)\b|\bfinal grade\b.{0,80}\b(myself|teacher|human|i decide)\b/])) {
+    addFact(facts, 'teacherFinalGradeDecision', true, sentence, source, messageIndex, 0.92);
+    addFact(facts, 'humanReviewAvailable', true, sentence, source, messageIndex, 0.9);
+    addFact(facts, 'humanCanOverride', true, sentence, source, messageIndex, 0.86);
+    addFact(facts, 'fullyAutomatedDecision', false, sentence, source, messageIndex, 0.86);
+    addFact(facts, 'assignsAcademicGrade', false, sentence, source, messageIndex, 0.82);
+  }
+  if (includesAny(s, [/\b(ai|system|score)\b.{0,80}\b(directly|automatically)\b.{0,80}\b(final grade|grade)\b|\bfinal grade\b.{0,80}\b(automatically|directly)\b.{0,80}\b(ai|system|score)\b/])) {
+    addFact(facts, 'assignsAcademicGrade', true, sentence, source, messageIndex, 0.88);
+    addFact(facts, 'fullyAutomatedDecision', true, sentence, source, messageIndex, 0.82);
+  }
+  if (includesAny(s, [/\bstudents?\b.{0,80}\b(ask|request)\b.{0,80}\b(review|correct|correction)\b|\b(review|correct|correction)\b.{0,80}\bincorrect score\b/])) {
+    addFact(facts, 'correctionRightAvailable', true, sentence, source, messageIndex, 0.9);
+    addFact(facts, 'manualReviewAvailable', true, sentence, source, messageIndex, 0.86);
+    addFact(facts, 'affectedPersons', 'Students', sentence, source, messageIndex, 0.82);
+  }
+  if (includesAny(s, [/\bstudent names?\b.{0,60}\b(use|used|entered|shared|included)\b|\b(use|used|enter|entered|share|shared|include|included)\b.{0,60}\bstudent names?\b/])) {
+    const negatedNames = includesAny(s, [/\b(no|not|without|do not|don't|does not|doesn't|not told|have not told)\b.{0,80}\bstudent names?\b|\bstudent names?\b.{0,80}\b(no|not|unknown|not told)\b/]);
+    if (includesAny(s, [/\bnot told\b|\bhave not told\b|\bunknown\b|\bwhether\b/])) {
+      addFact(facts, 'studentNamesUseUnknown', true, sentence, source, messageIndex, 0.9);
+    } else {
+      addFact(facts, 'studentNamesUsed', !negatedNames, sentence, source, messageIndex, 0.86);
+      if (!negatedNames) addFact(facts, 'processesPersonalData', true, sentence, source, messageIndex, 0.86);
+    }
+  }
+  const personalDataUnknownMention = includesAny(s, [/\bnot told\b|\bhave not told\b|\bunknown\b|\bwhether\b/]);
+  if (!personalDataUnknownMention && includesAny(s, [/\bstudent (names?|ids?|grades?|records?)\b|\bgrades?\b.{0,40}\bstudents?\b/])) {
+    addFact(facts, 'processesPersonalData', true, sentence, source, messageIndex, 0.75);
+  }
 
   if (includesAny(s, [/\b(university|student|students|school|academic|attendance|counselor|counsellor)\b/])) {
     addFact(facts, 'educationContext', true, sentence, source, messageIndex);
+  }
+  if (includesAny(s, [/\b(admission|admissions|university admissions|educational institution access|student applicant|applicant scoring|waiting[- ]list|acceptance|rejection)\b/])) {
+    addFact(facts, 'educationContext', true, sentence, source, messageIndex);
+    addFact(facts, 'educationAdmissionsPurpose', true, sentence, source, messageIndex, 0.9);
+    addFact(facts, 'systemPurpose', 'Support university admissions by scoring applicants and recommending acceptance, rejection, or waiting-list outcomes', sentence, source, messageIndex, 0.82);
+  }
+  if (includesAny(s, [/\b(applicant scoring|scores? applicants?|applicant score|student applicant score|admissions score)\b/])) {
+    addFact(facts, 'applicantScoring', true, sentence, source, messageIndex, 0.92);
+    addFact(facts, 'producesIndividualRiskScore', true, sentence, source, messageIndex, 0.85);
+    addFact(facts, 'profilesIndividualCharacteristic', true, sentence, source, messageIndex, 0.82);
+  }
+  if (includesAny(s, [/\b(acceptance|rejection|waiting[- ]list|admissions recommendation|recommendations? for admission|admission outcome)\b/])) {
+    addFact(facts, 'recommendsAdmissionsOutcome', true, sentence, source, messageIndex, 0.9);
+    addFact(facts, 'decisionsSupported', 'Acceptance, rejection, or waiting-list recommendation', sentence, source, messageIndex, 0.82);
+  }
+  if (includesAny(s, [/\b(officers?|admissions officers?)\b.{0,80}\b(usually|normally|often|typically)\b.{0,80}\bfollow\b/])) {
+    addFact(facts, 'officersUsuallyFollowRecommendation', true, sentence, source, messageIndex, 0.86);
+    addFact(facts, 'humanReviewAvailable', true, sentence, source, messageIndex, 0.7);
+  }
+  if (includesAny(s, [/\b(no|not|without)\b.{0,80}\b(formal )?(appeal|challenge|review) mechanism\b/])) {
+    addFact(facts, 'noFormalAppealMechanism', true, sentence, source, messageIndex, 0.9);
+    addFact(facts, 'appealMechanismAvailable', false, sentence, source, messageIndex, 0.86);
+  }
+  if (includesAny(s, [/\b(no|not|without)\b.{0,100}\b(clear|individual|score)\b.{0,80}\b(explanation|reasons?)\b/])) {
+    addFact(facts, 'noClearIndividualExplanation', true, sentence, source, messageIndex, 0.88);
+    addFact(facts, 'explanationAvailable', false, sentence, source, messageIndex, 0.82);
+  }
+  if (includesAny(s, [/\b(third[- ]party cloud|cloud provider|external cloud|processor|subprocessor|subcontractor)\b/])) {
+    addFact(facts, 'usesThirdPartyCloudProvider', true, sentence, source, messageIndex, 0.88);
+  }
+  if (includesAny(s, [/\b(demographic information|demographics|gender|age|region|socioeconomic|socio-economic|previous school|ethnic|race|racial)\b/])) {
+    addFact(facts, 'processesDemographicData', true, sentence, source, messageIndex, 0.85);
+    addFact(facts, 'processesPersonalData', true, sentence, source, messageIndex, 0.8);
+  }
+  if (includesAny(s, [/\b(disability|disabled|health condition|special needs)\b/])) {
+    addFact(facts, 'processesDisabilityData', true, sentence, source, messageIndex, 0.9);
+    addFact(facts, 'dataFieldDisability', true, sentence, source, messageIndex, 0.9);
+    addFact(facts, 'processesPersonalData', true, sentence, source, messageIndex, 0.86);
+  }
+  if (includesAny(s, [/\bgender\b/])) {
+    addFact(facts, 'dataFieldGender', true, sentence, source, messageIndex, 0.82);
+  }
+  if (includesAny(s, [/\bage\b/])) {
+    addFact(facts, 'dataFieldAge', true, sentence, source, messageIndex, 0.78);
+  }
+  if (includesAny(s, [/\bregion|regional\b/])) {
+    addFact(facts, 'dataFieldRegion', true, sentence, source, messageIndex, 0.78);
+  }
+  if (includesAny(s, [/\bsocioeconomic|socio-economic\b/])) {
+    addFact(facts, 'dataFieldSocioeconomic', true, sentence, source, messageIndex, 0.82);
+  }
+  if (includesAny(s, [/\bprevious school\b/])) {
+    addFact(facts, 'dataFieldPreviousSchool', true, sentence, source, messageIndex, 0.78);
+  }
+  if (includesAny(s, [/\bhistorical\b.{0,80}\b(bias|discrimination|unfairness)\b|\b(gender|socioeconomic|regional|disability)\b.{0,80}\bbias\b/])) {
+    addFact(facts, 'historicalBiasEvidence', true, sentence, source, messageIndex, 0.86);
   }
   if (includesAny(s, [/\b(stress|wellbeing|well-being|counseling|counselling|counselor|counsellor)\b/])) {
     addFact(facts, 'studentWellbeingPurpose', true, sentence, source, messageIndex);
   }
   if (includesAny(s, [/\b(workforce|employee|employees|employment|hr staff|human resources|manager|managers)\b/])) {
     addFact(facts, 'employmentContext', true, sentence, source, messageIndex);
+  }
+  if (includesAny(s, [/\b(job applicants?|candidates?|applicants?)\b/])) {
+    addFact(facts, 'employmentContext', true, sentence, source, messageIndex, 0.88);
+    addFact(facts, 'jobApplicantsAffected', true, sentence, source, messageIndex, 0.9);
+    addFact(facts, 'affectedPersons', 'Job applicants', sentence, source, messageIndex, 0.88);
+    addFact(facts, 'processesPersonalData', true, sentence, source, messageIndex, 0.82);
+  }
+  if (includesAny(s, [
+    /\b(rank|ranks|ranking|score|scores|scoring|prioriti[sz]e|prioriti[sz]es|shortlist|screen|evaluate|assess)\w*\b.{0,100}\b(job applicants?|candidates?|applicants?)\b/,
+    /\b(job applicants?|candidates?|applicants?)\b.{0,100}\b(rank|ranks|ranking|score|scores|scoring|prioriti[sz]e|prioriti[sz]es|shortlist|screen|evaluate|assess)\w*\b/
+  ])) {
+    addFact(facts, 'employmentRecruitmentPurpose', true, sentence, source, messageIndex, 0.92);
+    addFact(facts, 'applicantRankingPurpose', true, sentence, source, messageIndex, 0.92);
+    addFact(facts, 'ranksJobApplicants', true, sentence, source, messageIndex, 0.9);
+    addFact(facts, 'supportsHiringDecision', true, sentence, source, messageIndex, 0.86);
+    addFact(facts, 'systemPurpose', 'Rank job applicants for recruitment or hiring review', sentence, source, messageIndex, 0.88);
+    addFact(facts, 'systemOutputs', 'Applicant ranking or suitability score', sentence, source, messageIndex, 0.86);
+    addFact(facts, 'decisionsSupported', 'Hiring or shortlisting decision support', sentence, source, messageIndex, 0.84);
+    addFact(facts, 'producesIndividualRiskScore', true, sentence, source, messageIndex, 0.8);
+    addFact(facts, 'profilesIndividualCharacteristic', true, sentence, source, messageIndex, 0.78);
   }
   if (includesAny(s, [/\bmanufacturing\b/])) {
     addFact(facts, 'manufacturingContext', true, sentence, source, messageIndex);
@@ -270,7 +718,11 @@ function detectFactsInSentence(sentence, source, messageIndex) {
   if (includesAny(s, [/\b(does not|not|no)\b.{0,60}\b(personali[sz]ed content|content recommendation|news feed)\b/])) {
     addFact(facts, 'recommendsPersonalizedContent', false, sentence, source, messageIndex);
   }
-  if (includesAny(s, [/\b(automated grading|assigns? grades?|academic grade|grades students)\b/])) {
+  const negatesAcademicGradeAssignment = textExplicitlyNegatesFinalGradeAssignment(s);
+  if (negatesAcademicGradeAssignment) {
+    addFact(facts, 'assignsAcademicGrade', false, sentence, source, messageIndex, 0.9);
+    addFact(facts, 'fullyAutomatedDecision', false, sentence, source, messageIndex, 0.82);
+  } else if (includesAny(s, [/\b(automated grading|assigns? grades?|academic grade|grades students)\b/])) {
     addFact(facts, 'assignsAcademicGrade', true, sentence, source, messageIndex);
   }
   if (includesAny(s, [/\b(learning outcome|student assessment|exam score|performance evaluation)\b/])) {
@@ -320,7 +772,7 @@ function detectFactsInSentence(sentence, source, messageIndex) {
   } else if (includesAny(s, [/\bhealth data\b/])) {
     addFact(facts, 'processesHealthData', true, sentence, source, messageIndex);
   }
-  if (includesAny(s, [/\bdoes not use\b.{0,120}\bbiometric data\b|\b(no|not|without)\b.{0,60}\bbiometric data\b/])) {
+  if (includesAny(s, [/\bdoes not use\b.{0,120}\b(biometric data|biometrics)\b|\b(no|not|without)\b.{0,60}\b(biometric data|biometrics)\b/])) {
     addFact(facts, 'processesBiometricData', false, sentence, source, messageIndex);
   } else if (includesAny(s, [/\bbiometric data\b|\bbiometrics\b/])) {
     addFact(facts, 'processesBiometricData', true, sentence, source, messageIndex);
@@ -369,6 +821,31 @@ function detectFactsInSentence(sentence, source, messageIndex) {
     addFact(facts, 'processesHRRecords', true, sentence, source, messageIndex);
     addFact(facts, 'processesPersonalData', true, sentence, source, messageIndex);
   }
+  if (includesAny(s, [/\bcvs?\b|\bcurricula vitae\b|\bresumes?\b/])) {
+    addFact(facts, 'processesApplicantCVs', true, sentence, source, messageIndex, 0.9);
+    addFact(facts, 'systemInputs', 'CVs or resumes', sentence, source, messageIndex, 0.86);
+    addFact(facts, 'processesPersonalData', true, sentence, source, messageIndex, 0.86);
+  }
+  if (includesAny(s, [/\beducation\b|\beducational background\b|\bdegrees?\b|\bschools?\b|\buniversit(y|ies)\b/]) && includesAny(s, [/\b(job applicants?|candidates?|applicants?|cvs?|resumes?)\b/])) {
+    addFact(facts, 'processesApplicantEducation', true, sentence, source, messageIndex, 0.86);
+    addFact(facts, 'systemInputs', 'Applicant education history', sentence, source, messageIndex, 0.82);
+    addFact(facts, 'processesPersonalData', true, sentence, source, messageIndex, 0.82);
+  }
+  if (includesAny(s, [/\bwork experience\b|\bemployment history\b|\bexperience\b/]) && includesAny(s, [/\b(job applicants?|candidates?|applicants?|cvs?|resumes?)\b/])) {
+    addFact(facts, 'processesApplicantWorkExperience', true, sentence, source, messageIndex, 0.88);
+    addFact(facts, 'systemInputs', 'Applicant work experience', sentence, source, messageIndex, 0.84);
+    addFact(facts, 'processesPersonalData', true, sentence, source, messageIndex, 0.82);
+  }
+  if (includesAny(s, [/\bskills?\b|\bcompetenc(y|ies)\b/]) && includesAny(s, [/\b(job applicants?|candidates?|applicants?|cvs?|resumes?)\b/])) {
+    addFact(facts, 'processesApplicantSkills', true, sentence, source, messageIndex, 0.88);
+    addFact(facts, 'systemInputs', 'Applicant skills', sentence, source, messageIndex, 0.84);
+    addFact(facts, 'processesPersonalData', true, sentence, source, messageIndex, 0.78);
+  }
+  if (includesAny(s, [/\bcover letters?\b|\bmotivation letters?\b/])) {
+    addFact(facts, 'processesCoverLetters', true, sentence, source, messageIndex, 0.9);
+    addFact(facts, 'systemInputs', 'Cover letters', sentence, source, messageIndex, 0.86);
+    addFact(facts, 'processesPersonalData', true, sentence, source, messageIndex, 0.86);
+  }
   if (includesAny(s, [/\bheart rate\b|\bsleep patterns?\b|\bhealth-related\b|\bwellbeing\b|\bwell-being\b|\bstress\b|\bwearable\b|\bsmartwatch\b/])) {
     addFact(facts, 'processesHealthRelatedData', true, sentence, source, messageIndex);
   }
@@ -391,7 +868,25 @@ function detectFactsInSentence(sentence, source, messageIndex) {
   if (includesAny(s, [/\b(human review|human oversight|counselors? can review|counsellors? can review|claims? officers? review|review and override)\b/])) {
     addFact(facts, 'humanReviewAvailable', true, sentence, source, messageIndex);
   }
+  if (includesAny(s, [/\breview\b.{0,80}\b(ai[- ]generated )?(score|scores|feedback|recommendation|output)\b/])) {
+    addFact(facts, 'humanReviewAvailable', true, sentence, source, messageIndex, 0.86);
+  }
   if (includesAny(s, [/\b(claims?\s+officer|officer|human reviewer)\b.{0,80}\breviews?\b.{0,80}\b(recommendation|claim|output)\b/])) {
+    addFact(facts, 'humanReviewAvailable', true, sentence, source, messageIndex, 0.9);
+  }
+  if (includesAny(s, [/\b(hr|hr specialist|hr staff|human resources|recruiter|hiring manager)\b.{0,90}\breviews?\b.{0,90}\b(ranking|recommendation|candidates?|applicants?|output)\b/])) {
+    addFact(facts, 'humanReviewAvailable', true, sentence, source, messageIndex, 0.9);
+  }
+  if (includesAny(s, [/\b(recommendation|claim|output)\b.{0,100}\breviewed\b.{0,80}\b(claims?\s+officer|human reviewer)\b/])) {
+    addFact(facts, 'humanReviewAvailable', true, sentence, source, messageIndex, 0.9);
+  }
+  if (includesAny(s, [
+    /\b(i|we|human|person|people|staff|agent|agents|support agent|support agents|officer|officers|manager|managers|reviewer|reviewers|specialist|specialists|team)\b.{0,100}\breview(s|ed)?\b.{0,100}\b(ai[- ]generated|AI|output|result|recommendation|ranking|score|flag|decision|assessment)\b/i,
+    /\b(ai[- ]generated|AI|output|result|recommendation|ranking|score|flag|decision|assessment)\b.{0,100}\breviewed\b.{0,100}\b(i|we|human|person|people|staff|agent|agents|support agent|support agents|officer|officers|manager|managers|reviewer|reviewers|specialist|specialists|team)\b/i
+  ])) {
+    addFact(facts, 'humanReviewAvailable', true, sentence, source, messageIndex, 0.82);
+  }
+  if (includesAny(s, [/\b(ranking|recommendation|candidates?|applicants?|output)\b.{0,100}\breviewed\b.{0,80}\b(hr|hr specialist|hr staff|human resources|recruiter|hiring manager|human reviewer)\b/])) {
     addFact(facts, 'humanReviewAvailable', true, sentence, source, messageIndex, 0.9);
   }
   if (includesAny(s, [/\bhuman manager reviews\b|\bmanager reviews\b|\breviews every proposed schedule\b|\bmanual scheduling review\b/])) {
@@ -399,6 +894,55 @@ function detectFactsInSentence(sentence, source, messageIndex) {
   }
   if (includesAny(s, [/\b(can override|override the system|override recommendations?|manual override|review and override)\b/])) {
     addFact(facts, 'humanCanOverride', true, sentence, source, messageIndex);
+  }
+  if (includesAny(s, [/\b(i|teacher|human)\b.{0,100}\b(can|could|may)\b.{0,60}\b(change|modify|adjust)\b.{0,80}\b(ai'?s? )?(recommendation|score|feedback|output)\b/])) {
+    addFact(facts, 'humanCanModify', true, sentence, source, messageIndex, 0.88);
+    addFact(facts, 'humanCanOverride', true, sentence, source, messageIndex, 0.8);
+  }
+  if (includesAny(s, [/\b(i|we|human|person|people|staff|agent|agents|support agent|support agents|officer|officers|manager|managers|reviewer|reviewers|specialist|specialists|team)\b.{0,100}\b(can|could|may|have authority to|retains? authority to|retains? full authority to)\b.{0,70}\b(change|modify|adjust|override|edit|approve)\b.{0,90}\b(ai'?s? )?(output|result|recommendation|ranking|score|flag|decision|assessment|it)\b/i])) {
+    addFact(facts, 'humanCanModify', true, sentence, source, messageIndex, 0.82);
+    addFact(facts, 'humanCanOverride', true, sentence, source, messageIndex, 0.8);
+  }
+  if (includesAny(s, [/\b(i|hr|hr specialist|hr staff|human resources|recruiter|hiring manager|human)\b.{0,100}\b(can|could|may)\b.{0,60}\b(change|modify|adjust|override)\b.{0,80}\b(ai'?s? )?(ranking|recommendation|shortlist|score|output)\b/])) {
+    addFact(facts, 'humanCanModify', true, sentence, source, messageIndex, 0.88);
+    addFact(facts, 'humanCanOverride', true, sentence, source, messageIndex, 0.84);
+  }
+  if (includesAny(s, [/\b(i|teacher|human)\b.{0,100}\b(can|could|may)\b.{0,60}\breject\b.{0,80}\b(ai'?s? )?(recommendation|score|feedback|output)\b/])) {
+    addFact(facts, 'humanCanReject', true, sentence, source, messageIndex, 0.88);
+    addFact(facts, 'humanCanOverride', true, sentence, source, messageIndex, 0.8);
+  }
+  if (includesAny(s, [/\b(i|we|human|person|people|staff|agent|agents|support agent|support agents|officer|officers|manager|managers|reviewer|reviewers|specialist|specialists|team)\b.{0,100}\b(can|could|may|have authority to|retains? authority to|retains? full authority to)\b.{0,70}\b(reject|ignore|disregard)\b.{0,90}\b(ai'?s? )?(output|result|recommendation|ranking|score|flag|decision|assessment|it)\b/i])) {
+    addFact(facts, 'humanCanReject', true, sentence, source, messageIndex, 0.82);
+    addFact(facts, 'humanCanOverride', true, sentence, source, messageIndex, 0.78);
+  }
+  if (includesAny(s, [
+    /\b(human|person|people|staff|agent|agents|support agent|support agents|officer|officers|manager|managers|reviewer|reviewers|specialist|specialists|team)\b.{0,100}\b(full authority|authority)\b.{0,120}\b(approve|edit|change|modify|adjust|override|reject|ignore|disregard)\b/i
+  ])) {
+    addFact(facts, 'humanCanOverride', true, sentence, source, messageIndex, 0.82);
+    if (includesAny(s, [/\b(edit|change|modify|adjust|approve)\b/])) {
+      addFact(facts, 'humanCanModify', true, sentence, source, messageIndex, 0.78);
+    }
+    if (includesAny(s, [/\b(reject|ignore|disregard)\b/])) {
+      addFact(facts, 'humanCanReject', true, sentence, source, messageIndex, 0.78);
+    }
+  }
+  if (includesAny(s, [/\b(i|hr|hr specialist|hr staff|human resources|recruiter|hiring manager|human)\b.{0,100}\b(can|could|may)\b.{0,60}\b(reject|ignore|disregard)\b.{0,80}\b(ai'?s? )?(ranking|recommendation|shortlist|score|output)\b/])) {
+    addFact(facts, 'humanCanReject', true, sentence, source, messageIndex, 0.88);
+    addFact(facts, 'humanCanOverride', true, sentence, source, messageIndex, 0.84);
+  }
+  if (!negatesAutomatedDecision && includesAny(s, [/\b(ai|system|tool)\b.{0,80}\b(automatically|directly|without human|fully automated)\b.{0,80}\b(reject|shortlist|rank out|screen out)\w*\b.{0,80}\b(job applicants?|candidates?|applicants?)\b/])) {
+    addFact(facts, 'fullyAutomatedDecision', true, sentence, source, messageIndex, 0.86);
+    addFact(facts, 'makesHiringDecision', true, sentence, source, messageIndex, 0.8);
+  }
+  if (includesAny(s, [
+    /\b(ai|system|tool)\b.{0,80}\b(does not|doesn't|do not|don't|never|not)\b.{0,80}\b(reject|shortlist|decide|hire|make hiring)\w*\b.{0,80}\b(job applicants?|candidates?|applicants?|hiring decisions?)\b/,
+    /\b(i|hr|hr specialist|hr staff|human resources|recruiter|hiring manager|human)\b.{0,100}\b(decide|decides|make|makes)\b.{0,100}\b(final )?(hiring|shortlisting|selection|decision|outcome)\b.{0,100}\b(interview|shortlist|proceed|candidate|applicant|hiring)\b/,
+    /\b(i|hr|hr specialist|hr staff|human resources|recruiter|hiring manager|human)\b.{0,100}\b(decide|decides|make|makes)\b.{0,80}\b(final )?(hiring|shortlisting|selection)\b/,
+    /\bmake the final decision\b.{0,100}\b(who proceeds|interview stage|applicants?|candidates?)\b/
+  ])) {
+    addFact(facts, 'fullyAutomatedDecision', false, sentence, source, messageIndex, 0.86);
+    addFact(facts, 'makesHiringDecision', false, sentence, source, messageIndex, 0.82);
+    addFact(facts, 'humanReviewAvailable', true, sentence, source, messageIndex, 0.82);
   }
   if (includesAny(s, [/\b(claims?\s+officer|officer|human reviewer)\b.{0,80}\b(can )?(modify|change|adjust|reject|override)\b.{0,80}\b(recommendation|claim|output)\b/])) {
     if (includesAny(s, [/\boverride\b/])) addFact(facts, 'humanCanOverride', true, sentence, source, messageIndex, 0.86);
@@ -420,17 +964,24 @@ function detectFactsInSentence(sentence, source, messageIndex) {
   if (includesAny(s, [/\bbefore publication\b|\bpublished only after\b|\bpublication\b/]) && includesAny(s, [/\breview|modify|reject|manager\b/])) {
     addFact(facts, 'decisionPublishedOnlyAfterHumanReview', true, sentence, source, messageIndex);
   }
-  if (includesAny(s, [/\bview the reason\b|\breason for their assigned shifts?\b|\bexplanation\b|\breasons? for assigned shifts?\b/])) {
+  const negatesExplanation = includesAny(s, [
+    /\b(no|not|without)\b.{0,100}\b(clear|individual|score)?\b.{0,80}\b(explanation|reasons?)\b/
+  ]);
+  if (!negatesExplanation && includesAny(s, [/\bview the reason\b|\breason for their assigned shifts?\b|\bexplanation\b|\breasons? for assigned shifts?\b/])) {
     addFact(facts, 'explanationAvailable', true, sentence, source, messageIndex);
   }
   if (includesAny(s, [/\brequest corrections?\b|\bcorrect inaccurate information\b|\bcorrection right\b|\bmay correct\b/])) {
     addFact(facts, 'correctionRightAvailable', true, sentence, source, messageIndex);
   }
-  if (includesAny(s, [/\bchallenge an assignment\b|\bchallenge\b.{0,60}\bassignment\b|\bappeal\b|\bcontest\b/])) {
+  const negatesAppeal = includesAny(s, [
+    /\b(no|not|without)\b.{0,80}\b(formal )?(appeal|challenge|review) mechanism\b/,
+    /\b(no|not|without)\b.{0,80}\b(second )?manual review\b/
+  ]);
+  if (!negatesAppeal && includesAny(s, [/\bchallenge an assignment\b|\bchallenge\b.{0,60}\bassignment\b|\bappeal\b|\bcontest\b/])) {
     addFact(facts, 'challengeMechanismAvailable', true, sentence, source, messageIndex);
     addFact(facts, 'appealMechanismAvailable', true, sentence, source, messageIndex, 0.9);
   }
-  if (includesAny(s, [/\bmanual scheduling review\b|\bmanual review\b|\brequest a manual\b/])) {
+  if (!negatesAppeal && includesAny(s, [/\bmanual scheduling review\b|\bmanual review\b|\brequest a manual\b/])) {
     addFact(facts, 'manualReviewAvailable', true, sentence, source, messageIndex);
     addFact(facts, 'appealMechanismAvailable', true, sentence, source, messageIndex, 0.9);
   }
@@ -483,7 +1034,7 @@ function detectFactsInSentence(sentence, source, messageIndex) {
   if (includesAny(s, [/\bpseudonymi[sz]ation\b|\banonymi[sz]ation\b|\bde-identif(y|ied|ication)\b/])) {
     addFact(facts, 'pseudonymizationUsed', true, sentence, source, messageIndex, 0.85);
   }
-  if (includesAny(s, [/\bappeal\b|\bcontest\b|\bchallenge the decision\b|\breview request\b/])) {
+  if (!negatesAppeal && includesAny(s, [/\bappeal\b|\bcontest\b|\bchallenge the decision\b|\breview request\b/])) {
     addFact(facts, 'appealMechanismAvailable', true, sentence, source, messageIndex, 0.85);
   }
   if (includesAny(s, [/\bmodel training\b|\btrain the model\b|\btraining data\b/])) {
@@ -496,8 +1047,190 @@ function detectFactsInSentence(sentence, source, messageIndex) {
   return facts;
 }
 
-function extractFactsFromText(text, source, messageIndex = null) {
-  return splitSentences(text).flatMap((sentence) => detectFactsInSentence(sentence, source, messageIndex));
+function extractFactsFromText(text, source, messageIndex = null, sourceMessageId = null) {
+  return splitSentences(text)
+    .flatMap((sentence) => detectFactsInSentence(sentence, source, messageIndex))
+    .map((fact) => (sourceMessageId ? { ...fact, sourceMessageId } : fact));
+}
+
+function getLastSystemTextBeforeLatestUser(messages) {
+  const items = Array.isArray(messages) ? messages : [];
+  let latestUserPosition = -1;
+
+  for (let index = items.length - 1; index >= 0; index -= 1) {
+    if (items[index]?.sender === 'user') {
+      latestUserPosition = index;
+      break;
+    }
+  }
+
+  const end = latestUserPosition >= 0 ? latestUserPosition - 1 : items.length - 1;
+  for (let index = end; index >= 0; index -= 1) {
+    if (items[index]?.sender === 'system' && normalizeWhitespace(items[index].text)) {
+      return normalizeWhitespace(items[index].text);
+    }
+  }
+
+  return '';
+}
+
+function parseShortContextAnswer(text) {
+  const normalized = normalizeWhitespace(text).toLowerCase().replace(/^["']+|["'.!?]+$/g, '');
+  if (!normalized || normalized.length > 80) return null;
+
+  if (/^(?:fully automated decision\s*=\s*)?true(?:\s+is\s+correct)?$/.test(normalized)) {
+    return { type: 'boolean', value: true };
+  }
+  if (/^(?:fully automated decision\s*=\s*)?false(?:\s+is\s+correct)?$/.test(normalized)) {
+    return { type: 'boolean', value: false };
+  }
+  if (/^(?:yes|yeah|yep|correct|that is correct|the latter|second|new|latest|now)$/.test(normalized)) {
+    return { type: ['the latter', 'second', 'new', 'latest', 'now'].includes(normalized) ? 'incoming' : 'yes' };
+  }
+  if (/^(?:no|nope|incorrect|the former|first|previous|old|earlier)$/.test(normalized)) {
+    return { type: ['the former', 'first', 'previous', 'old', 'earlier'].includes(normalized) ? 'existing' : 'no' };
+  }
+
+  return null;
+}
+
+function createContextualFact({ fact, value, latestUserMessage, pendingQuestion, confidence = 0.96 }) {
+  return {
+    ...createFactEvidence({
+      fact,
+      value,
+      sourceText: latestUserMessage.text,
+      source: 'USER_CONFIRMED',
+      messageIndex: latestUserMessage.index,
+      confidence
+    }),
+    sourceMessageId: latestUserMessage.sourceMessageId,
+    extractionMethod: 'CONTEXTUAL_SHORT_REPLY',
+    pendingQuestion
+  };
+}
+
+function latestActionableContradiction(previousState) {
+  const contradictions = (previousState?.contradictions || []).filter(isActionableContradiction);
+  return contradictions.find((item) => item.normalizedField === FINAL_GRADE_FIELD) || contradictions[0] || null;
+}
+
+function resolveContradictionValue(contradiction, parsedAnswer) {
+  if (!contradiction || !parsedAnswer) return null;
+
+  if (parsedAnswer.type === 'existing') {
+    return {
+      fact: contradiction.existingFact || contradiction.fact,
+      value: contradiction.existingRawValue
+    };
+  }
+
+  if (parsedAnswer.type === 'incoming') {
+    return {
+      fact: contradiction.incomingFact || contradiction.fact,
+      value: contradiction.incomingRawValue
+    };
+  }
+
+  if (parsedAnswer.type === 'boolean' && STRICT_BOOLEAN_CONTRADICTION_FACTS.has(contradiction.normalizedField)) {
+    return {
+      fact: contradiction.normalizedField,
+      value: parsedAnswer.value
+    };
+  }
+
+  return null;
+}
+
+function isAutomationBoundaryQuestion(text) {
+  return includesAny(normalizeWhitespace(text).toLowerCase(), [
+    /\bfully automated decision\b/,
+    /\bdirectly decide(?:s)? (?:an )?outcomes?\b/,
+    /\bdoes the ai output directly decide\b/,
+    /\bcan it automatically reject or shortlist\b/,
+    /\bautomated final decision\b/
+  ]);
+}
+
+function extractContextualFactsFromLatestAnswer({ messages, latestUserMessage, previousState }) {
+  if (!latestUserMessage) return [];
+
+  const parsedAnswer = parseShortContextAnswer(latestUserMessage.text);
+  if (!parsedAnswer) return [];
+
+  const pendingQuestion = getLastSystemTextBeforeLatestUser(messages);
+  const pendingQuestionText = normalizeWhitespace(pendingQuestion).toLowerCase();
+  const facts = [];
+
+  if (/which one is correct\?*$/i.test(pendingQuestionText)) {
+    const contradiction = latestActionableContradiction(previousState);
+    const resolution = resolveContradictionValue(contradiction, parsedAnswer);
+    if (resolution && isKnownFactValue(resolution.value)) {
+      facts.push(createContextualFact({
+        fact: resolution.fact,
+        value: resolution.value,
+        latestUserMessage,
+        pendingQuestion
+      }));
+    }
+    return facts;
+  }
+
+  if (isAutomationBoundaryQuestion(pendingQuestion) && parsedAnswer.type === 'boolean') {
+    facts.push(createContextualFact({
+      fact: 'fullyAutomatedDecision',
+      value: parsedAnswer.value,
+      latestUserMessage,
+      pendingQuestion
+    }));
+  }
+
+  return facts;
+}
+
+function contextualResolutionCandidates(contextualFacts) {
+  return (contextualFacts || [])
+    .map(contradictionCandidateForEntry)
+    .filter(Boolean);
+}
+
+function factConflictsWithContextualResolution(entry, resolutions) {
+  const candidate = contradictionCandidateForEntry(entry);
+  if (!candidate) return false;
+
+  return (resolutions || []).some((resolution) =>
+    candidate.normalizedField === resolution.normalizedField &&
+    candidate.normalizedValue !== resolution.normalizedValue
+  );
+}
+
+function filterFactsForContextualResolutions(facts, resolutions) {
+  if (!(resolutions || []).length) return facts;
+  return (facts || []).filter((entry) => !factConflictsWithContextualResolution(entry, resolutions));
+}
+
+function applyContextualResolutionsToState(previousState, resolutions) {
+  if (!(resolutions || []).length) return previousState;
+
+  const confirmedFacts = { ...(previousState?.confirmedFacts || {}) };
+  const factEvidence = filterFactsForContextualResolutions(previousState?.factEvidence || [], resolutions);
+  const contradictions = (previousState?.contradictions || []).filter((item) =>
+    !(resolutions || []).some((resolution) => resolution.normalizedField === item.normalizedField)
+  );
+
+  resolutions.forEach((resolution) => {
+    if (resolution.fact && resolution.normalizedField !== FINAL_GRADE_FIELD) {
+      confirmedFacts[resolution.fact] = resolution.rawValue;
+    }
+  });
+
+  return {
+    ...previousState,
+    confirmedFacts,
+    factEvidence,
+    contradictions,
+    contextualResolutionsApplied: resolutions.length
+  };
 }
 
 function evidenceIdentity(item) {
@@ -505,6 +1238,7 @@ function evidenceIdentity(item) {
     item.fact,
     String(item.value),
     item.source,
+    item.sourceMessageId || '',
     item.messageIndex === null || item.messageIndex === undefined ? 'project' : item.messageIndex,
     item.sourceText
   ].join('|');
@@ -518,45 +1252,440 @@ function hasConfirmedEvidence(evidence, fact) {
   return evidence.some((item) => item.fact === fact && ['USER_CONFIRMED', 'LLM_EXTRACTED', 'PROJECT_METADATA'].includes(item.source));
 }
 
-function mergeConversationFacts(previousState, newFacts) {
+function normalizeComparableFactText(value) {
+  return normalizeWhitespace(value).toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+
+function mergeAppendableFactValues(currentValue, incomingValue) {
+  const values = [];
+  const seen = new Set();
+
+  [currentValue, incomingValue].forEach((value) => {
+    listFromFact(value).forEach((item) => {
+      const normalized = normalizeComparableFactText(item);
+      if (!normalized || seen.has(normalized)) return;
+      seen.add(normalized);
+      values.push(item);
+    });
+  });
+
+  return values.join('; ');
+}
+
+function textFactValuesCompatible(fact, currentValue, incomingValue) {
+  if (!COMPATIBLE_TEXT_FACTS.has(fact)) return false;
+
+  const currentText = normalizeWhitespace(currentValue).toLowerCase();
+  const incomingText = normalizeWhitespace(incomingValue).toLowerCase();
+  if (!currentText || !incomingText) return false;
+
+  const currentCompact = normalizeComparableFactText(currentText);
+  const incomingCompact = normalizeComparableFactText(incomingText);
+  if (currentCompact === incomingCompact || currentCompact.includes(incomingCompact) || incomingCompact.includes(currentCompact)) {
+    return true;
+  }
+
+  if (fact === 'userRole') {
+    return ['teacher', 'student', 'officer', 'manager', 'reviewer', 'counselor', 'counsellor']
+      .some((role) => currentText.includes(role) && incomingText.includes(role));
+  }
+
+  return ['education', 'university', 'school', 'insurance', 'claim', 'employment', 'workforce', 'manufacturing']
+    .some((domain) => currentText.includes(domain) && incomingText.includes(domain));
+}
+
+function shouldPreferIncomingTextValue(currentValue, incomingValue, incomingIsUserConfirmed) {
+  if (!incomingIsUserConfirmed) return false;
+  return normalizeWhitespace(incomingValue).length > normalizeWhitespace(currentValue).length;
+}
+
+function isKnownFactValue(value) {
+  return value !== undefined &&
+    value !== null &&
+    value !== '' &&
+    value !== 'planned_or_uncertain' &&
+    value !== 'unknown';
+}
+
+function textExplicitlyAffirmsFinalGradeAssignment(text) {
+  const s = normalizeWhitespace(text).toLowerCase();
+  if (!s) return false;
+  if (textExplicitlyNegatesFinalGradeAssignment(s)) return false;
+  return includesAny(s, [
+    /\b(ai|system|tool)\b.{0,100}\b(automatically|directly|without human|fully automated)\b.{0,100}\b(assign|determine|decide|give|set)s?\b.{0,80}\b(final )?grades?\b/,
+    /\b(ai|system|tool)\b.{0,100}\b(assign|determine|decide|give|set)s?\b.{0,80}\b(final )?grades?\b/,
+    /\bautomated grading\b/,
+    /\bassigns? grades? to students?\b/
+  ]);
+}
+
+function textExplicitlyNegatesFinalGradeAssignment(text) {
+  const s = normalizeWhitespace(text).toLowerCase();
+  if (!s) return false;
+  return includesAny(s, [
+    /\b(ai|system|tool)\b.{0,100}\b(never|does not|doesn't|do not|don't|not)\b.{0,80}\b(assign|determine|decide|give|set)s?\b.{0,80}\b(final )?grades?\b/,
+    /\bnever assigns? grades?\b/,
+    /\b(i|teacher|human)\b.{0,100}\b(decide|decides|make|makes)\b.{0,80}\b(final )?grades?\b/
+  ]);
+}
+
+function textExplicitlyNegatesAutomatedDecision(text) {
+  const s = normalizeWhitespace(text).toLowerCase();
+  if (!s) return false;
+  return includesAny(s, [
+    /\b(cannot|can't|does not|doesn't|do not|don't|never|not)\b.{0,80}\b(automatically|directly|without human|fully automated)\b.{0,100}\b(approve|reject|decide|determine|shortlist|rank|score|assign)\w*\b/,
+    /\b(ai|system|tool|model)\b.{0,100}\b(cannot|can't|does not|doesn't|do not|don't|never|not)\b.{0,80}\b(approve|reject|decide|determine|shortlist|rank|score|assign|make)\w*\b/,
+    /\b(automatically|directly)\b.{0,80}\b(cannot|can't|does not|doesn't|do not|don't|never|not)\b.{0,80}\b(approve|reject|decide|determine|shortlist|rank|score|assign)\w*\b/,
+    /\b(automatically|directly)\b.{0,120}\b(?:but|while|whereas)\b.{0,100}\b(customers?|users?|people|humans?|agents?|support agents?|staff|officers?|managers?|reviewers?|specialists?|teachers?)\b.{0,80}\b(decide|decides|choose|chooses|approve|reject|change|modify|override|review)\w*\b/
+  ]);
+}
+
+function textExplicitlyAffirmsAutomatedDecision(text) {
+  const s = normalizeWhitespace(text).toLowerCase();
+  if (!s) return false;
+  if (textExplicitlyNegatesAutomatedDecision(s)) return false;
+
+  return includesAny(s, [
+    /\b(ai|system|tool|model)\b.{0,100}\b(automatically|directly|fully automated|solely automated|without human|no human)\b.{0,100}\b(approve|reject|decide|determine|shortlist|rank|score|assign|make)\w*\b/,
+    /\b(ai|system|tool|model)\b.{0,100}\b(approve|reject|decide|determine|shortlist|rank|score|assign|make)\w*\b.{0,100}\b(automatically|directly|fully automated|solely automated|without human|no human)\b/,
+    /\b(automatically|directly|fully automated|solely automated)\b.{0,50}\b(approve|reject|decide|determine|shortlist|rank|score|assign)\w*\b.{0,100}\b(refunds?|returns?|requests?|tickets?|orders?|claims?|applications?|applicants?|candidates?|customers?|students?|employees?|grades?|shifts?|outcomes?|decisions?|coupons?)\b/,
+    /\bwithout human\b.{0,80}\b(approval|review|intervention|decision)\b/,
+    /\bno human\b.{0,80}\b(review|approval|intervention)\b/
+  ]);
+}
+
+function systemNameLooksLikeHumanOrAffectedActor(value) {
+  const s = normalizeWhitespace(value).toLowerCase();
+  if (!s) return false;
+  return includesAny(s, [
+    /^(customers?|users?|students?|employees?|applicants?|candidates?|claimants?|patients?|citizens?|people|individuals)$/,
+    /^(support agents?|agents?|officers?|claims?\s+officers?|hr staff|human resources|recruiters?|hiring managers?|managers?|reviewers?|specialists?|teachers?|counselors?|counsellors?|senior agents?)$/
+  ]);
+}
+
+function llmFactSupportedByExplicitEvidence(entry) {
+  if (!entry || entry.source !== 'LLM_EXTRACTED') return true;
+
+  if ((APPENDABLE_FACTS.has(entry.fact) || COMPATIBLE_TEXT_FACTS.has(entry.fact) || ['systemName', 'retentionPeriod'].includes(entry.fact)) && typeof entry.value === 'boolean') {
+    return false;
+  }
+
+  if (entry.fact === 'systemName' && systemNameLooksLikeHumanOrAffectedActor(entry.value)) {
+    return false;
+  }
+
+  if (entry.fact === 'assignsAcademicGrade') {
+    return entry.value === true
+      ? textExplicitlyAffirmsFinalGradeAssignment(entry.sourceText)
+      : textExplicitlyNegatesFinalGradeAssignment(entry.sourceText);
+  }
+
+  if (entry.fact === 'fullyAutomatedDecision' && entry.value === true) {
+    return textExplicitlyAffirmsAutomatedDecision(entry.sourceText);
+  }
+
+  return true;
+}
+
+function sourceMessageRef(entry) {
+  return entry?.sourceMessageId ||
+    entry?.messageId ||
+    (entry?.messageIndex === null || entry?.messageIndex === undefined ? 'project' : `user-message-${entry.messageIndex + 1}`);
+}
+
+function finalGradeContradictionCandidate(entry) {
+  if (entry.fact === 'teacherFinalGradeDecision' && entry.value === true) {
+    return {
+      normalizedField: FINAL_GRADE_FIELD,
+      normalizedValue: 'teacher_decides_final_grade',
+      displayValue: 'you decide the final grade'
+    };
+  }
+
+  if (entry.fact === 'assignsAcademicGrade') {
+    if (entry.value === true) {
+      return {
+        normalizedField: FINAL_GRADE_FIELD,
+        normalizedValue: 'ai_assigns_final_grade',
+        displayValue: 'the AI assigns the final grade'
+      };
+    }
+    if (entry.value === false) {
+      return {
+        normalizedField: FINAL_GRADE_FIELD,
+        normalizedValue: 'ai_does_not_assign_final_grade',
+        displayValue: 'the AI does not assign the final grade'
+      };
+    }
+  }
+
+  return null;
+}
+
+function genericBooleanContradictionCandidate(entry) {
+  if (!STRICT_BOOLEAN_CONTRADICTION_FACTS.has(entry.fact)) return null;
+  if (typeof entry.value !== 'boolean') return null;
+
+  return {
+    normalizedField: entry.fact,
+    normalizedValue: entry.value ? 'true' : 'false',
+    displayValue: `${FACT_LABELS[entry.fact] || entry.fact} is ${entry.value ? 'true' : 'false'}`
+  };
+}
+
+function contradictionCandidateForEntry(entry) {
+  if (!entry || entry.source !== 'USER_CONFIRMED' || !entry.fact || !isKnownFactValue(entry.value)) return null;
+
+  const specialCandidate = finalGradeContradictionCandidate(entry);
+  const genericCandidate = specialCandidate || genericBooleanContradictionCandidate(entry);
+  if (!genericCandidate) return null;
+
+  return {
+    ...genericCandidate,
+    fact: entry.fact,
+    label: FACT_LABELS[entry.fact] || entry.fact,
+    rawValue: entry.value,
+    sourceText: entry.sourceText,
+    source: entry.source,
+    messageIndex: entry.messageIndex,
+    sourceMessageId: sourceMessageRef(entry)
+  };
+}
+
+function finalGradeValuesIncompatible(left, right) {
+  const values = new Set([left.normalizedValue, right.normalizedValue]);
+  return values.has('ai_assigns_final_grade') &&
+    (values.has('teacher_decides_final_grade') || values.has('ai_does_not_assign_final_grade'));
+}
+
+function contradictionCandidatesIncompatible(left, right) {
+  if (!left || !right) return false;
+  if (left.normalizedField !== right.normalizedField) return false;
+  if (!isKnownFactValue(left.normalizedValue) || !isKnownFactValue(right.normalizedValue)) return false;
+  if (left.normalizedField === FINAL_GRADE_FIELD) return finalGradeValuesIncompatible(left, right);
+  return left.normalizedValue !== right.normalizedValue;
+}
+
+function summarizeExplicitFact(entry) {
+  const candidate = contradictionCandidateForEntry(entry);
+  return {
+    fact: entry.fact,
+    label: FACT_LABELS[entry.fact] || entry.fact,
+    value: entry.value,
+    source: entry.source,
+    messageIndex: entry.messageIndex,
+    sourceMessageId: sourceMessageRef(entry),
+    normalizedField: candidate?.normalizedField || entry.fact,
+    normalizedValue: candidate?.normalizedValue ?? entry.value,
+    sourceText: entry.sourceText
+  };
+}
+
+function explicitFactsForLog(entries) {
+  return (entries || [])
+    .filter((entry) => entry?.source === 'USER_CONFIRMED' && entry.fact && isKnownFactValue(entry.value))
+    .map(summarizeExplicitFact);
+}
+
+function factsForLifecycleLog(entries) {
+  return (entries || [])
+    .filter((entry) => entry?.fact)
+    .map((entry) => ({
+      fact: entry.fact,
+      label: FACT_LABELS[entry.fact] || entry.fact,
+      value: entry.value,
+      source: entry.source,
+      messageIndex: entry.messageIndex,
+      sourceMessageId: sourceMessageRef(entry),
+      sourceText: entry.sourceText
+    }));
+}
+
+function contradictionForCandidates(existing, incoming) {
+  const key = [
+    incoming.normalizedField,
+    existing.normalizedValue,
+    incoming.normalizedValue,
+    existing.sourceMessageId,
+    incoming.sourceMessageId
+  ].join('|');
+
+  return {
+    key,
+    fact: incoming.fact,
+    label: incoming.normalizedField === FINAL_GRADE_FIELD ? 'Final grade assignment' : (FACT_LABELS[incoming.fact] || incoming.fact),
+    normalizedField: incoming.normalizedField,
+    existingFact: existing.fact,
+    incomingFact: incoming.fact,
+    existingValue: existing.displayValue,
+    incomingValue: incoming.displayValue,
+    oldValue: existing.displayValue,
+    newValue: incoming.displayValue,
+    existingRawValue: existing.rawValue,
+    incomingRawValue: incoming.rawValue,
+    oldSourceMessageId: existing.sourceMessageId,
+    newSourceMessageId: incoming.sourceMessageId,
+    sourceMessageIds: [existing.sourceMessageId, incoming.sourceMessageId].filter(Boolean),
+    previousSourceText: existing.sourceText,
+    sourceText: incoming.sourceText,
+    source: incoming.source,
+    messageIndex: incoming.messageIndex,
+    status: 'needs_clarification'
+  };
+}
+
+function isActionableContradiction(item) {
+  return item?.status === 'needs_clarification' &&
+    normalizeWhitespace(item.normalizedField || item.fact) &&
+    isKnownFactValue(item.existingValue) &&
+    isKnownFactValue(item.incomingValue);
+}
+
+function formatContradictionQuestion(contradiction) {
+  if (!isActionableContradiction(contradiction)) return null;
+
+  if (contradiction.normalizedField === FINAL_GRADE_FIELD) {
+    return `You previously said ${contradiction.existingValue}, but you now said that ${contradiction.incomingValue}. Which one is correct?`;
+  }
+
+  return `You previously said ${contradiction.label} was ${contradiction.existingValue}, but you now said it was ${contradiction.incomingValue}. Which one is correct?`;
+}
+
+function isTextLikeFact(fact) {
+  return APPENDABLE_FACTS.has(fact) ||
+    COMPATIBLE_TEXT_FACTS.has(fact) ||
+    ['systemName', 'retentionPeriod'].includes(fact);
+}
+
+function storedFactEvidenceInvalid(entry) {
+  if (!entry?.fact) return false;
+  if (isTextLikeFact(entry.fact) && typeof entry.value === 'boolean') return true;
+  if (entry.fact === 'systemName' && systemNameLooksLikeHumanOrAffectedActor(entry.value)) return true;
+  if (entry.fact === 'fullyAutomatedDecision' && entry.value === true) {
+    return !textExplicitlyAffirmsAutomatedDecision(entry.sourceText);
+  }
+  if (entry.fact === 'assignsAcademicGrade' && entry.value === true) {
+    return !textExplicitlyAffirmsFinalGradeAssignment(entry.sourceText);
+  }
+  return false;
+}
+
+function storedConfirmedFactInvalid(fact, value, factEvidence) {
+  if (isTextLikeFact(fact) && typeof value === 'boolean') return true;
+  if (fact === 'systemName' && systemNameLooksLikeHumanOrAffectedActor(value)) return true;
+
+  const supportingEvidence = (factEvidence || []).filter((entry) => entry.fact === fact && entry.value === value);
+  if (fact === 'fullyAutomatedDecision' && value === true && supportingEvidence.length) {
+    return supportingEvidence.every(storedFactEvidenceInvalid);
+  }
+  if (fact === 'assignsAcademicGrade' && value === true && supportingEvidence.length) {
+    return supportingEvidence.every(storedFactEvidenceInvalid);
+  }
+  return false;
+}
+
+function sanitizeConversationFactState(previousState) {
+  const originalFacts = previousState?.confirmedFacts || {};
+  const originalEvidence = previousState?.factEvidence || [];
+  const factEvidence = originalEvidence.filter((entry) => !storedFactEvidenceInvalid(entry));
+  const confirmedFacts = { ...originalFacts };
+
+  Object.entries(confirmedFacts).forEach(([fact, value]) => {
+    if (storedConfirmedFactInvalid(fact, value, originalEvidence)) {
+      delete confirmedFacts[fact];
+    }
+  });
+
+  return {
+    confirmedFacts,
+    unknownFacts: { ...(previousState?.unknownFacts || {}) },
+    factEvidence,
+    contradictions: previousState?.contradictions || [],
+    sanitizedDroppedFactCount: Object.keys(originalFacts).length - Object.keys(confirmedFacts).length,
+    sanitizedDroppedEvidenceCount: originalEvidence.length - factEvidence.length
+  };
+}
+
+function mergeConversationFacts(previousState, newFacts, options = {}) {
   const confirmedFacts = { ...(previousState?.confirmedFacts || {}) };
   const unknownFacts = { ...UNKNOWN_FACTS, ...(previousState?.unknownFacts || {}) };
   const factEvidence = [...(previousState?.factEvidence || [])];
-  const contradictions = [...(previousState?.contradictions || [])];
+  const contradictions = [];
   const existingEvidence = new Set(factEvidence.map(evidenceIdentity));
+  const contradictionCandidates = (previousState?.factEvidence || [])
+    .map(contradictionCandidateForEntry)
+    .filter(Boolean);
+  const contradictionDebug = {
+    chatId: options.chatId || null,
+    previousExplicitFacts: explicitFactsForLog(previousState?.factEvidence || []),
+    newlyExtractedFacts: explicitFactsForLog(newFacts),
+    normalizedFields: contradictionCandidates.map((candidate) => ({
+      field: candidate.normalizedField,
+      value: candidate.normalizedValue,
+      fact: candidate.fact,
+      sourceMessageId: candidate.sourceMessageId
+    })),
+    conflicts: []
+  };
 
   newFacts.forEach((entry) => {
     if (!entry || !entry.fact) return;
 
+    const incomingCandidate = contradictionCandidateForEntry(entry);
+    if (incomingCandidate) {
+      contradictionDebug.normalizedFields.push({
+        field: incomingCandidate.normalizedField,
+        value: incomingCandidate.normalizedValue,
+        fact: incomingCandidate.fact,
+        sourceMessageId: incomingCandidate.sourceMessageId
+      });
+
+      const conflictingCandidate = contradictionCandidates.find((candidate) =>
+        contradictionCandidatesIncompatible(candidate, incomingCandidate)
+      );
+
+      if (conflictingCandidate) {
+        const contradiction = contradictionForCandidates(conflictingCandidate, incomingCandidate);
+        if (!contradictions.some((item) => item.key === contradiction.key)) {
+          contradictions.push(contradiction);
+          contradictionDebug.conflicts.push({
+            normalizedField: contradiction.normalizedField,
+            exactConflictingField: contradiction.normalizedField,
+            oldValue: contradiction.oldValue,
+            newValue: contradiction.newValue,
+            oldSourceMessageId: contradiction.oldSourceMessageId,
+            newSourceMessageId: contradiction.newSourceMessageId,
+            existingFact: contradiction.existingFact,
+            incomingFact: contradiction.incomingFact
+          });
+        }
+
+        const id = evidenceIdentity(entry);
+        if (!existingEvidence.has(id)) {
+          factEvidence.push(entry);
+          existingEvidence.add(id);
+        }
+        contradictionCandidates.push(incomingCandidate);
+        delete unknownFacts[entry.fact];
+        return;
+      }
+    }
+
     const currentValue = confirmedFacts[entry.fact];
     const hasCurrentValue = currentValue !== undefined && currentValue !== null;
-    const userConfirmedExisting = hasUserConfirmedEvidence(factEvidence, entry.fact);
-    const confirmedExisting = hasConfirmedEvidence(factEvidence, entry.fact);
     const incomingIsUserConfirmed = entry.source === 'USER_CONFIRMED';
     const incomingIsLlmExtracted = entry.source === 'LLM_EXTRACTED';
     const currentIsUncertain = currentValue === 'planned_or_uncertain';
     const incomingIsMoreSpecific = entry.value !== 'planned_or_uncertain';
 
     if (hasCurrentValue && currentValue !== entry.value) {
-      if ((incomingIsUserConfirmed && userConfirmedExisting && !currentIsUncertain) || (incomingIsLlmExtracted && confirmedExisting && !currentIsUncertain)) {
-        const contradictionKey = `${entry.fact}|${currentValue}|${entry.value}|${entry.sourceText}`;
-        if (!contradictions.some((item) => item.key === contradictionKey)) {
-          contradictions.push({
-            key: contradictionKey,
-            fact: entry.fact,
-            label: FACT_LABELS[entry.fact] || entry.fact,
-            existingValue: currentValue,
-            incomingValue: entry.value,
-            sourceText: entry.sourceText,
-            source: entry.source,
-            messageIndex: entry.messageIndex,
-            status: 'needs_clarification'
-          });
+      if (APPENDABLE_FACTS.has(entry.fact)) {
+        confirmedFacts[entry.fact] = mergeAppendableFactValues(currentValue, entry.value);
+      } else if (textFactValuesCompatible(entry.fact, currentValue, entry.value)) {
+        if (shouldPreferIncomingTextValue(currentValue, entry.value, incomingIsUserConfirmed)) {
+          confirmedFacts[entry.fact] = entry.value;
         }
-        return;
-      }
-
-      if (incomingIsUserConfirmed || (incomingIsLlmExtracted && currentIsUncertain && incomingIsMoreSpecific) || (currentIsUncertain && incomingIsMoreSpecific)) {
+      } else if (incomingIsUserConfirmed || (incomingIsLlmExtracted && currentIsUncertain && incomingIsMoreSpecific) || (currentIsUncertain && incomingIsMoreSpecific)) {
         confirmedFacts[entry.fact] = entry.value;
       }
     } else if (!hasCurrentValue) {
@@ -570,6 +1699,10 @@ function mergeConversationFacts(previousState, newFacts) {
       factEvidence.push(entry);
       existingEvidence.add(id);
     }
+
+    if (incomingCandidate) {
+      contradictionCandidates.push(incomingCandidate);
+    }
   });
 
   Object.keys(UNKNOWN_FACTS).forEach((key) => {
@@ -578,7 +1711,7 @@ function mergeConversationFacts(previousState, newFacts) {
     }
   });
 
-  return { confirmedFacts, unknownFacts, factEvidence, contradictions };
+  return { confirmedFacts, unknownFacts, factEvidence, contradictions, contradictionDebug };
 }
 
 function uniqueByValue(items) {
@@ -617,6 +1750,61 @@ function addListItems(target, value) {
   listFromFact(value).forEach((item) => target.push(item));
 }
 
+function listItemDedupeKey(value) {
+  const text = normalizeWhitespace(value).toLowerCase().replace(/^(and|their|his|her|its|the|a|an)\s+/, '');
+  if (/\border[- ]tracking\b/.test(text) && /\breturns?\b/.test(text) && /\bproduct recommendations?\b/.test(text)) return 'order_returns_product_recommendations';
+  if (/\border[- ]tracking\b/.test(text)) return 'order_tracking';
+  if (/\breturns?\b|\brefunds?\b|\brefund recommendations?\b/.test(text)) return 'returns_or_refunds';
+  if (/\bproduct recommendations?\b|\bpersonalized recommendations?\b/.test(text)) return 'product_recommendations';
+  if (/\bbrowsing history\b|\bbrowser history\b/.test(text)) return 'browsing_history';
+  if (/\bpurchase history\b|\bpurchasing history\b/.test(text)) return 'purchase_history';
+  if (/\blive chats?\b|\bchat transcripts?\b/.test(text)) return 'live_chat';
+  if (/\btickets?\b|\bsupport tickets?\b/.test(text)) return 'support_ticket';
+  if (/\borders?\b|\border records?\b/.test(text)) return 'orders';
+  if (/\b(cv|cvs|resume|resumes|curricula vitae)\b/.test(text)) return 'cv_or_resume';
+  if (/\bcover letters?\b|\bmotivation letters?\b/.test(text)) return 'cover_letter';
+  if (/\bwork experience\b|\bemployment history\b/.test(text)) return 'work_experience';
+  if (/\beducation\b|\beducational background\b|\bdegrees?\b/.test(text)) return 'education';
+  if (/\bskills?\b|\bcompetenc(y|ies)\b/.test(text)) return 'skills';
+  if (/\bavailability\b/.test(text)) return 'availability';
+  if (/\bworking[- ]hour preferences?\b|\bpreferred working hours?\b/.test(text)) return 'working_hour_preferences';
+  if (/\bjob qualifications?\b|\bqualifications?\b/.test(text)) return 'job_qualifications';
+  if (/\bprevious shift assignments?\b|\bshift records?\b|\bprevious shift records?\b/.test(text)) return 'previous_shift_assignments';
+  if (/\bmaximum weekly working limits?\b|\bweekly working limits?\b|\bworking[- ]time limits?\b/.test(text)) return 'weekly_working_limits';
+  return text.replace(/[^a-z0-9]+/g, '');
+}
+
+function uniqueReadableItems(items) {
+  const seen = new Set();
+  const values = [];
+
+  (items || []).forEach((item) => {
+    const cleaned = sentenceCase(item);
+    const constituentKeys = cleaned
+      .split(/\s*,\s*|\s+and\s+/i)
+      .map((part) => listItemDedupeKey(part))
+      .filter(Boolean);
+    if (constituentKeys.length > 1 && constituentKeys.every((key) => seen.has(key))) return;
+
+    const key = listItemDedupeKey(cleaned);
+    if (!cleaned || !key || seen.has(key)) return;
+    seen.add(key);
+    values.push(cleaned);
+  });
+
+  return values;
+}
+
+function readableFactSummary(value) {
+  const items = uniqueReadableItems(listFromFact(value));
+  if (items.some((item) => listItemDedupeKey(item) === 'order_returns_product_recommendations')) {
+    return items
+      .filter((item) => listItemDedupeKey(item) !== 'product_recommendations')
+      .join('; ');
+  }
+  return items.join('; ');
+}
+
 function conclusion(value, status, confidence, reason, state, factKeys, ruleIds = []) {
   const payload = evidencePayload(state, factKeys);
   return {
@@ -635,8 +1823,13 @@ function buildSystemUnderstanding(project, state) {
   const facts = state.confirmedFacts || {};
   const isClaimAssessment = Boolean(facts.insuranceClaimsPurpose || facts.recommendsClaimAssessment || facts.insuranceContext);
   const isWorkforceScheduling = Boolean(facts.workforceSchedulingPurpose || facts.recommendsMonthlyShiftSchedule);
+  const isRecruitment = isRecruitmentAssessment(facts);
   const inputs = [];
-  addListItems(inputs, facts.systemInputs);
+  if (facts.processesApplicantCVs) inputs.push('CVs or resumes');
+  if (facts.processesApplicantEducation) inputs.push('Applicant education history');
+  if (facts.processesApplicantWorkExperience) inputs.push('Applicant work experience');
+  if (facts.processesApplicantSkills) inputs.push('Applicant skills');
+  if (facts.processesCoverLetters) inputs.push('Cover letters');
   if (facts.processesEmployeeAvailability) inputs.push('Employee availability');
   if (facts.processesWorkingHourPreferences) inputs.push('Working-hour preferences');
   if (facts.processesJobQualifications) inputs.push('Job qualifications');
@@ -645,16 +1838,30 @@ function buildSystemUnderstanding(project, state) {
   if (facts.processesHRRecords) inputs.push('HR records');
   if (facts.processesInsuranceClaimData) inputs.push('Insurance claim data');
   if (facts.processesClaimantData) inputs.push('Claimant data');
+  if (facts.processesStudentWork) inputs.push('Student work');
+  if (facts.processesDemographicData) inputs.push('Demographic information');
+  if (facts.processesDisabilityData) inputs.push('Disability information');
+  if (facts.dataFieldGender) inputs.push('Gender');
+  if (facts.dataFieldAge) inputs.push('Age');
+  if (facts.dataFieldRegion) inputs.push('Region');
+  if (facts.dataFieldSocioeconomic) inputs.push('Socioeconomic information');
+  if (facts.dataFieldPreviousSchool) inputs.push('Previous school information');
   if (facts.processesQuestionnaireData) inputs.push('Questionnaire responses');
   if (facts.processesJournalEntries) inputs.push('Written journal entries');
   if (facts.processesAttendanceRecords) inputs.push('Attendance records');
   if (facts.processesAcademicPerformanceData) inputs.push('Academic performance data');
   if (facts.processesWearableData) inputs.push('Optional smartwatch data');
+  addListItems(inputs, facts.systemInputs);
 
   const outputs = [];
   addListItems(outputs, facts.systemOutputs);
+  if (facts.ranksJobApplicants || facts.applicantRankingPurpose) outputs.push('Applicant ranking or suitability score');
   if (facts.recommendsMonthlyShiftSchedule) outputs.push('Recommended monthly shift schedule');
   if (facts.recommendsClaimAssessment) outputs.push('Claim assessment recommendation');
+  if (facts.lessonPlanningPurpose) outputs.push(facts.systemOutputs || 'Lesson plans or learning materials');
+  if (facts.feedbackSuggestionOnly) outputs.push('Feedback suggestions');
+  if (facts.essayScoringPurpose) outputs.push('Essay score or evaluation');
+  if (facts.recommendsAdmissionsOutcome) outputs.push('Acceptance, rejection, or waiting-list recommendation');
   if (facts.explanationAvailable) {
     outputs.push(isWorkforceScheduling
       ? 'Reasons for assigned shifts'
@@ -669,8 +1876,11 @@ function buildSystemUnderstanding(project, state) {
 
   const decisionsSupported = [];
   addListItems(decisionsSupported, facts.decisionsSupported);
+  if (isRecruitment) decisionsSupported.push('Hiring or shortlisting decision support');
   if (facts.recommendsMonthlyShiftSchedule || facts.workforceSchedulingPurpose) decisionsSupported.push('Employee shift allocation');
   if (facts.recommendsClaimAssessment || facts.insuranceClaimsPurpose) decisionsSupported.push('Insurance claim assessment');
+  if (facts.assignmentEvaluationPurpose || facts.essayScoringPurpose) decisionsSupported.push('Educational assessment or feedback');
+  if (facts.recommendsAdmissionsOutcome || facts.educationAdmissionsPurpose) decisionsSupported.push('University admissions outcome');
   if (facts.recommendsCounselorContact) decisionsSupported.push('Whether a student should be contacted by a university counselor');
   if (facts.producesIndividualRiskScore && facts.studentWellbeingPurpose) {
     decisionsSupported.push('Prioritization for student wellbeing intervention');
@@ -680,15 +1890,21 @@ function buildSystemUnderstanding(project, state) {
 
   const affectedPersons = [];
   addListItems(affectedPersons, facts.affectedPersons);
-  if (facts.employmentContext) affectedPersons.push('Employees');
+  if (isRecruitment) affectedPersons.push('Job applicants');
+  if (facts.employmentContext && !isRecruitment) affectedPersons.push('Employees');
   if (facts.insuranceContext || facts.insuranceClaimsPurpose || facts.processesClaimantData) affectedPersons.push('Claimants');
+  if (facts.assignmentEvaluationPurpose || facts.essayScoringPurpose || facts.lessonPlanningPurpose) affectedPersons.push('Students');
+  if (facts.educationAdmissionsPurpose) affectedPersons.push('Student applicants');
   if (facts.educationContext) affectedPersons.push('University students');
 
   const users = [];
   addListItems(users, facts.primaryUsers);
+  if (isRecruitment) users.push('HR or recruitment staff');
   if (facts.authorizedHRAndManagersOnly || facts.processesHRRecords) users.push('HR staff');
-  if (facts.manufacturingContext || (facts.employmentContext && (facts.humanCanModify || facts.humanCanReject))) users.push('Manufacturing managers');
+  if (facts.manufacturingContext || (isWorkforceScheduling && facts.employmentContext && (facts.humanCanModify || facts.humanCanReject))) users.push('Manufacturing managers');
   if (facts.insuranceClaimsPurpose || facts.recommendsClaimAssessment) users.push('Claims officers');
+  if (facts.userRole) users.push(String(facts.userRole));
+  if (facts.educationAdmissionsPurpose) users.push('Admissions officers');
   if (facts.recommendsCounselorContact || (facts.educationContext && facts.humanReviewAvailable)) users.push('University counselors');
 
   let humanRole = 'Not yet established';
@@ -698,23 +1914,43 @@ function buildSystemUnderstanding(project, state) {
     humanRole = 'A claims officer reviews the claim recommendation and can change, reject, or override it before the final claim decision.';
   } else if (isWorkforceScheduling && facts.humanReviewAvailable && facts.humanCanModify && facts.humanCanReject) {
     humanRole = 'A manager reviews, modifies or rejects every schedule before publication.';
+  } else if (isRecruitment && facts.humanReviewAvailable && (facts.humanCanOverride || facts.humanCanModify || facts.humanCanReject || facts.makesHiringDecision === false)) {
+    humanRole = 'HR or recruitment staff review the AI ranking and can change, reject, or decide the final hiring or shortlisting outcome.';
+  } else if (facts.educationAdmissionsPurpose && facts.officersUsuallyFollowRecommendation) {
+    humanRole = 'Admissions officers review recommendations, but the user says officers usually follow them; meaningful independent review requires verification.';
+  } else if (facts.teacherFinalGradeDecision) {
+    humanRole = 'The teacher reviews the AI output and decides the final grade.';
+  } else if (facts.feedbackSuggestionOnly) {
+    humanRole = 'The AI suggests feedback; final use remains with the teacher.';
   } else if (facts.humanReviewAvailable && facts.humanCanOverride) {
     humanRole = isClaimAssessment
       ? 'A claims officer reviews and can override the recommendation.'
       : 'A human reviewer can review and override recommendations.';
   } else if (isClaimAssessment && facts.humanReviewAvailable) {
     humanRole = 'A claims officer reviews the claim recommendation, but override authority needs confirmation.';
+  } else if (isRecruitment && facts.humanReviewAvailable) {
+    humanRole = 'HR or recruitment staff review the applicant ranking, but final authority still needs confirmation.';
   } else if (facts.humanReviewAvailable) {
     humanRole = 'Human review is available, but override authority needs confirmation.';
   }
 
   let purpose = project?.fullDescription || project?.shortDescription || project?.title || 'Purpose not yet established.';
   if (facts.systemPurpose) {
-    purpose = String(facts.systemPurpose);
+    purpose = readableFactSummary(facts.systemPurpose) || String(facts.systemPurpose);
   } else if (facts.workforceSchedulingPurpose || facts.recommendsMonthlyShiftSchedule) {
     purpose = 'Recommend fair monthly employee shift schedules while respecting availability, qualifications and working-time limits.';
+  } else if (isRecruitment) {
+    purpose = 'Rank job applicants for recruitment or hiring review using application materials.';
   } else if (facts.insuranceClaimsPurpose || facts.recommendsClaimAssessment) {
     purpose = 'Support insurance claim assessment with an advisory recommendation for human review.';
+  } else if (facts.lessonPlanningPurpose) {
+    purpose = 'Generate lesson plans or learning materials';
+  } else if (facts.essayScoringPurpose) {
+    purpose = 'Score or evaluate student essays';
+  } else if (facts.assignmentEvaluationPurpose) {
+    purpose = 'Evaluate student assignments or student work';
+  } else if (facts.educationAdmissionsPurpose || facts.recommendsAdmissionsOutcome) {
+    purpose = 'Support university admissions by scoring applicants and recommending acceptance, rejection, or waiting-list outcomes.';
   } else {
     const purposeEvidence = factEvidenceFor(state, ['studentWellbeingPurpose', 'producesIndividualRiskScore', 'recommendsCounselorContact']);
     purpose = purposeEvidence[0]?.sourceText || purpose;
@@ -725,8 +1961,14 @@ function buildSystemUnderstanding(project, state) {
     deploymentContext = String(facts.deploymentContext);
   } else if (facts.manufacturingContext && facts.workforceSchedulingPurpose) {
     deploymentContext = 'Manufacturing workforce scheduling';
+  } else if (isRecruitment) {
+    deploymentContext = 'Employment recruitment and applicant screening';
   } else if (facts.insuranceContext || facts.insuranceClaimsPurpose) {
     deploymentContext = 'Insurance claim handling';
+  } else if (facts.educationAdmissionsPurpose) {
+    deploymentContext = 'University admissions and access to education';
+  } else if (facts.assignmentEvaluationPurpose || facts.lessonPlanningPurpose || facts.essayScoringPurpose) {
+    deploymentContext = 'Education support or assessment';
   } else if (facts.employmentContext) {
     deploymentContext = 'Employment decision-support context';
   } else if (facts.educationContext) {
@@ -737,7 +1979,7 @@ function buildSystemUnderstanding(project, state) {
     purpose,
     users: Array.from(new Set(users)),
     affectedPersons: Array.from(new Set(affectedPersons)),
-    inputs: Array.from(new Set(inputs)),
+    inputs: uniqueReadableItems(inputs),
     outputs: Array.from(new Set(outputs)),
     decisionsSupported: Array.from(new Set(decisionsSupported)),
     humanRole,
@@ -756,8 +1998,18 @@ function buildClassifications(state) {
   if (facts.studentWellbeingPurpose) {
     classifications.push(conclusion('StudentWellbeing', 'confirmed', 0.94, 'The system purpose is student stress or wellbeing support.', state, 'studentWellbeingPurpose', ['RULE_DOMAIN_02']));
   }
+  if (facts.educationAdmissionsPurpose) {
+    classifications.push(conclusion('EducationAdmissionsAccess', 'confirmed', 0.93, 'The system is used in university admissions or access to education.', state, 'educationAdmissionsPurpose', ['RULE_EDU_ADMISSIONS_CONTEXT_01']));
+  }
   if (facts.employmentContext) {
     classifications.push(conclusion('Employment', 'confirmed', 0.95, 'The system operates in an employment or workforce-management context.', state, 'employmentContext', ['RULE_EMPLOYMENT_DOMAIN_01']));
+  }
+  if (isRecruitmentAssessment(facts)) {
+    classifications.push(conclusion('EmploymentRecruitment', 'confirmed', 0.94, 'The system is used for recruitment, applicant screening, or hiring support.', state, ['employmentRecruitmentPurpose', 'jobApplicantsAffected', 'supportsHiringDecision'], ['RULE_EMPLOYMENT_RECRUITMENT_01']));
+    classifications.push(conclusion('RecruitmentDecisionSupport', 'confirmed', 0.9, 'The AI output supports hiring or shortlisting review, but final automation is not assumed unless explicitly confirmed.', state, ['supportsHiringDecision', 'applicantRankingPurpose', 'ranksJobApplicants'], ['RULE_RECRUITMENT_DECISION_SUPPORT_01']));
+  }
+  if (facts.ranksJobApplicants || facts.applicantRankingPurpose) {
+    classifications.push(conclusion('ApplicantRanking', 'confirmed', 0.94, 'The system ranks or scores job applicants.', state, ['ranksJobApplicants', 'applicantRankingPurpose'], ['RULE_APPLICANT_RANKING_01']));
   }
   if (facts.manufacturingContext) {
     classifications.push(conclusion('Manufacturing', 'confirmed', 0.93, 'The deployment context is a manufacturing company.', state, 'manufacturingContext', ['RULE_MANUFACTURING_CONTEXT_01']));
@@ -775,9 +2027,25 @@ function buildClassifications(state) {
     classifications.push(conclusion('ClaimAssessmentRecommendation', 'confirmed', 0.9, 'The system recommends or supports claim assessment rather than directly deciding the claim.', state, 'recommendsClaimAssessment', ['RULE_CLAIM_RECOMMENDATION_01']));
     classifications.push(conclusion('DecisionSupport', 'confirmed', 0.88, 'The system supports a claim decision process with an advisory output reviewed by a human.', state, ['recommendsClaimAssessment', 'humanReviewAvailable'], ['RULE_FUNCTION_CLAIM_01']));
   }
+  if (facts.applicantScoring) {
+    classifications.push(conclusion('ApplicantScoring', 'confirmed', 0.92, 'The system scores applicants for an admissions process.', state, 'applicantScoring', ['RULE_APPLICANT_SCORING_01']));
+  }
+  if (facts.recommendsAdmissionsOutcome) {
+    classifications.push(conclusion('AdmissionsRecommendation', 'confirmed', 0.9, 'The system recommends acceptance, rejection, or waiting-list outcomes for human or institutional review.', state, 'recommendsAdmissionsOutcome', ['RULE_ADMISSIONS_RECOMMENDATION_01']));
+    classifications.push(conclusion('DecisionSupport', 'confirmed', 0.88, 'The system supports an admissions decision process with a recommendation output.', state, ['recommendsAdmissionsOutcome', 'educationAdmissionsPurpose'], ['RULE_FUNCTION_ADMISSIONS_01']));
+  }
+  if (facts.educationAdmissionsPurpose && (facts.applicantScoring || facts.recommendsAdmissionsOutcome)) {
+    classifications.push(conclusion('HighRiskEducationAccessAssessment', 'requires_verification', 0.76, 'This may match an EU AI Act Annex III education high-risk use case because it evaluates or influences access to educational institutions. Applicability timing and role-specific duties require retrieved current legal sources and provider/deployer verification.', state, ['educationAdmissionsPurpose', 'applicantScoring', 'recommendsAdmissionsOutcome'], ['RULE_EU_AI_ACT_ANNEX_III_EDU_ACCESS_01']));
+  }
+  if (isRecruitmentAssessment(facts) && (facts.ranksJobApplicants || facts.supportsHiringDecision)) {
+    classifications.push(conclusion('HighRiskEmploymentRecruitmentAssessment', 'requires_verification', 0.74, 'Recruitment ranking may fall within employment high-risk AI categories if it materially influences access to work. Provider/deployer roles, jurisdiction, and current legal applicability still require verification.', state, ['employmentRecruitmentPurpose', 'ranksJobApplicants', 'supportsHiringDecision'], ['RULE_EU_AI_ACT_ANNEX_III_EMPLOYMENT_RECRUITMENT_01']));
+  }
   if (facts.recommendsMonthlyShiftSchedule) {
     classifications.push(conclusion('ShiftRecommendation', 'confirmed', 0.94, 'The system recommends a monthly shift schedule rather than making unrelated employment decisions.', state, 'recommendsMonthlyShiftSchedule', ['RULE_SHIFT_RECOMMENDATION_01']));
     classifications.push(conclusion('DecisionSupport', 'confirmed', 0.9, 'The system supports employee shift allocation decisions with a recommendation reviewed by humans.', state, ['recommendsMonthlyShiftSchedule', 'humanReviewAvailable'], ['RULE_FUNCTION_03']));
+  }
+  if (facts.systemPurpose && isDecisionSupportAssessment(facts)) {
+    classifications.push(conclusion('DecisionSupport', 'confirmed', 0.74, 'The system purpose or output supports an assessment, recommendation, ranking, flag, or decision process.', state, ['systemPurpose', 'systemOutputs', 'decisionsSupported'], ['RULE_GENERIC_DECISION_SUPPORT_01']));
   }
   if (facts.producesIndividualRiskScore) {
     classifications.push(conclusion('RiskScoring', 'confirmed', 0.96, 'The system generates an individual risk score.', state, 'producesIndividualRiskScore', ['RULE_FUNCTION_01']));
@@ -815,8 +2083,20 @@ function buildClassifications(state) {
   if (facts.processesHRRecords || facts.processesJobQualifications || facts.processesPreviousShiftAssignments) {
     classifications.push(conclusion('HRDataProcessing', 'confirmed', 0.9, 'The system processes HR-system records or job qualification information.', state, ['processesHRRecords', 'processesJobQualifications', 'processesPreviousShiftAssignments'], ['RULE_HR_DATA_01']));
   }
+  if (facts.processesApplicantCVs || facts.processesApplicantEducation || facts.processesApplicantWorkExperience || facts.processesApplicantSkills || facts.processesCoverLetters) {
+    classifications.push(conclusion('CandidateApplicationDataProcessing', 'confirmed', 0.9, 'The system processes candidate application materials such as CVs, education, work experience, skills, or cover letters.', state, ['processesApplicantCVs', 'processesApplicantEducation', 'processesApplicantWorkExperience', 'processesApplicantSkills', 'processesCoverLetters'], ['RULE_CANDIDATE_APPLICATION_DATA_01']));
+  }
   if (facts.processesInsuranceClaimData || facts.processesClaimantData) {
     classifications.push(conclusion('PersonalDataProcessing', 'confirmed', 0.88, 'The system processes insurance claim or claimant-related personal information.', state, ['processesInsuranceClaimData', 'processesClaimantData'], ['RULE_CLAIM_DATA_01']));
+  }
+  if (facts.processesDemographicData) {
+    classifications.push(conclusion('DemographicDataProcessing', 'confirmed', 0.82, 'Demographic fields are processed and must be classified field by field before treating any field as special-category data.', state, ['processesDemographicData', 'dataFieldGender', 'dataFieldAge', 'dataFieldRegion', 'dataFieldSocioeconomic', 'dataFieldPreviousSchool'], ['RULE_DEMOGRAPHIC_DATA_FIELD_REVIEW_01']));
+  }
+  if (facts.processesDisabilityData) {
+    classifications.push(conclusion('DisabilityDataProcessing', 'confirmed', 0.9, 'Disability information is processed and may qualify as special-category or sensitive personal data depending on jurisdiction and legal basis.', state, ['processesDisabilityData', 'dataFieldDisability'], ['RULE_DISABILITY_SPECIAL_CATEGORY_REVIEW_01']));
+  }
+  if (facts.usesThirdPartyCloudProvider) {
+    classifications.push(conclusion('ThirdPartyCloudProcessing', 'confirmed', 0.84, 'A third-party cloud provider is involved, so controller/processor roles and transfer/security safeguards require verification.', state, 'usesThirdPartyCloudProvider', ['RULE_THIRD_PARTY_CLOUD_01']));
   }
   if (facts.humanReviewAvailable && (facts.humanCanOverride || facts.humanCanModify || facts.humanCanReject || facts.decisionPublishedOnlyAfterHumanReview)) {
     classifications.push(conclusion('HumanReviewedAI', 'confirmed', 0.92, 'The AI output is subject to human review or override before the final outcome.', state, ['humanReviewAvailable', 'humanCanOverride', 'humanCanModify', 'humanCanReject', 'decisionPublishedOnlyAfterHumanReview'], ['RULE_HUMAN_REVIEWED_AI_01']));
@@ -914,6 +2194,7 @@ function risk(value, status, confidence, reason, state, factKeys, ruleIds, domai
 
 function buildRisks(state) {
   const facts = state.confirmedFacts || {};
+  const isRecruitment = isRecruitmentAssessment(facts);
   const primaryRisks = [];
   const nonApplicableRisks = [];
 
@@ -922,15 +2203,89 @@ function buildRisks(state) {
       'Personal data misuse or excessive processing',
       'likely',
       0.78,
-      facts.employmentContext
-        ? 'The system processes employee availability, preference, qualification, or HR records, so privacy, minimization, and access controls need evidence.'
+      isRecruitment
+        ? 'The system processes candidate application materials, so privacy, minimization, retention, and access controls need evidence.'
+        : facts.employmentContext
+          ? 'The system processes employee availability, preference, qualification, or HR records, so privacy, minimization, and access controls need evidence.'
         : facts.educationContext
           ? 'The system processes multiple student data sources, so privacy, minimization, and purpose limitation need evidence.'
           : 'The system processes personal data, so privacy, minimization, purpose limitation, and access controls need evidence.',
       state,
-      ['processesPersonalData', 'processesQuestionnaireData', 'processesJournalEntries', 'processesAttendanceRecords', 'processesAcademicPerformanceData', 'processesEmployeeAvailability', 'processesWorkingHourPreferences', 'processesJobQualifications', 'processesPreviousShiftAssignments', 'processesHRRecords'],
+      ['processesPersonalData', 'processesQuestionnaireData', 'processesJournalEntries', 'processesAttendanceRecords', 'processesAcademicPerformanceData', 'processesEmployeeAvailability', 'processesWorkingHourPreferences', 'processesJobQualifications', 'processesPreviousShiftAssignments', 'processesHRRecords', 'processesApplicantCVs', 'processesApplicantEducation', 'processesApplicantWorkExperience', 'processesApplicantSkills', 'processesCoverLetters'],
       ['RISK_PRIVACY_01'],
       'data-protection'
+    ));
+  }
+  if (isRecruitment && (facts.ranksJobApplicants || facts.applicantRankingPurpose)) {
+    primaryRisks.push(risk(
+      'Unfair applicant ranking or discriminatory screening',
+      facts.historicalBiasEvidence ? 'likely' : 'possible',
+      facts.historicalBiasEvidence ? 0.78 : 0.68,
+      facts.historicalBiasEvidence
+        ? 'The user described possible historical bias, so applicant ranking must be validated for disparate impact before HR relies on it.'
+        : 'Applicant ranking can affect access to work; fairness validation is needed before treating the ranking as reliable.',
+      state,
+      ['employmentRecruitmentPurpose', 'applicantRankingPurpose', 'ranksJobApplicants', 'supportsHiringDecision', 'historicalBiasEvidence'],
+      ['RISK_RECRUITMENT_BIAS_01'],
+      'ethical'
+    ));
+    primaryRisks.push(risk(
+      'Incorrect ranking from incomplete or misread application data',
+      'possible',
+      0.64,
+      'CVs, education history, work experience, skills, and cover letters can be incomplete or parsed incorrectly, which may unfairly lower a candidate ranking.',
+      state,
+      ['processesApplicantCVs', 'processesApplicantEducation', 'processesApplicantWorkExperience', 'processesApplicantSkills', 'processesCoverLetters'],
+      ['RISK_RECRUITMENT_DATA_ACCURACY_01'],
+      'ethical'
+    ));
+    primaryRisks.push(risk(
+      'Over-reliance by HR on applicant rankings',
+      facts.humanReviewAvailable && (facts.humanCanOverride || facts.humanCanModify || facts.humanCanReject || facts.makesHiringDecision === false) ? 'possible' : 'likely',
+      facts.humanReviewAvailable && (facts.humanCanOverride || facts.humanCanModify || facts.humanCanReject || facts.makesHiringDecision === false) ? 0.56 : 0.72,
+      facts.humanReviewAvailable && (facts.humanCanOverride || facts.humanCanModify || facts.humanCanReject || facts.makesHiringDecision === false)
+        ? 'Confirmed human review or final HR authority reduces over-reliance risk, but review quality should still be evidenced.'
+        : 'HR staff may over-rely on applicant rankings if review authority and automatic rejection or shortlisting boundaries are unclear.',
+      state,
+      ['applicantRankingPurpose', 'ranksJobApplicants', 'humanReviewAvailable', 'humanCanOverride', 'humanCanModify', 'humanCanReject', 'makesHiringDecision'],
+      ['RISK_RECRUITMENT_OVERRELIANCE_01'],
+      'legal-ethical'
+    ));
+  }
+  if (!isRecruitment && facts.systemPurpose && isDecisionSupportAssessment(facts)) {
+    primaryRisks.push(risk(
+      'Incorrect AI-supported assessment or recommendation',
+      'possible',
+      0.62,
+      'The AI output appears to support an assessment, recommendation, ranking, flag, or decision process, so errors in input data or model output could lead to unsuitable outcomes.',
+      state,
+      ['systemPurpose', 'systemOutputs', 'decisionsSupported', 'profilesIndividualCharacteristic', 'producesIndividualRiskScore'],
+      ['RISK_GENERIC_ACCURACY_01'],
+      'technical-safety'
+    ));
+    primaryRisks.push(risk(
+      'Over-reliance on AI output',
+      facts.humanReviewAvailable && (facts.humanCanOverride || facts.humanCanModify || facts.humanCanReject || facts.fullyAutomatedDecision === false) ? 'possible' : 'likely',
+      facts.humanReviewAvailable && (facts.humanCanOverride || facts.humanCanModify || facts.humanCanReject || facts.fullyAutomatedDecision === false) ? 0.54 : 0.68,
+      facts.humanReviewAvailable
+        ? 'Human review is described, but the quality, independence, and authority of that review still need evidence.'
+        : 'The AI output may be over-relied on if human review and override authority are not clear.',
+      state,
+      ['systemPurpose', 'decisionsSupported', 'humanReviewAvailable', 'humanCanOverride', 'humanCanModify', 'humanCanReject', 'fullyAutomatedDecision'],
+      ['RISK_GENERIC_OVERRELIANCE_01'],
+      'ethical'
+    ));
+  }
+  if (!isRecruitment && facts.systemPurpose && isDecisionSupportAssessment(facts) && facts.affectedPersons && !facts.explanationAvailable && !facts.correctionRightAvailable && !facts.manualReviewAvailable && !facts.appealMechanismAvailable) {
+    primaryRisks.push(risk(
+      'Insufficient explanation or review path for affected people',
+      'possible',
+      0.58,
+      'When an AI-supported output affects people, explanation, correction, or human-review routes should be evidenced.',
+      state,
+      ['systemPurpose', 'affectedPersons', 'explanationAvailable', 'correctionRightAvailable', 'manualReviewAvailable', 'appealMechanismAvailable'],
+      ['RISK_GENERIC_CONTESTABILITY_01'],
+      'legal-ethical'
     ));
   }
   if (facts.processesInsuranceClaimData || facts.processesClaimantData) {
@@ -983,6 +2338,80 @@ function buildRisks(state) {
       ['processesAcademicPerformanceData', 'processesAttendanceRecords'],
       ['RISK_FAIRNESS_01'],
       'ethical'
+    ));
+  }
+  if (facts.educationAdmissionsPurpose && (facts.applicantScoring || facts.recommendsAdmissionsOutcome)) {
+    primaryRisks.push(risk(
+      'Unfair admissions outcome or discriminatory ranking',
+      facts.historicalBiasEvidence ? 'likely' : 'possible',
+      facts.historicalBiasEvidence ? 0.78 : 0.66,
+      facts.historicalBiasEvidence
+        ? 'The user described historical gender, socioeconomic, regional, or disability bias, so applicant scoring must be validated for disparate impact before recommendations are relied on.'
+        : 'Admissions scoring can affect access to education; fairness evidence is required before treating the recommendation as reliable.',
+      state,
+      ['educationAdmissionsPurpose', 'applicantScoring', 'recommendsAdmissionsOutcome', 'historicalBiasEvidence', 'dataFieldGender', 'dataFieldSocioeconomic', 'dataFieldRegion', 'dataFieldDisability'],
+      ['RISK_ADMISSIONS_BIAS_01'],
+      'ethical'
+    ));
+  }
+  if (facts.officersUsuallyFollowRecommendation) {
+    primaryRisks.push(risk(
+      'Formal human review may become rubber-stamping',
+      'requires_verification',
+      0.72,
+      'Admissions officers usually following the recommendation raises a question whether human review is meaningful, independent, and capable of changing outcomes.',
+      state,
+      ['officersUsuallyFollowRecommendation', 'humanReviewAvailable', 'recommendsAdmissionsOutcome'],
+      ['RISK_RUBBER_STAMPING_01'],
+      'legal-ethical'
+    ));
+  }
+  if (facts.noClearIndividualExplanation || facts.explanationAvailable === false) {
+    primaryRisks.push(risk(
+      'Insufficient individual explanation for score-driven outcomes',
+      'likely',
+      0.7,
+      'The user reported no clear individual score explanation; transparency and contestability controls require improvement or verification.',
+      state,
+      ['noClearIndividualExplanation', 'explanationAvailable', 'applicantScoring'],
+      ['RISK_EXPLANATION_GAP_01'],
+      'legal-ethical'
+    ));
+  }
+  if (facts.noFormalAppealMechanism || facts.appealMechanismAvailable === false) {
+    primaryRisks.push(risk(
+      'Missing appeal or review path for affected applicants',
+      'likely',
+      0.72,
+      'No formal appeal mechanism was described for applicants affected by admissions recommendations.',
+      state,
+      ['noFormalAppealMechanism', 'appealMechanismAvailable', 'recommendsAdmissionsOutcome'],
+      ['RISK_APPEAL_GAP_01'],
+      'legal-ethical'
+    ));
+  }
+  if (facts.retentionPeriodDefined && /five\s+years?|5\s+years?/i.test(String(facts.retentionPeriod || ''))) {
+    primaryRisks.push(risk(
+      'Five-year retention requires documented necessity and proportionality',
+      'requires_verification',
+      0.64,
+      'A five-year retention period is not treated as automatically non-compliant, but purpose, legal obligation, necessity, deletion/anonymization, and schedule evidence must justify it.',
+      state,
+      ['retentionPeriodDefined', 'retentionPeriod'],
+      ['RISK_RETENTION_JUSTIFICATION_01'],
+      'data-protection'
+    ));
+  }
+  if (facts.usesThirdPartyCloudProvider) {
+    primaryRisks.push(risk(
+      'Third-party cloud controls require verification',
+      'requires_verification',
+      0.62,
+      'Cloud processing was described, but encryption, access controls, processor terms, audit rights, subcontractors, transfer mechanism, incident handling, and deletion controls were not all evidenced.',
+      state,
+      'usesThirdPartyCloudProvider',
+      ['RISK_CLOUD_PROCESSOR_CONTROLS_01'],
+      'technical-security'
     ));
   }
   if (facts.workforceSchedulingPurpose || facts.recommendsMonthlyShiftSchedule) {
@@ -1195,6 +2624,7 @@ function buildTensions(state) {
 
 function buildSafeguards(state) {
   const facts = state.confirmedFacts || {};
+  const isRecruitment = isRecruitmentAssessment(facts);
   const confirmed = [];
   const partial = [];
   const missing = [];
@@ -1209,13 +2639,15 @@ function buildSafeguards(state) {
     ? 'A claims reviewer'
     : facts.workforceSchedulingPurpose || facts.recommendsMonthlyShiftSchedule
       ? 'A human manager'
-      : 'A human reviewer';
+      : isRecruitment
+        ? 'HR or recruitment staff'
+        : 'A human reviewer';
 
   if (facts.humanReviewAvailable) addSafeguard(confirmed, 'HumanOversight', 'Human review is confirmed.', 'humanReviewAvailable', ['SAFEGUARD_OVERSIGHT_01']);
   if (facts.humanCanOverride) addSafeguard(confirmed, 'HumanCanOverride', `${humanActor} can override the proposed output.`, 'humanCanOverride', ['SAFEGUARD_OVERRIDE_01']);
   if (facts.humanCanModify) addSafeguard(confirmed, 'HumanCanModify', `${humanActor} can modify the proposed output.`, 'humanCanModify', ['SAFEGUARD_MODIFY_01']);
   if (facts.humanCanReject) addSafeguard(confirmed, 'HumanCanReject', `${humanActor} can reject the proposed output.`, 'humanCanReject', ['SAFEGUARD_REJECT_01']);
-  const affectedGroup = facts.employmentContext ? 'Employees' : facts.insuranceContext || facts.insuranceClaimsPurpose ? 'Claimants' : 'Affected people';
+  const affectedGroup = isRecruitment ? 'Job applicants' : facts.employmentContext ? 'Employees' : facts.insuranceContext || facts.insuranceClaimsPurpose ? 'Claimants' : 'Affected people';
   if (facts.employeesInformed || facts.affectedPersonsInformed) addSafeguard(confirmed, 'TransparencyNotice', `${affectedGroup} are informed about the data used by the system.`, ['employeesInformed', 'affectedPersonsInformed'], ['SAFEGUARD_NOTICE_01']);
   if (facts.explanationAvailable) addSafeguard(confirmed, 'ExplanationAvailable', `${affectedGroup} can receive or view reasons for the AI-supported outcome.`, 'explanationAvailable', ['SAFEGUARD_EXPLANATION_01']);
   if (facts.correctionRightAvailable) addSafeguard(confirmed, 'CorrectionRight', `${affectedGroup} can request correction of inaccurate information.`, 'correctionRightAvailable', ['SAFEGUARD_CORRECTION_01']);
@@ -1238,14 +2670,18 @@ function buildSafeguards(state) {
     const dataFactKeys = ['processesPersonalData', 'processesInsuranceClaimData', 'processesClaimantData', 'processesHealthRelatedData'];
     if (!facts.retentionPeriodDefined) addSafeguard(requiresEvidence, 'RetentionPeriod', 'Retention period is relevant for personal or sensitive data and needs evidence.', dataFactKeys, ['SAFEGUARD_RETENTION_01']);
     if (!facts.pseudonymizationUsed) addSafeguard(requiresEvidence, 'PseudonymizationOrAnonymization', facts.employmentContext
-      ? 'Pseudonymization or minimization may be relevant for employee scheduling and HR records and needs evidence.'
+      ? isRecruitment
+        ? 'Pseudonymization or minimization may be relevant for applicant CVs, cover letters, and ranking records and needs evidence.'
+        : 'Pseudonymization or minimization may be relevant for employee scheduling and HR records and needs evidence.'
       : facts.educationContext
         ? 'Pseudonymization or anonymization is relevant for journal, wearable, or student records and needs evidence.'
         : facts.insuranceContext || facts.insuranceClaimsPurpose
           ? 'Pseudonymization, minimization, or access separation may be relevant for claim and claimant records and needs evidence.'
         : 'Pseudonymization, anonymization, or data minimization may be relevant for the processed personal data and needs evidence.', dataFactKeys, ['SAFEGUARD_PSEUDONYMIZATION_01']);
     if (!facts.securityMeasuresDocumented) addSafeguard(requiresEvidence, 'SecurityMeasures', facts.employmentContext
-      ? 'Security controls are relevant for processed employee data and need evidence.'
+      ? isRecruitment
+        ? 'Security controls are relevant for processed applicant data and ranking records and need evidence.'
+        : 'Security controls are relevant for processed employee data and need evidence.'
       : facts.educationContext
         ? 'Security controls are relevant for the processed student data and need evidence.'
         : facts.insuranceContext || facts.insuranceClaimsPurpose
@@ -1272,6 +2708,7 @@ function buildSafeguards(state) {
 
 function buildRegulatoryConsiderations(state) {
   const facts = state.confirmedFacts || {};
+  const isRecruitment = isRecruitmentAssessment(facts);
   const items = [];
   const processesPersonRelatedData = facts.processesPersonalData || facts.processesInsuranceClaimData || facts.processesClaimantData;
 
@@ -1281,15 +2718,17 @@ function buildRegulatoryConsiderations(state) {
       applicabilityStatus: facts.legalBasisDocumented ? 'likely_applicable_with_confirmed_basis' : 'likely_applicable_requires_basis_evidence',
       confidence: 0.82,
       reason: facts.employmentContext
-        ? 'The system processes employee-related personal data, so lawfulness, fairness, transparency, minimization, retention, and access control should be evidenced.'
+        ? isRecruitment
+          ? 'The system processes applicant-related personal data, so lawfulness, fairness, transparency, minimization, retention, and access control should be evidenced.'
+          : 'The system processes employee-related personal data, so lawfulness, fairness, transparency, minimization, retention, and access control should be evidenced.'
         : facts.educationContext
           ? 'The system processes student-related personal data, so lawfulness, fairness, transparency, minimization, and purpose limitation should be evidenced.'
           : facts.insuranceContext || facts.insuranceClaimsPurpose
             ? 'The system processes claim or claimant-related personal data, so lawfulness, fairness, transparency, minimization, retention, and access control should be evidenced.'
           : 'The system processes personal data, so lawfulness, fairness, transparency, minimization, retention, and access control should be evidenced.',
-      supportingFacts: ['processesPersonalData', facts.processesInsuranceClaimData ? 'processesInsuranceClaimData' : null, facts.processesClaimantData ? 'processesClaimantData' : null, facts.legalBasisDocumented ? 'legalBasisDocumented' : null, facts.purposeLimitation ? 'purposeLimitation' : null].filter(Boolean),
+      supportingFacts: ['processesPersonalData', facts.processesInsuranceClaimData ? 'processesInsuranceClaimData' : null, facts.processesClaimantData ? 'processesClaimantData' : null, facts.processesApplicantCVs ? 'processesApplicantCVs' : null, facts.processesCoverLetters ? 'processesCoverLetters' : null, facts.legalBasisDocumented ? 'legalBasisDocumented' : null, facts.purposeLimitation ? 'purposeLimitation' : null].filter(Boolean),
       missingConditions: ['retentionPeriodDefined', 'securityMeasuresDocumented', 'pseudonymizationUsed'].filter((key) => !facts[key]),
-      ...evidencePayload(state, ['processesPersonalData', 'processesInsuranceClaimData', 'processesClaimantData', 'legalBasisDocumented', 'purposeLimitation', 'employeesInformed', 'affectedPersonsInformed', 'accessRestricted', 'retentionPeriodDefined']),
+      ...evidencePayload(state, ['processesPersonalData', 'processesInsuranceClaimData', 'processesClaimantData', 'processesApplicantCVs', 'processesCoverLetters', 'legalBasisDocumented', 'purposeLimitation', 'employeesInformed', 'affectedPersonsInformed', 'accessRestricted', 'retentionPeriodDefined']),
       ruleIds: ['REG_DATA_PROTECTION_01']
     });
   }
@@ -1305,6 +2744,18 @@ function buildRegulatoryConsiderations(state) {
       ruleIds: ['REG_SENSITIVE_DATA_01']
     });
   }
+  if (facts.processesDemographicData || facts.processesDisabilityData) {
+    items.push({
+      value: 'Field-by-field demographic and special-category data review',
+      applicabilityStatus: facts.processesDisabilityData ? 'likely_applicable_requires_legal_basis_review' : 'requires_field_level_verification',
+      confidence: facts.processesDisabilityData ? 0.78 : 0.64,
+      reason: 'Demographic data must not be treated as one undifferentiated special category. Disability information may be special-category or sensitive data; gender, age, region, socioeconomic status, and previous school require separate legal classification and purpose review.',
+      supportingFacts: ['processesDemographicData', facts.processesDisabilityData ? 'processesDisabilityData' : null, facts.dataFieldGender ? 'dataFieldGender' : null, facts.dataFieldAge ? 'dataFieldAge' : null, facts.dataFieldRegion ? 'dataFieldRegion' : null, facts.dataFieldSocioeconomic ? 'dataFieldSocioeconomic' : null, facts.dataFieldPreviousSchool ? 'dataFieldPreviousSchool' : null].filter(Boolean),
+      missingConditions: ['field-level lawful basis', 'special-category condition if disability or health data is used', 'data minimization evidence'],
+      ...evidencePayload(state, ['processesDemographicData', 'processesDisabilityData', 'dataFieldDisability', 'dataFieldGender', 'dataFieldAge', 'dataFieldRegion', 'dataFieldSocioeconomic', 'dataFieldPreviousSchool']),
+      ruleIds: ['REG_FIELD_LEVEL_DATA_CLASSIFICATION_01']
+    });
+  }
   if (facts.producesIndividualRiskScore || facts.profilesIndividualCharacteristic) {
     items.push({
       value: 'Automated individual assessment / profiling review',
@@ -1317,6 +2768,74 @@ function buildRegulatoryConsiderations(state) {
       missingConditions: facts.appealMechanismAvailable ? [] : ['appealMechanismAvailable'],
       ...evidencePayload(state, ['producesIndividualRiskScore', 'profilesIndividualCharacteristic', 'humanReviewAvailable', 'humanCanOverride']),
       ruleIds: ['REG_PROFILING_01']
+    });
+  }
+  if (facts.recommendsAdmissionsOutcome || facts.officersUsuallyFollowRecommendation || facts.fullyAutomatedDecision || isRecruitment) {
+    items.push({
+      value: 'GDPR Article 22 / KVKK automated decision review',
+      applicabilityStatus: facts.fullyAutomatedDecision === true
+        ? 'possibly_applicable_requires_effects_review'
+        : isRecruitment
+          ? 'requires_solely_automated_decision_verification'
+        : facts.officersUsuallyFollowRecommendation
+          ? 'conditional_rubber_stamping_review'
+          : 'requires_solely_automated_decision_verification',
+      confidence: 0.68,
+      reason: isRecruitment
+        ? 'Article 22 or KVKK automated-decision restrictions are not automatically triggered merely because AI ranks applicants. They may become relevant if the ranking effectively determines rejection, shortlisting, or hiring without meaningful human review.'
+        : 'Article 22 or KVKK automated-decision restrictions are not automatically violated merely because AI supports admissions. They may become applicable if human review is merely formal and the AI recommendation effectively determines an outcome with legal or similarly significant effects.',
+      supportingFacts: ['recommendsAdmissionsOutcome', facts.officersUsuallyFollowRecommendation ? 'officersUsuallyFollowRecommendation' : null, isRecruitment ? 'employmentRecruitmentPurpose' : null, facts.ranksJobApplicants ? 'ranksJobApplicants' : null, facts.humanReviewAvailable ? 'humanReviewAvailable' : null].filter(Boolean),
+      missingConditions: ['solely automated final decision', 'meaningful independent human review', 'human authority and competence to override', 'legal or similarly significant effects'],
+      ...evidencePayload(state, ['recommendsAdmissionsOutcome', 'officersUsuallyFollowRecommendation', 'employmentRecruitmentPurpose', 'ranksJobApplicants', 'humanReviewAvailable', 'humanCanOverride', 'fullyAutomatedDecision']),
+      ruleIds: ['REG_GDPR_ARTICLE_22_CONDITIONAL_01', 'REG_KVKK_AUTOMATED_DECISION_CONDITIONAL_01']
+    });
+  }
+  if (facts.educationAdmissionsPurpose && (facts.applicantScoring || facts.recommendsAdmissionsOutcome)) {
+    items.push({
+      value: 'EU AI Act education-access high-risk classification candidate',
+      applicabilityStatus: 'requires_verification',
+      confidence: 0.74,
+      reason: 'The use case may match an Annex III education high-risk category because it evaluates or influences access to educational institutions. Provider and deployer duties must be separated, and applicability timing must be verified against retrieved current legal sources.',
+      supportingFacts: ['educationAdmissionsPurpose', facts.applicantScoring ? 'applicantScoring' : null, facts.recommendsAdmissionsOutcome ? 'recommendsAdmissionsOutcome' : null].filter(Boolean),
+      missingConditions: ['provider identity', 'deployer identity', 'current retrieved EU AI Act source with version/date', 'whether the system determines or materially influences access'],
+      ...evidencePayload(state, ['educationAdmissionsPurpose', 'applicantScoring', 'recommendsAdmissionsOutcome']),
+      ruleIds: ['REG_EU_AI_ACT_ANNEX_III_EDU_ACCESS_01']
+    });
+  }
+  if (isRecruitment && (facts.ranksJobApplicants || facts.supportsHiringDecision)) {
+    items.push({
+      value: 'EU AI Act employment recruitment high-risk classification candidate',
+      applicabilityStatus: 'requires_verification',
+      confidence: 0.72,
+      reason: 'Applicant ranking for recruitment may materially influence access to work. The assessment should verify provider/deployer roles, whether the AI output is used for selection or shortlisting, and the current legal applicability date.',
+      supportingFacts: ['employmentRecruitmentPurpose', facts.ranksJobApplicants ? 'ranksJobApplicants' : null, facts.supportsHiringDecision ? 'supportsHiringDecision' : null].filter(Boolean),
+      missingConditions: ['provider identity', 'deployer identity', 'current retrieved EU AI Act source with version/date', 'whether ranking determines or materially influences shortlisting or hiring'],
+      ...evidencePayload(state, ['employmentRecruitmentPurpose', 'ranksJobApplicants', 'supportsHiringDecision']),
+      ruleIds: ['REG_EU_AI_ACT_ANNEX_III_EMPLOYMENT_RECRUITMENT_01']
+    });
+  }
+  if (facts.retentionPeriodDefined) {
+    items.push({
+      value: 'Data-retention necessity and proportionality review',
+      applicabilityStatus: 'requires_justification',
+      confidence: 0.66,
+      reason: 'The defined retention period is not treated as automatically non-compliant. It requires evidence of documented purpose, legal obligation or necessity, proportionality, deletion/anonymization procedure, and retention schedule.',
+      supportingFacts: ['retentionPeriodDefined', facts.retentionPeriod ? 'retentionPeriod' : null].filter(Boolean),
+      missingConditions: ['documented purpose', 'legal obligation or necessity', 'deletion or anonymization procedure', 'retention schedule'],
+      ...evidencePayload(state, ['retentionPeriodDefined', 'retentionPeriod']),
+      ruleIds: ['REG_RETENTION_REVIEW_01']
+    });
+  }
+  if (facts.usesThirdPartyCloudProvider) {
+    items.push({
+      value: 'Third-party cloud processor and transfer-safeguard review',
+      applicabilityStatus: 'requires_verification',
+      confidence: 0.64,
+      reason: 'Third-party cloud use requires role, processor, security, subcontractor, incident, audit, transfer, and deletion evidence. Localization or missing encryption is not assumed without user evidence.',
+      supportingFacts: ['usesThirdPartyCloudProvider'],
+      missingConditions: ['controller/processor roles', 'data-processing agreement', 'encryption/access controls', 'audit rights', 'subprocessors', 'international transfer mechanism', 'processor retention/deletion'],
+      ...evidencePayload(state, 'usesThirdPartyCloudProvider'),
+      ruleIds: ['REG_CLOUD_PROCESSOR_REVIEW_01']
     });
   }
   if (facts.employmentContext && (facts.workforceSchedulingPurpose || facts.recommendsMonthlyShiftSchedule)) {
@@ -1344,20 +2863,23 @@ function buildRegulatoryConsiderations(state) {
     });
   }
 
-  return uniqueByValue(items).slice(0, 6);
+  return uniqueByValue(items).slice(0, 10);
 }
 
 function buildMissingInformation(state) {
   const facts = state.confirmedFacts || {};
+  const isRecruitment = isRecruitmentAssessment(facts);
   const questions = [];
   const processesPersonRelatedData = facts.processesPersonalData || facts.processesInsuranceClaimData || facts.processesClaimantData;
 
-  if ((state.contradictions || []).length) {
+  if ((state.contradictions || []).some(isActionableContradiction)) {
     questions.push('Please clarify the contradictory statement before the assessment is finalized.');
   }
   if ((processesPersonRelatedData || facts.processesHealthRelatedData) && !facts.retentionPeriodDefined) {
     questions.push(facts.employmentContext
-      ? 'What is the retention period for employee availability, preference, qualification, and shift assignment records?'
+      ? isRecruitment
+        ? 'What is the retention period for applicant CVs, cover letters, ranking records, and related recruitment data?'
+        : 'What is the retention period for employee availability, preference, qualification, and shift assignment records?'
       : facts.educationContext
         ? 'What is the retention period for questionnaire, journal, academic, attendance, and wearable data?'
         : facts.insuranceContext || facts.insuranceClaimsPurpose
@@ -1366,7 +2888,9 @@ function buildMissingInformation(state) {
   }
   if ((processesPersonRelatedData || facts.processesHealthRelatedData) && !facts.pseudonymizationUsed) {
     questions.push(facts.employmentContext
-      ? 'Are employee scheduling records minimized, pseudonymized, or otherwise protected from unnecessary identification?'
+      ? isRecruitment
+        ? 'Are applicant records minimized, pseudonymized where possible, or otherwise protected from unnecessary identification?'
+        : 'Are employee scheduling records minimized, pseudonymized, or otherwise protected from unnecessary identification?'
       : facts.educationContext
         ? 'Are journal entries, wearable data, and student records pseudonymized, anonymized, or otherwise separated from direct identifiers?'
         : facts.insuranceContext || facts.insuranceClaimsPurpose
@@ -1378,12 +2902,38 @@ function buildMissingInformation(state) {
       ? 'Can students challenge, appeal, or request review of counselor-prioritization outcomes?'
       : 'Can affected people challenge, appeal, or request review of score-driven outcomes?');
   }
+  if (facts.educationAdmissionsPurpose && facts.officersUsuallyFollowRecommendation) {
+    questions.push('How do admissions officers independently examine and override recommendations, and how is rubber-stamping prevented?');
+  }
+  if (facts.educationAdmissionsPurpose && !facts.explanationAvailable) {
+    questions.push('What individual explanation is provided for applicant scores and admissions recommendations?');
+  }
+  if (facts.educationAdmissionsPurpose && !facts.appealMechanismAvailable) {
+    questions.push('What appeal, correction, or second-review mechanism is available to applicants?');
+  }
+  if (isRecruitment && facts.fullyAutomatedDecision !== true && facts.makesHiringDecision !== false && !facts.humanReviewAvailable) {
+    questions.push('Does the AI ranking only support HR review, or can it automatically reject or shortlist applicants?');
+  }
+  if (isRecruitment && facts.humanReviewAvailable && !facts.explanationAvailable && !facts.correctionRightAvailable && !facts.manualReviewAvailable && !facts.appealMechanismAvailable) {
+    questions.push('Can applicants receive an explanation, correct inaccurate application data, or request a human review of a ranking?');
+  }
+  if (!isRecruitment && facts.systemPurpose && isDecisionSupportAssessment(facts) && !facts.humanReviewAvailable && facts.fullyAutomatedDecision !== true && facts.fullyAutomatedDecision !== false) {
+    questions.push('Does a person review the AI output and have authority to change or reject it before it affects the outcome?');
+  }
+  if (!isRecruitment && facts.systemPurpose && isDecisionSupportAssessment(facts) && facts.affectedPersons && !facts.explanationAvailable && !facts.correctionRightAvailable && !facts.manualReviewAvailable && !facts.appealMechanismAvailable) {
+    questions.push('Can affected people receive an explanation or request human review if the AI output is wrong?');
+  }
+  if (facts.usesThirdPartyCloudProvider) {
+    questions.push('What processor agreement, encryption, access-control, audit, subcontractor, transfer, incident, and deletion controls exist for the cloud provider?');
+  }
   if ((facts.workforceSchedulingPurpose || facts.recommendsMonthlyShiftSchedule) && !facts.challengeMechanismAvailable) {
     questions.push('Can employees challenge a shift assignment or request manual scheduling review?');
   }
   if ((processesPersonRelatedData || facts.processesHealthRelatedData) && !facts.securityMeasuresDocumented) {
     questions.push(facts.employmentContext
-      ? 'Which access controls, audit logs, or security measures protect employee scheduling and HR records?'
+      ? isRecruitment
+        ? 'Which access controls, audit logs, or security measures protect applicant records and ranking outputs?'
+        : 'Which access controls, audit logs, or security measures protect employee scheduling and HR records?'
       : facts.educationContext
         ? 'Which access controls, encryption, or audit logs protect the processed student data?'
         : facts.insuranceContext || facts.insuranceClaimsPurpose
@@ -1399,20 +2949,55 @@ function buildMissingInformation(state) {
 
 function buildRecommendedActions(state) {
   const facts = state.confirmedFacts || {};
+  const isRecruitment = isRecruitmentAssessment(facts);
   const actions = [];
-  const affectedGroup = facts.employmentContext ? 'employees' : facts.insuranceContext || facts.insuranceClaimsPurpose ? 'claimants' : 'affected people';
+  const affectedGroup = isRecruitment ? 'job applicants' : facts.employmentContext ? 'employees' : facts.insuranceContext || facts.insuranceClaimsPurpose ? 'claimants' : 'affected people';
 
   if (facts.workforceSchedulingPurpose || facts.recommendsMonthlyShiftSchedule) {
     actions.push('Validate shift allocation fairness across night, weekend, workload, qualification, and availability constraints.');
     actions.push('Keep manager review, modification, and rejection before schedule publication as mandatory controls.');
   }
+  if (isRecruitment) {
+    actions.push('Validate applicant ranking for bias, data-quality errors, and disparate impact before using it for shortlisting or hiring.');
+    actions.push('Document whether the ranking is advisory only or can automatically reject or shortlist applicants.');
+    actions.push('Provide applicants with appropriate explanation, correction, and human-review channels for AI-supported rankings.');
+  }
   if (facts.insuranceClaimsPurpose || facts.recommendsClaimAssessment) {
     actions.push('Document which claim data inputs influence the recommendation and which checks prevent inaccurate claim outcomes.');
     actions.push('Keep claims-officer review and override authority explicit for every recommendation.');
   }
+  if (
+    facts.systemPurpose &&
+    isDecisionSupportAssessment(facts) &&
+    !isRecruitment &&
+    !facts.workforceSchedulingPurpose &&
+    !facts.recommendsMonthlyShiftSchedule &&
+    !facts.insuranceClaimsPurpose &&
+    !facts.recommendsClaimAssessment &&
+    !facts.educationAdmissionsPurpose &&
+    !facts.recommendsAdmissionsOutcome &&
+    !facts.assignmentEvaluationPurpose &&
+    !facts.essayScoringPurpose
+  ) {
+    actions.push('Document the AI inputs, outputs, intended use, and limits before relying on the result.');
+    actions.push('Define whether the AI is advisory only or can directly determine an outcome.');
+    actions.push('Keep explanation, correction, and human-review routes available when people are affected.');
+  }
+  if (facts.educationAdmissionsPurpose || facts.recommendsAdmissionsOutcome) {
+    actions.push('Document provider and deployer roles separately before assigning EU AI Act obligations.');
+    actions.push('Verify the education-access high-risk classification against a retrieved current EU AI Act source.');
+    actions.push('Document how admissions officers independently review, override, and record departures from recommendations.');
+    actions.push('Provide applicants with score explanations, correction rights, and an appeal or second-review path.');
+  }
+  if (facts.historicalBiasEvidence || facts.processesDemographicData || facts.processesDisabilityData) {
+    actions.push('Validate admissions scoring for disparate impact across disability, gender, socioeconomic, regional, and previous-school groups.');
+    actions.push('Classify each data field separately before treating it as GDPR Article 9 or KVKK special-category data.');
+  }
   if (facts.processesPersonalData || facts.processesInsuranceClaimData || facts.processesClaimantData || facts.processesHealthRelatedData) {
     actions.push(facts.employmentContext
-      ? 'Document retention, access control, security, and minimization evidence for each employee data source.'
+      ? isRecruitment
+        ? 'Document retention, access control, security, and minimization evidence for each applicant data source.'
+        : 'Document retention, access control, security, and minimization evidence for each employee data source.'
       : facts.insuranceContext || facts.insuranceClaimsPurpose
         ? 'Document retention, access control, security, and minimization evidence for each claim or claimant data source.'
       : 'Document data retention, access control, security, and minimization evidence for each data source.');
@@ -1442,8 +3027,11 @@ function buildRecommendedActions(state) {
   if (facts.correctionRightAvailable || facts.challengeMechanismAvailable || facts.manualReviewAvailable) {
     actions.push(`Keep correction, challenge, and manual-review paths visible to ${affectedGroup} and track their outcomes.`);
   }
+  if (facts.usesThirdPartyCloudProvider) {
+    actions.push('Collect cloud-processor evidence: DPA, access controls, encryption, audit rights, subprocessors, transfer mechanism, incident handling, and deletion guarantees.');
+  }
 
-  return Array.from(new Set(actions)).slice(0, 7);
+  return Array.from(new Set(actions)).slice(0, 10);
 }
 
 function buildConfirmedFactList(state) {
@@ -1486,7 +3074,7 @@ function buildReasoningTrace(state, keywordCandidates = [], context = {}) {
       },
       {
         step: 'fact_merge',
-        method: 'Project/user-scoped facts are merged with previous confirmed facts; contradictions are kept for clarification.'
+        method: 'Project/user-scoped facts are merged with previous confirmed facts; appendable facts are combined and current-turn contradictions are kept for clarification.'
       },
       {
         step: 'applicability_rules',
@@ -1524,6 +3112,7 @@ function buildReport({ project, state, keywordCandidates, stateMergeStats = null
   const facts = state.confirmedFacts || {};
   const isClaimAssessment = Boolean(facts.insuranceContext || facts.insuranceClaimsPurpose || facts.recommendsClaimAssessment);
   const isWorkforceScheduling = Boolean(facts.workforceSchedulingPurpose || facts.recommendsMonthlyShiftSchedule);
+  const isRecruitment = isRecruitmentAssessment(facts);
   const projectId = getProjectId(project);
   const systemUnderstanding = buildSystemUnderstanding(project, state);
   const { classifications, excludedClassifications } = buildClassifications(state);
@@ -1540,22 +3129,36 @@ function buildReport({ project, state, keywordCandidates, stateMergeStats = null
     summaryParts.push(projectId
       ? 'The selected project is understood as an employment-context workforce scheduling decision-support system.'
       : 'This general ontology chat is understood as an employment-context workforce scheduling decision-support system.');
+  } else if (isRecruitment) {
+    summaryParts.push('The AI use is understood as employment recruitment decision support for ranking job applicants.');
   } else if (facts.insuranceContext || facts.insuranceClaimsPurpose || facts.recommendsClaimAssessment) {
     summaryParts.push(projectId
       ? 'The selected project is understood as an insurance claim assessment decision-support system.'
       : 'This general ontology chat is understood as an insurance claim assessment decision-support system.');
+  } else if (facts.educationAdmissionsPurpose || facts.recommendsAdmissionsOutcome) {
+    summaryParts.push('The selected project is understood as a university admissions decision-support system that may influence access to education.');
+  } else if (facts.essayScoringPurpose || facts.assignmentEvaluationPurpose) {
+    summaryParts.push('The AI use is understood as education assessment support for student work, including scoring or feedback.');
   } else if (facts.educationContext && facts.studentWellbeingPurpose) {
     summaryParts.push('The selected project is understood as an education-context student wellbeing decision-support system.');
+  } else if (facts.systemPurpose) {
+    summaryParts.push(`The AI use is understood as: ${facts.systemPurpose}.`);
   } else {
     summaryParts.push(projectId
-      ? 'The selected project has been assessed only from selected project metadata and confirmed conversation facts.'
-      : 'This general ontology chat has been assessed only from confirmed conversation facts.');
+      ? 'The selected project assessment is based on the selected project metadata and confirmed conversation facts.'
+      : 'Please describe what the AI system does and who is affected so the ontology assessment can stay grounded in confirmed facts.');
+  }
+  if (isRecruitment && facts.ranksJobApplicants) {
+    summaryParts.push('It ranks applicants from application materials and is not treated as an automated rejection, shortlisting, or hiring system unless that authority is explicitly confirmed.');
   }
   if (facts.recommendsMonthlyShiftSchedule) {
     summaryParts.push('It recommends monthly shift schedules for human review and is not treated as an automated hiring, firing, promotion, salary, or disciplinary decision system.');
   }
   if (facts.recommendsClaimAssessment) {
     summaryParts.push('It produces claim assessment recommendations and is not treated as making final claim approval or rejection decisions unless that authority is confirmed.');
+  }
+  if (facts.recommendsAdmissionsOutcome) {
+    summaryParts.push('It recommends admissions outcomes; confirmed legal non-compliance is not asserted without evidence of solely automated or rubber-stamped final decisions.');
   }
   if (facts.producesIndividualRiskScore) {
     summaryParts.push('It generates an individual risk score, so prioritization, profiling, and fairness risks require evidence-based review.');
@@ -1568,6 +3171,9 @@ function buildReport({ project, state, keywordCandidates, stateMergeStats = null
       ? 'Claims-officer review and override are confirmed safeguards and reduce automation risk.'
       : 'Human review and override are confirmed safeguards and reduce automation risk.');
   }
+  if ((facts.essayScoringPurpose || facts.assignmentEvaluationPurpose) && facts.teacherFinalGradeDecision) {
+    summaryParts.push('The teacher remains the final decision-maker for grading, so the AI is not treated as determining the final grade by itself.');
+  }
   if (isWorkforceScheduling && facts.humanReviewAvailable && (facts.humanCanModify || facts.humanCanReject)) {
     summaryParts.push('Human review, modification, and rejection rights are confirmed safeguards and reduce residual scheduling risk.');
   } else if (isClaimAssessment && facts.humanReviewAvailable && (facts.humanCanModify || facts.humanCanReject) && !facts.humanCanOverride) {
@@ -1577,7 +3183,7 @@ function buildReport({ project, state, keywordCandidates, stateMergeStats = null
     summaryParts.push('Legal basis and explicit or informed consent are confirmed and preserved across turns.');
   }
 
-  return {
+  const report = {
     reportVersion: ASSESSMENT_VERSION,
     projectScope: {
       projectId,
@@ -1594,14 +3200,28 @@ function buildReport({ project, state, keywordCandidates, stateMergeStats = null
     confirmedFacts,
     classifications,
     excludedClassifications,
-    domains: classifications.filter((item) => ['Education', 'StudentWellbeing', 'Employment', 'Manufacturing', 'Insurance'].includes(item.value)),
-    systemFunctions: classifications.filter((item) => ['RiskScoring', 'DecisionSupport', 'WorkforceScheduling', 'ShiftRecommendation', 'InsuranceClaimsSupport', 'ClaimAssessmentRecommendation', 'HumanReviewedAI'].includes(item.value)),
-    dataProcessingFunctions: classifications.filter((item) => item.value.endsWith('Processing') || item.value === 'JournalTextProcessing' || item.value === 'AcademicRecordProcessing' || item.value === 'HRDataProcessing'),
-    decisionEffects: facts.recommendsCounselorContact
+    domains: classifications.filter((item) => ['Education', 'StudentWellbeing', 'EducationAdmissionsAccess', 'Employment', 'EmploymentRecruitment', 'Manufacturing', 'Insurance'].includes(item.value)),
+    systemFunctions: classifications.filter((item) => ['RiskScoring', 'DecisionSupport', 'WorkforceScheduling', 'ShiftRecommendation', 'InsuranceClaimsSupport', 'ClaimAssessmentRecommendation', 'ApplicantScoring', 'AdmissionsRecommendation', 'RecruitmentDecisionSupport', 'ApplicantRanking', 'HumanReviewedAI'].includes(item.value)),
+    dataProcessingFunctions: classifications.filter((item) => item.value.endsWith('Processing') || item.value === 'JournalTextProcessing' || item.value === 'AcademicRecordProcessing' || item.value === 'HRDataProcessing' || item.value === 'CandidateApplicationDataProcessing'),
+    decisionEffects: facts.recommendsAdmissionsOutcome || facts.educationAdmissionsPurpose
+      ? [
+          conclusion('AdmissionsRecommendation', 'confirmed', 0.84, 'The system supports admissions decisions through applicant scoring or acceptance, rejection, or waiting-list recommendations.', state, ['educationAdmissionsPurpose', 'applicantScoring', 'recommendsAdmissionsOutcome'], ['RULE_DECISION_EFFECT_ADMISSIONS_01']),
+          facts.officersUsuallyFollowRecommendation
+            ? conclusion('HumanReviewEffectivenessRequiresVerification', 'requires_verification', 0.72, 'Admissions officers usually follow the recommendation, so meaningful independent human review must be verified.', state, ['officersUsuallyFollowRecommendation', 'humanReviewAvailable'], ['RULE_DECISION_EFFECT_ADMISSIONS_02'])
+            : null
+        ].filter(Boolean)
+      : facts.recommendsCounselorContact
       ? [
           conclusion('CounselorInterventionPrioritization', 'likely', 0.76, 'The system may prioritize students for counselor intervention.', state, ['recommendsCounselorContact', 'producesIndividualRiskScore'], ['RULE_DECISION_EFFECT_01']),
           facts.humanReviewAvailable && facts.humanCanOverride
             ? conclusion('NonBindingRecommendation', 'confirmed', 0.88, 'The human reviewer can override the recommendation.', state, ['humanReviewAvailable', 'humanCanOverride'], ['RULE_DECISION_EFFECT_02'])
+            : null
+        ].filter(Boolean)
+      : isRecruitment
+      ? [
+          conclusion('ApplicantRanking', 'confirmed', 0.86, 'The system ranks job applicants and may influence hiring or shortlisting review.', state, ['employmentRecruitmentPurpose', 'applicantRankingPurpose', 'ranksJobApplicants'], ['RULE_DECISION_EFFECT_RECRUITMENT_01']),
+          facts.humanReviewAvailable && (facts.humanCanOverride || facts.humanCanModify || facts.humanCanReject || facts.makesHiringDecision === false)
+            ? conclusion('HumanReviewedAI', 'confirmed', 0.88, 'HR or recruitment staff can review or change the ranking before the final hiring or shortlisting outcome.', state, ['humanReviewAvailable', 'humanCanOverride', 'humanCanModify', 'humanCanReject', 'makesHiringDecision'], ['RULE_DECISION_EFFECT_RECRUITMENT_02'])
             : null
         ].filter(Boolean)
       : facts.producesIndividualRiskScore
@@ -1645,6 +3265,8 @@ function buildReport({ project, state, keywordCandidates, stateMergeStats = null
     }),
     nonApplicableRisks
   };
+
+  return report;
 }
 
 function normalizeIdentityValue(value) {
@@ -1661,11 +3283,27 @@ function factEntriesToMap(entries) {
 
 function domainGroupsForFacts(facts) {
   const groups = new Set();
-  if (facts.educationContext || facts.studentWellbeingPurpose || facts.recommendsCounselorContact) groups.add('education');
+  if (facts.educationContext || facts.studentWellbeingPurpose || facts.recommendsCounselorContact || facts.educationAdmissionsPurpose || facts.recommendsAdmissionsOutcome) groups.add('education');
   if (facts.insuranceContext || facts.insuranceClaimsPurpose || facts.recommendsClaimAssessment || facts.processesInsuranceClaimData || facts.processesClaimantData) groups.add('insurance');
-  if (facts.employmentContext || facts.workforceSchedulingPurpose || facts.recommendsMonthlyShiftSchedule) groups.add('employment');
+  if (facts.employmentContext || facts.workforceSchedulingPurpose || facts.recommendsMonthlyShiftSchedule || isRecruitmentAssessment(facts)) groups.add('employment');
   if (facts.manufacturingContext) groups.add('employment');
   return groups;
+}
+
+function useCaseGroupsForFacts(facts) {
+  const groups = new Set();
+  if (facts.lessonPlanningPurpose) groups.add('lesson_planning');
+  if (facts.assignmentEvaluationPurpose || facts.essayScoringPurpose || facts.evaluatesLearningOutcome || facts.assignsAcademicGrade) groups.add('student_assessment');
+  if (facts.educationAdmissionsPurpose || facts.applicantScoring || facts.recommendsAdmissionsOutcome) groups.add('education_admissions');
+  if (facts.studentWellbeingPurpose || facts.recommendsCounselorContact) groups.add('student_wellbeing');
+  if (facts.insuranceClaimsPurpose || facts.recommendsClaimAssessment) groups.add('insurance_claims');
+  if (facts.workforceSchedulingPurpose || facts.recommendsMonthlyShiftSchedule) groups.add('workforce_scheduling');
+  if (isRecruitmentAssessment(facts)) groups.add('employment_recruitment');
+  return groups;
+}
+
+function setsOverlap(left, right) {
+  return Array.from(left).some((item) => right.has(item));
 }
 
 function getPreviousStateResetInfo(previousState, incomingFacts) {
@@ -1683,11 +3321,22 @@ function getPreviousStateResetInfo(previousState, incomingFacts) {
     };
   }
 
+  const previousUseCases = useCaseGroupsForFacts(previousFacts);
+  const incomingUseCases = useCaseGroupsForFacts(incomingFactMap);
+  if (!previousName && incomingName && previousUseCases.size && incomingUseCases.size && !setsOverlap(previousUseCases, incomingUseCases)) {
+    return {
+      reset: true,
+      reason: 'incoming_named_system_differs_from_previous_use_case',
+      incomingSystemName: incomingFactMap.systemName,
+      previousUseCases: Array.from(previousUseCases),
+      incomingUseCases: Array.from(incomingUseCases)
+    };
+  }
+
   const previousDomains = domainGroupsForFacts(previousFacts);
   const incomingDomains = domainGroupsForFacts(incomingFactMap);
   if (previousDomains.size && incomingDomains.size) {
-    const overlap = Array.from(incomingDomains).some((domain) => previousDomains.has(domain));
-    if (!overlap) {
+    if (!setsOverlap(incomingDomains, previousDomains)) {
       return {
         reset: true,
         reason: 'incoming_domain_differs_from_previous_state',
@@ -1700,41 +3349,498 @@ function getPreviousStateResetInfo(previousState, incomingFacts) {
   return { reset: false, reason: null };
 }
 
-function assessOntologyChat({ project, messages = [], previousState = {}, newMessage = '', messageIndex = null, llmFacts = [], geminiExtraction = null }) {
+function firstNonEmpty(...values) {
+  return values.find((value) => normalizeWhitespace(value));
+}
+
+function factEvidenceSummary(state, keys) {
+  return factEvidenceFor(state, keys)
+    .map((item) => ({
+      fact: item.fact,
+      value: item.value,
+      source: item.source,
+      evidence: item.sourceText
+    }))
+    .filter((item) => item.evidence || item.value !== undefined);
+}
+
+function booleanStatus(value) {
+  if (value === true) return 'provided';
+  if (value === false) return 'provided_negative';
+  return 'unknown';
+}
+
+function isTeacherRole(value) {
+  return /\bteacher\b/i.test(String(value || ''));
+}
+
+function isRecruitmentAssessment(facts) {
+  return Boolean(
+    facts.employmentRecruitmentPurpose ||
+    facts.applicantRankingPurpose ||
+    facts.ranksJobApplicants ||
+    facts.supportsHiringDecision ||
+    facts.processesApplicantCVs ||
+    facts.processesCoverLetters ||
+    facts.jobApplicantsAffected
+  );
+}
+
+function buildConversationStateSnapshot(state, ontologyResult) {
+  const facts = state.confirmedFacts || {};
+  const system = ontologyResult?.systemUnderstanding || {};
+  const hasEducation = Boolean(facts.educationContext || facts.assignmentEvaluationPurpose || facts.lessonPlanningPurpose || facts.essayScoringPurpose);
+  const hasRecruitment = isRecruitmentAssessment(facts);
+  const hasSensitiveData = Boolean(facts.processesHealthData || facts.processesHealthRelatedData || facts.processesBiometricData || facts.processesDisabilityData);
+  const hasFeedbackGeneration = /feedback/i.test(String(facts.systemPurpose || '')) ||
+    (system.outputs || []).some((item) => /feedback/i.test(String(item)));
+  const hasEssayScoring = Boolean(facts.essayScoringPurpose || /essay/i.test(String(facts.systemPurpose || '')));
+  const outputText = (() => {
+    if (hasRecruitment && (facts.ranksJobApplicants || facts.applicantRankingPurpose)) return 'applicant ranking or suitability score';
+    if (hasEssayScoring && hasFeedbackGeneration) return 'score and feedback';
+    if (hasEssayScoring) return 'score';
+    if (hasFeedbackGeneration) return 'feedback';
+    return (system.outputs || [])[0] || null;
+  })();
+  const decisionImpact = facts.teacherFinalGradeDecision
+    ? 'Teacher decides the final grade'
+    : facts.assignsAcademicGrade === true || facts.fullyAutomatedDecision === true
+      ? 'AI may directly determine or affect the final grade'
+      : (facts.assignmentEvaluationPurpose || facts.essayScoringPurpose)
+        ? null
+        : hasRecruitment
+          ? facts.fullyAutomatedDecision === true || facts.makesHiringDecision === true
+            ? 'AI may automatically reject, shortlist, or determine a hiring outcome'
+            : facts.makesHiringDecision === false || facts.fullyAutomatedDecision === false
+              ? 'HR or recruitment staff decide the hiring or shortlisting outcome'
+              : 'Applicant ranking may influence hiring or shortlisting'
+          : firstNonEmpty((system.decisionsSupported || [])[0], facts.decisionsSupported) || null;
+
+  const knownSafeguards = [];
+  if (facts.teacherFinalGradeDecision || facts.humanReviewAvailable) knownSafeguards.push('Human review');
+  if (facts.humanCanOverride) knownSafeguards.push('Human can override or change the AI output');
+  if (facts.feedbackSuggestionOnly) knownSafeguards.push('AI output is advisory feedback only');
+  if (facts.explanationAvailable) knownSafeguards.push('Explanation available');
+  if (facts.correctionRightAvailable || facts.manualReviewAvailable) knownSafeguards.push('Correction or review request available');
+  if (facts.accessRestricted || facts.authorizedStaffOnly || facts.authorizedHRAndManagersOnly) knownSafeguards.push('Access restriction');
+
+  const unknownFields = [];
+  if (!facts.systemPurpose && !facts.lessonPlanningPurpose && !facts.assignmentEvaluationPurpose && !facts.essayScoringPurpose && !facts.recommendsAdmissionsOutcome && !facts.recommendsClaimAssessment && !facts.recommendsMonthlyShiftSchedule && !hasRecruitment) {
+    unknownFields.push('ai_purpose');
+  }
+  if (hasRecruitment && facts.fullyAutomatedDecision !== true && facts.makesHiringDecision !== false && !facts.humanReviewAvailable) {
+    unknownFields.push('automation_boundary');
+  }
+  if (hasRecruitment && facts.explanationAvailable === undefined) unknownFields.push('explanation_available');
+  if (hasRecruitment && !facts.correctionRightAvailable && !facts.manualReviewAvailable && facts.appealMechanismAvailable === undefined) {
+    unknownFields.push('applicant_review_or_correction_available');
+  }
+  if ((facts.assignmentEvaluationPurpose || facts.essayScoringPurpose) && !decisionImpact) unknownFields.push('decision_impact');
+  if ((facts.assignmentEvaluationPurpose || facts.essayScoringPurpose || facts.lessonPlanningPurpose) && facts.processesPersonalData !== true && facts.studentNamesUsed === undefined) {
+    unknownFields.push('personal_data');
+  }
+  if ((facts.assignmentEvaluationPurpose || facts.essayScoringPurpose) && facts.explanationAvailable === undefined) unknownFields.push('explanation_available');
+  if ((facts.assignmentEvaluationPurpose || facts.essayScoringPurpose) && !facts.correctionRightAvailable && !facts.manualReviewAvailable && facts.appealMechanismAvailable === undefined) {
+    unknownFields.push('correction_or_review_available');
+  }
+
+  return {
+    user_role: facts.userRole || null,
+    domain: hasEducation ? 'education' : facts.insuranceContext ? 'insurance' : facts.employmentContext || hasRecruitment ? 'employment' : null,
+    ai_system_name: facts.systemName || null,
+    ai_purpose: firstNonEmpty(system.purpose, facts.systemPurpose) || null,
+    ai_secondary_purpose: hasFeedbackGeneration ? 'feedback generation' : null,
+    input_data: system.inputs || [],
+    output: outputText,
+    ai_output: outputText,
+    affected_stakeholders: system.affectedPersons || [],
+    decision_impact: decisionImpact,
+    human_oversight: facts.teacherFinalGradeDecision || facts.humanReviewAvailable ? 'provided' : 'unknown',
+    human_review: facts.humanReviewAvailable ? 'present' : 'unknown',
+    override_authority: facts.humanCanOverride || facts.humanCanModify || facts.humanCanReject ? 'present' : 'unknown',
+    final_decision_maker: facts.teacherFinalGradeDecision ? 'teacher' : facts.assignsAcademicGrade === true || facts.makesHiringDecision === true ? 'AI system' : facts.makesHiringDecision === false ? 'human reviewer' : 'unknown',
+    final_grade_automated: facts.assignsAcademicGrade === false || facts.fullyAutomatedDecision === false || facts.teacherFinalGradeDecision ? false : facts.assignsAcademicGrade === true ? true : null,
+    personal_data: facts.processesPersonalData === true ? 'provided' : 'unknown',
+    sensitive_data: hasSensitiveData ? 'provided' : 'unknown',
+    explanation_available: booleanStatus(facts.explanationAvailable),
+    appeal_available: facts.correctionRightAvailable || facts.manualReviewAvailable || facts.appealMechanismAvailable ? 'provided' : facts.appealMechanismAvailable === false ? 'provided_negative' : 'unknown',
+    known_safeguards: Array.from(new Set(knownSafeguards)),
+    known_risks: (ontologyResult?.primaryRisks || []).map((item) => item.value).filter(Boolean).slice(0, 4),
+    unknown_fields: unknownFields
+  };
+}
+
+function hasEnoughEducationAssessmentContext(facts) {
+  const knowsPurpose = Boolean(facts.systemPurpose || facts.assignmentEvaluationPurpose || facts.essayScoringPurpose);
+  const knowsAffectedPeople = Boolean(facts.affectedPersons || facts.educationContext);
+  const knowsOutput = Boolean(facts.systemOutputs || facts.essayScoringPurpose || facts.feedbackSuggestionOnly);
+  const knowsHumanBoundary = Boolean(facts.teacherFinalGradeDecision || facts.assignsAcademicGrade === true || facts.assignsAcademicGrade === false || facts.fullyAutomatedDecision === false);
+  const knowsControl = Boolean(facts.humanReviewAvailable && (facts.humanCanOverride || facts.humanCanModify || facts.humanCanReject || facts.teacherFinalGradeDecision));
+  const knowsAtLeastOneAccountabilityDetail = Boolean(
+    facts.explanationAvailable !== undefined ||
+    facts.correctionRightAvailable ||
+    facts.manualReviewAvailable ||
+    facts.appealMechanismAvailable !== undefined ||
+    facts.studentNamesUsed !== undefined ||
+    facts.studentNamesUseUnknown ||
+    facts.historicalBiasEvidence
+  );
+
+  return knowsPurpose && knowsAffectedPeople && knowsOutput && knowsHumanBoundary && knowsControl && knowsAtLeastOneAccountabilityDetail;
+}
+
+function hasEnoughRecruitmentAssessmentContext(facts) {
+  const knowsPurpose = Boolean(facts.systemPurpose || facts.employmentRecruitmentPurpose || facts.applicantRankingPurpose || facts.ranksJobApplicants);
+  const knowsAffectedPeople = Boolean(facts.affectedPersons || facts.jobApplicantsAffected);
+  const knowsOutput = Boolean(facts.systemOutputs || facts.ranksJobApplicants || facts.applicantRankingPurpose);
+  const knowsHumanBoundary = Boolean(
+    facts.humanReviewAvailable ||
+    facts.fullyAutomatedDecision === true ||
+    facts.fullyAutomatedDecision === false ||
+    facts.makesHiringDecision === true ||
+    facts.makesHiringDecision === false
+  );
+  const knowsControl = Boolean(
+    facts.humanReviewAvailable &&
+    (facts.humanCanOverride || facts.humanCanModify || facts.humanCanReject || facts.makesHiringDecision === false)
+  );
+  const knowsAtLeastOneAccountabilityDetail = Boolean(
+    facts.explanationAvailable !== undefined ||
+    facts.correctionRightAvailable ||
+    facts.manualReviewAvailable ||
+    facts.appealMechanismAvailable !== undefined ||
+    facts.challengeMechanismAvailable ||
+    facts.processesPersonalData === true ||
+    facts.retentionPeriodDefined ||
+    facts.securityMeasuresDocumented ||
+    facts.historicalBiasEvidence
+  );
+
+  return knowsPurpose && knowsAffectedPeople && knowsOutput && knowsHumanBoundary && (knowsControl || facts.fullyAutomatedDecision === true || facts.makesHiringDecision === true) && knowsAtLeastOneAccountabilityDetail;
+}
+
+function isDecisionSupportAssessment(facts) {
+  const purposeText = [facts.systemPurpose, facts.systemOutputs, facts.decisionsSupported].filter(Boolean).join(' ');
+  return Boolean(
+    facts.producesIndividualRiskScore ||
+    facts.profilesIndividualCharacteristic ||
+    facts.fullyAutomatedDecision === true ||
+    facts.decisionsSupported ||
+    genericPurposeLooksDecisionRelevant(purposeText)
+  );
+}
+
+function hasEnoughGenericAssessmentContext(facts) {
+  if (!facts.systemPurpose) return false;
+  const decisionRelevant = isDecisionSupportAssessment(facts);
+  const knowsOutput = Boolean(facts.systemOutputs || facts.decisionsSupported);
+  const knowsAffectedOrInputs = Boolean(facts.affectedPersons || facts.systemInputs || facts.processesPersonalData !== undefined);
+  const knowsDecisionBoundary = !decisionRelevant || Boolean(
+    facts.humanReviewAvailable ||
+    facts.fullyAutomatedDecision === true ||
+    facts.fullyAutomatedDecision === false
+  );
+  const knowsAtLeastOneAccountabilityDetail = Boolean(
+    facts.explanationAvailable !== undefined ||
+    facts.correctionRightAvailable ||
+    facts.manualReviewAvailable ||
+    facts.appealMechanismAvailable !== undefined ||
+    facts.challengeMechanismAvailable ||
+    facts.processesPersonalData !== undefined ||
+    facts.retentionPeriodDefined ||
+    facts.securityMeasuresDocumented ||
+    facts.historicalBiasEvidence
+  );
+
+  return knowsOutput && knowsAffectedOrInputs && knowsDecisionBoundary && knowsAtLeastOneAccountabilityDetail;
+}
+
+function selectClarificationQuestion(facts, snapshot) {
+  const isRecruitment = isRecruitmentAssessment(facts);
+  const isGenericDecisionSupport = isDecisionSupportAssessment(facts);
+  const knowsPurpose = Boolean(
+    facts.systemPurpose ||
+    facts.lessonPlanningPurpose ||
+    facts.assignmentEvaluationPurpose ||
+    facts.essayScoringPurpose ||
+    facts.recommendsAdmissionsOutcome ||
+    facts.recommendsClaimAssessment ||
+    facts.recommendsMonthlyShiftSchedule ||
+    isRecruitment ||
+    facts.studentWellbeingPurpose
+  );
+
+  if (!knowsPurpose) {
+    return 'What do you use the AI for - for example, preparing lesson materials, evaluating assignments, or communicating with students?';
+  }
+
+  if ((facts.essayScoringPurpose || facts.assignmentEvaluationPurpose) && !facts.teacherFinalGradeDecision && facts.assignsAcademicGrade !== true) {
+    return 'Does the AI score directly determine the final grade, or do you review it and decide yourself?';
+  }
+
+  if ((facts.essayScoringPurpose || facts.assignmentEvaluationPurpose) && hasEnoughEducationAssessmentContext(facts)) {
+    return null;
+  }
+
+  if ((facts.essayScoringPurpose || facts.assignmentEvaluationPurpose) && facts.teacherFinalGradeDecision && facts.explanationAvailable === undefined && !facts.correctionRightAvailable && !facts.manualReviewAvailable && facts.appealMechanismAvailable === undefined) {
+    return 'Can students ask for an explanation or request that you review a score if they think an AI-assisted assessment is wrong?';
+  }
+
+  if ((facts.essayScoringPurpose || facts.assignmentEvaluationPurpose) && facts.teacherFinalGradeDecision && facts.explanationAvailable === undefined) {
+    return 'Do students receive any explanation of how the AI-assisted score or feedback was produced?';
+  }
+
+  if ((facts.essayScoringPurpose || facts.assignmentEvaluationPurpose) && facts.teacherFinalGradeDecision && !facts.correctionRightAvailable && !facts.manualReviewAvailable && facts.appealMechanismAvailable === undefined) {
+    return 'Can students ask for a correction or human review if they think an AI-assisted result is wrong?';
+  }
+
+  if ((facts.lessonPlanningPurpose || facts.assignmentEvaluationPurpose || facts.essayScoringPurpose) && snapshot.personal_data === 'unknown' && !facts.studentNamesUseUnknown) {
+    return 'Do you enter student names, grades, or other personal information into the tool?';
+  }
+
+  if (isRecruitment && hasEnoughRecruitmentAssessmentContext(facts)) {
+    return null;
+  }
+
+  if (isRecruitment && facts.fullyAutomatedDecision !== true && facts.makesHiringDecision !== false && !facts.humanReviewAvailable) {
+    return 'Does the AI ranking only support HR review, or can it automatically reject or shortlist applicants?';
+  }
+
+  if (isRecruitment && facts.humanReviewAvailable && facts.explanationAvailable === undefined && !facts.correctionRightAvailable && !facts.manualReviewAvailable && facts.appealMechanismAvailable === undefined) {
+    return 'Can applicants receive an explanation, correct inaccurate application data, or request a human review of a ranking?';
+  }
+
+  if (isRecruitment && facts.processesPersonalData === true && !facts.retentionPeriodDefined) {
+    return 'How long are applicant CVs, cover letters, ranking records, and related recruitment data retained?';
+  }
+
+  if (isRecruitment && facts.processesPersonalData === true && !facts.securityMeasuresDocumented) {
+    return 'Which access controls, audit logs, or security measures protect applicant records and ranking outputs?';
+  }
+
+  if (!isRecruitment && facts.systemPurpose && hasEnoughGenericAssessmentContext(facts)) {
+    return null;
+  }
+
+  if (!isRecruitment && facts.systemPurpose && isGenericDecisionSupport && !facts.humanReviewAvailable && facts.fullyAutomatedDecision !== true && facts.fullyAutomatedDecision !== false) {
+    return 'Does the AI output directly decide an outcome, or does a person review it and have authority to change or reject it?';
+  }
+
+  if (!isRecruitment && facts.systemPurpose && !facts.affectedPersons && !facts.systemInputs) {
+    return 'Who or what is affected by the AI output, and what information does the system use?';
+  }
+
+  if (!isRecruitment && facts.systemPurpose && facts.processesPersonalData !== true && snapshot.personal_data === 'unknown') {
+    return 'Does the system use personal data, such as names, records, profiles, or behavior history?';
+  }
+
+  if (!isRecruitment && facts.systemPurpose && isGenericDecisionSupport && facts.humanReviewAvailable && facts.explanationAvailable === undefined && !facts.correctionRightAvailable && !facts.manualReviewAvailable && facts.appealMechanismAvailable === undefined) {
+    return 'Can affected people receive an explanation or request human review if the AI output is wrong?';
+  }
+
+  return null;
+}
+
+function ontologyItemLabels(items, limit = 4) {
+  return (items || [])
+    .map((item) => item?.label || item?.value || item?.name || item)
+    .map((item) => normalizeWhitespace(item))
+    .filter(Boolean)
+    .filter((item, index, list) => list.findIndex((candidate) => candidate.toLowerCase() === item.toLowerCase()) === index)
+    .slice(0, limit);
+}
+
+function ontologySafeguardLabels(safeguards, limit = 4) {
+  return ontologyItemLabels(safeguards?.confirmed || safeguards || [], limit);
+}
+
+function formatOntologyFinalOutput({ facts, snapshot, ontologyResult }) {
+  if (!ontologyResult) return '';
+
+  const mappedConcepts = ontologyItemLabels(ontologyResult.classifications, 5);
+  const risks = ontologyItemLabels(ontologyResult.primaryRisks, 4);
+  const safeguards = ontologySafeguardLabels(ontologyResult.safeguards, 4);
+  const nextActions = ontologyItemLabels(ontologyResult.recommendedActions || ontologyResult.missingInformation, 3);
+  const boundary = facts.fullyAutomatedDecision === true
+    ? 'Fully automated decision: true for the described AI-decided outcomes.'
+    : facts.fullyAutomatedDecision === false
+      ? 'Fully automated decision: false; consequential outputs are human-reviewed.'
+      : snapshot.decision_impact
+        ? `Decision effect: ${snapshot.decision_impact}.`
+        : '';
+
+  const lines = ['Ontology output:'];
+  if (mappedConcepts.length) lines.push(`- Mapped concepts: ${mappedConcepts.join(', ')}.`);
+  if (boundary) lines.push(`- Decision boundary: ${boundary}`);
+  if (risks.length) lines.push(`- Main risks: ${risks.join('; ')}.`);
+  if (safeguards.length) lines.push(`- Confirmed safeguards: ${safeguards.join(', ')}.`);
+  if (nextActions.length) lines.push(`- Next checks: ${nextActions.join('; ')}.`);
+
+  return lines.length > 1 ? lines.join('\n') : '';
+}
+
+function buildGroundedConversationResponse({ state, ontologyResult, hasFacts, hasContradictions }) {
+  const facts = state.confirmedFacts || {};
+  const snapshot = buildConversationStateSnapshot(state, ontologyResult);
+  const userIsTeacher = isTeacherRole(facts.userRole);
+  const isRecruitment = isRecruitmentAssessment(facts);
+  const actionableContradictions = (state.contradictions || []).filter(isActionableContradiction);
+  const actionableContradiction = actionableContradictions.find((item) => item.normalizedField === FINAL_GRADE_FIELD) ||
+    actionableContradictions[0];
+  const contradictionQuestion = actionableContradiction ? formatContradictionQuestion(actionableContradiction) : null;
+  const followUpQuestion = hasContradictions ? null : selectClarificationQuestion(facts, snapshot);
+  const usedFactKeys = Object.keys(facts);
+  let answer = '';
+
+  if (hasContradictions && contradictionQuestion) {
+    answer = contradictionQuestion;
+  } else if (!hasFacts) {
+    answer = 'Tell me briefly what the AI system does and who uses it. I can then map it to the relevant ontology concepts and ask only for details that materially affect the answer.';
+  } else if (userIsTeacher && !facts.systemPurpose && !facts.lessonPlanningPurpose && !facts.assignmentEvaluationPurpose && !facts.essayScoringPurpose) {
+    answer = 'I understand that you are a teacher using AI in an education context. I do not yet know what the AI does in your workflow, so I should not infer risks or safeguards beyond that.';
+  } else if (facts.studentNamesUseUnknown) {
+    answer = 'Understood. I will keep student-name and personal-data use as unknown. I cannot say names are used, and I also cannot say they are not used, from the information available so far.';
+  } else if (facts.lessonPlanningPurpose && !facts.assignmentEvaluationPurpose && !facts.essayScoringPurpose) {
+    answer = 'Using AI to draft lesson plans or learning materials is usually lower impact than using it to grade students or decide outcomes. The practical checks are accuracy, age suitability, curriculum fit, and whether you put any student information into the tool.';
+  } else if ((facts.essayScoringPurpose || facts.assignmentEvaluationPurpose) && !facts.teacherFinalGradeDecision && facts.assignsAcademicGrade !== true) {
+    answer = 'Using AI to score or evaluate student work is an educational assessment use case. The key issue is not just that AI is involved, but whether its score affects a student outcome and whether a teacher meaningfully reviews it.';
+  } else if ((facts.essayScoringPurpose || facts.assignmentEvaluationPurpose) && facts.teacherFinalGradeDecision && (facts.correctionRightAvailable || facts.manualReviewAvailable)) {
+    answer = 'Based on what you have described so far, the AI is advisory: it helps with student work, you decide the final grade, and students can ask you to review an incorrect score. Those are useful safeguards. The remaining practical concerns are consistency, bias across student groups, and making sure you can explain or correct a result when needed.';
+  } else if ((facts.essayScoringPurpose || facts.assignmentEvaluationPurpose) && facts.teacherFinalGradeDecision && (facts.humanCanOverride || facts.humanCanModify || facts.humanCanReject)) {
+    answer = 'Your review and ability to change or reject the AI recommendation are important safeguards, because the AI does not determine the final grade by itself. The remaining concerns include whether the scores are accurate and fair and whether students can challenge an incorrect assessment.';
+  } else if ((facts.essayScoringPurpose || facts.assignmentEvaluationPurpose) && facts.teacherFinalGradeDecision) {
+    answer = 'Your review and authority to decide the final grade are important safeguards. The remaining concerns are whether the AI is accurate, whether it disadvantages particular students, and whether students can understand or challenge an incorrect result.';
+  } else if (isRecruitment && facts.humanReviewAvailable && (facts.humanCanOverride || facts.humanCanModify || facts.humanCanReject || facts.makesHiringDecision === false)) {
+    answer = 'This is an employment recruitment decision-support use case: the AI ranks job applicants from application materials, while human review or final HR authority reduces the risk that the ranking decides the outcome by itself. The remaining concerns are bias in ranking, errors in CV or cover-letter interpretation, transparency for applicants, and whether incorrect rankings can be challenged.';
+  } else if (isRecruitment) {
+    const inputSummary = (snapshot.input_data || []).length
+      ? (snapshot.input_data || []).join(', ')
+      : 'application materials';
+    answer = `This is an employment recruitment use case: the AI ranks job applicants using ${inputSummary}. That can affect access to work, so the main issues are bias, accuracy of applicant-data interpretation, privacy, transparency, and over-reliance on the ranking.`;
+  } else if (facts.systemPurpose) {
+    const purposeSummary = readableFactSummary(facts.systemPurpose) || String(facts.systemPurpose);
+    const concerns = ['accuracy of the AI output'];
+    if (facts.affectedPersons || facts.processesPersonalData || facts.profilesIndividualCharacteristic || facts.producesIndividualRiskScore) {
+      concerns.push('fairness or bias for affected people');
+    }
+    if (facts.processesPersonalData) {
+      concerns.push('privacy and data minimization');
+    }
+    if (isDecisionSupportAssessment(facts)) {
+      concerns.push(facts.humanReviewAvailable ? 'quality of human review' : 'whether the AI directly decides an outcome');
+      concerns.push('explanation or review when the output is wrong');
+    }
+    const affected = (snapshot.affected_stakeholders || []).length
+      ? ` The affected group appears to be ${(snapshot.affected_stakeholders || []).join(', ')}.`
+      : '';
+    const inputs = (snapshot.input_data || []).length
+      ? ` It uses ${(snapshot.input_data || []).join(', ')}.`
+      : '';
+    answer = `I understand the AI use as: ${purposeSummary}.${inputs}${affected} The main issues to assess are ${Array.from(new Set(concerns)).join(', ')}.`;
+  } else if (ontologyResult?.executiveSummary) {
+    const firstRisk = (ontologyResult.primaryRisks || [])[0];
+    answer = `${ontologyResult.executiveSummary} ${firstRisk?.value ? `The main point to watch is ${String(firstRisk.value).toLowerCase()}.` : ''}`.trim();
+  } else {
+    answer = 'Based on what you have described so far, I can keep building the assessment incrementally. I will avoid assuming missing facts and will ask only for details that change the answer.';
+  }
+
+  const ontologyFinalOutput = !hasContradictions && !followUpQuestion && hasFacts
+    ? formatOntologyFinalOutput({ facts, snapshot, ontologyResult })
+    : '';
+
+  const answerWithFinalOutput = ontologyFinalOutput && !answer.includes('Ontology output:')
+    ? `${answer}\n\n${ontologyFinalOutput}`
+    : answer;
+
+  const finalAnswer = followUpQuestion && !answerWithFinalOutput.includes(followUpQuestion)
+    ? `${answerWithFinalOutput}\n\n${followUpQuestion}`
+    : answerWithFinalOutput;
+
+  return {
+    answer: finalAnswer,
+    follow_up_question: followUpQuestion,
+    conversation_state: snapshot,
+    used_facts: factEvidenceSummary(state, usedFactKeys),
+    ontology_inferences: (ontologyResult?.classifications || []).map((item) => ({
+      class: item.value,
+      status: item.status,
+      evidence: item.evidence || []
+    })).slice(0, 8),
+    unknown_but_relevant: snapshot.unknown_fields,
+    unsupported_claims_removed: []
+  };
+}
+
+function assessOntologyChat({ project, messages = [], previousState = {}, newMessage = '', messageIndex = null, llmFacts = [], geminiExtraction = null, chatId = null }) {
+  const sanitizedPreviousStateBase = sanitizeConversationFactState(previousState);
   const projectText = getProjectText(project);
   const projectFacts = extractFactsFromText(projectText, 'PROJECT_METADATA', null);
-  const userMessages = messages.filter((message) => message.sender === 'user');
-  const userFacts = newMessage
-    ? extractFactsFromText(newMessage, 'USER_CONFIRMED', messageIndex)
-    : userMessages.flatMap((message, index) => extractFactsFromText(message.text, 'USER_CONFIRMED', index));
+  const userMessages = messages
+    .filter((message) => message.sender === 'user')
+    .map((message, index) => ({
+      sender: message.sender,
+      text: String(message.text || ''),
+      _id: message._id || message.id || null,
+      userMessageIndex: index,
+      sourceMessageId: String(message._id || message.id || `user-message-${index + 1}`)
+    }));
+  const baseUserFacts = newMessage
+    ? extractFactsFromText(newMessage, 'USER_CONFIRMED', messageIndex, `incoming-message-${messageIndex ?? userMessages.length + 1}`)
+    : userMessages.flatMap((message) => extractFactsFromText(message.text, 'USER_CONFIRMED', message.userMessageIndex, message.sourceMessageId));
   const latestUserMessage = newMessage
-    ? { text: newMessage, index: messageIndex ?? userMessages.length }
+    ? { text: newMessage, index: messageIndex ?? userMessages.length, sourceMessageId: `incoming-message-${messageIndex ?? userMessages.length + 1}` }
     : userMessages.length
-      ? { text: userMessages[userMessages.length - 1].text, index: userMessages.length - 1 }
+      ? { text: userMessages[userMessages.length - 1].text, index: userMessages[userMessages.length - 1].userMessageIndex, sourceMessageId: userMessages[userMessages.length - 1].sourceMessageId }
       : null;
-  const latestMessageFacts = latestUserMessage
-    ? extractFactsFromText(latestUserMessage.text, 'USER_CONFIRMED', latestUserMessage.index)
+  const baseLatestMessageFacts = latestUserMessage
+    ? extractFactsFromText(latestUserMessage.text, 'USER_CONFIRMED', latestUserMessage.index, latestUserMessage.sourceMessageId)
     : [];
+  const contextualLatestFacts = extractContextualFactsFromLatestAnswer({
+    messages,
+    latestUserMessage,
+    previousState: sanitizedPreviousStateBase
+  });
+  const contextualResolutions = contextualResolutionCandidates(contextualLatestFacts);
+  const sanitizedPreviousState = applyContextualResolutionsToState(sanitizedPreviousStateBase, contextualResolutions);
+  const userFacts = filterFactsForContextualResolutions([...baseUserFacts, ...contextualLatestFacts], contextualResolutions);
+  const latestMessageFacts = filterFactsForContextualResolutions([...baseLatestMessageFacts, ...contextualLatestFacts], contextualResolutions);
 
-  const validLlmFacts = Array.isArray(llmFacts) ? llmFacts.filter((fact) => fact && fact.fact && fact.source === 'LLM_EXTRACTED') : [];
-  const resetInfo = getPreviousStateResetInfo(previousState, [...userFacts, ...validLlmFacts]);
-  const mergeBaseState = resetInfo.reset ? {} : previousState;
-  const state = mergeConversationFacts(mergeBaseState, [...projectFacts, ...userFacts, ...validLlmFacts]);
+  const llmFactCandidates = Array.isArray(llmFacts) ? llmFacts.filter((fact) => fact && fact.fact && fact.source === 'LLM_EXTRACTED') : [];
+  const validLlmFacts = filterFactsForContextualResolutions(llmFactCandidates.filter(llmFactSupportedByExplicitEvidence), contextualResolutions);
+  const unsupportedLlmFacts = llmFactCandidates.filter((fact) => !llmFactSupportedByExplicitEvidence(fact));
+  const latestLlmFacts = latestUserMessage
+    ? validLlmFacts.filter((fact) => Number(fact.messageIndex) === latestUserMessage.index)
+    : [];
+  const factsForReset = latestMessageFacts.length || latestLlmFacts.length
+    ? [...latestMessageFacts, ...latestLlmFacts]
+    : [...userFacts, ...validLlmFacts];
+  const resetInfo = getPreviousStateResetInfo(sanitizedPreviousState, factsForReset);
+  const mergeBaseState = resetInfo.reset ? {} : sanitizedPreviousState;
+  const userFactsForMerge = resetInfo.reset ? latestMessageFacts : userFacts;
+  const llmFactsForMerge = resetInfo.reset ? latestLlmFacts : validLlmFacts;
+  const state = mergeConversationFacts(mergeBaseState, [...projectFacts, ...userFactsForMerge, ...llmFactsForMerge], { chatId });
   const stateMergeStats = {
+    chatId,
     projectId: getProjectId(project) || null,
     projectAttached: Boolean(getProjectId(project)),
     priorUserMessagesLoaded: Math.max(0, userMessages.length - (latestUserMessage ? 1 : 0)),
     priorMessagesLoaded: Math.max(0, messages.length - (latestUserMessage ? 1 : 0)),
-    existingFactsLoaded: Object.keys(previousState?.confirmedFacts || {}).length,
+    existingFactsLoaded: Object.keys(sanitizedPreviousState?.confirmedFacts || {}).length,
+    previousFactsSanitizedDropped: sanitizedPreviousState.sanitizedDroppedFactCount || 0,
+    previousEvidenceSanitizedDropped: sanitizedPreviousState.sanitizedDroppedEvidenceCount || 0,
     newFactsExtracted: latestMessageFacts.length,
+    contextualFactsExtracted: contextualLatestFacts.length,
+    contextualResolutionsApplied: sanitizedPreviousState.contextualResolutionsApplied || 0,
     llmFactsAccepted: validLlmFacts.length,
+    llmFactsDroppedByEvidenceGuard: unsupportedLlmFacts.length,
     llmFactsRejected: geminiExtraction?.rejectedFacts?.length || 0,
     llmExtractionStatus: geminiExtraction?.status || 'not_run',
     semanticCandidatesAccepted: geminiExtraction?.acceptedSemanticCandidates?.length || 0,
     semanticCandidatesRejected: geminiExtraction?.rejectedSemanticCandidates?.length || 0,
     previousStateReset: resetInfo.reset,
     previousStateResetReason: resetInfo.reason,
-    totalExtractedFactsThisRun: projectFacts.length + userFacts.length + validLlmFacts.length,
+    resetMergedLatestMessageOnly: Boolean(resetInfo.reset),
+    totalExtractedFactsThisRun: projectFacts.length + userFactsForMerge.length + llmFactsForMerge.length,
     mergedFactsUsed: Object.keys(state.confirmedFacts || {}).length
   };
   const fullText = [
@@ -1745,32 +3851,25 @@ function assessOntologyChat({ project, messages = [], previousState = {}, newMes
   const keywordCandidates = buildKeywordCandidates(fullText);
   const ontologyResult = buildReport({ project, state, keywordCandidates, stateMergeStats, geminiExtraction });
   const hasFacts = Object.keys(state.confirmedFacts || {}).length > 0;
-  const hasContradictions = (state.contradictions || []).some((item) => item.status === 'needs_clarification');
+  const hasContradictions = (state.contradictions || []).some(isActionableContradiction);
   const status = hasContradictions || !hasFacts ? 'needs_more_information' : 'completed';
-
-  let reply = '';
-  if (hasContradictions) {
-    reply = 'I found a contradiction in the confirmed project facts. Please clarify it before I finalize the assessment.';
-  } else if (status === 'completed') {
-    const risks = Array.isArray(ontologyResult.primaryRisks) ? ontologyResult.primaryRisks : [];
-    const actions = Array.isArray(ontologyResult.recommendedActions) ? ontologyResult.recommendedActions : [];
-    
-    const risksText = risks.length > 0
-      ? risks.map(r => `- **${r.title || r.value || 'Risk'}** (${r.severity || r.status || 'Unknown'}): ${r.reason || ''}`).join('\n')
-      : 'No major risks identified yet.';
-      
-    const actionsText = actions.length > 0
-      ? actions.map(a => `- ${a.value || a.action || a}`).join('\n')
-      : 'No specific actions required.';
-      
-    reply = `Based on your input, here is my assessment:\n\n### Main Risks\n${risksText}\n\n### Recommended Actions\n${actionsText}\n\nPlease let me know if you have any other questions or need further details.`;
-  } else {
-    reply = 'I need more project information before I can produce an evidence-based assessment. Could you provide more details about the system, users, or data?';
-  }
+  const conversationalResponse = buildGroundedConversationResponse({
+    state,
+    ontologyResult,
+    hasFacts,
+    hasContradictions
+  });
+  ontologyResult.conversationState = conversationalResponse.conversation_state;
+  ontologyResult.conversationalGrounding = {
+    usedFacts: conversationalResponse.used_facts,
+    ontologyInferences: conversationalResponse.ontology_inferences,
+    unknownButRelevant: conversationalResponse.unknown_but_relevant,
+    unsupportedClaimsRemoved: conversationalResponse.unsupported_claims_removed
+  };
 
   return {
     status,
-    reply,
+    reply: conversationalResponse.answer,
     state,
     ontologyResult,
     raw: {
@@ -1779,7 +3878,26 @@ function assessOntologyChat({ project, messages = [], previousState = {}, newMes
       factCount: Object.keys(state.confirmedFacts || {}).length,
       stateMergeStats,
       geminiExtraction,
+      unsupportedLlmFacts,
+      contradictionDebug: state.contradictionDebug || null,
+      stateLifecycle: {
+        chat_id: chatId,
+        loaded_previous_state: {
+          confirmedFacts: sanitizedPreviousState?.confirmedFacts || {},
+          factEvidenceCount: (sanitizedPreviousState?.factEvidence || []).length,
+          contradictions: sanitizedPreviousState?.contradictions || [],
+          sanitizedDroppedFactCount: sanitizedPreviousState.sanitizedDroppedFactCount || 0,
+          sanitizedDroppedEvidenceCount: sanitizedPreviousState.sanitizedDroppedEvidenceCount || 0
+        },
+        latest_extracted_facts: factsForLifecycleLog([...latestMessageFacts, ...latestLlmFacts]),
+        merged_state: state.confirmedFacts || {},
+        pending_question: contextualLatestFacts[0]?.pendingQuestion || null,
+        selected_next_question: conversationalResponse.follow_up_question || null,
+        state_storage_key: chatId ? `ontology-chat:${chatId}` : null,
+        state_save_result: null
+      },
       keywordCandidates,
+      conversationalResponse,
       contradictions: state.contradictions || []
     }
   };

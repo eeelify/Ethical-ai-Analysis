@@ -78,7 +78,7 @@ const OntologyChatConversationSchema = new mongoose.Schema({
   },
   assessmentVersion: {
     type: String,
-    default: 'ontology-chat-semantic-facts-v2'
+    default: 'ontology-chat-semantic-facts-v3'
   },
   lastOntologyRaw: {
     type: mongoose.Schema.Types.Mixed,

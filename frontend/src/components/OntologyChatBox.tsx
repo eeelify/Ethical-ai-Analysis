@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, Bot, CheckCircle2, Loader2, Plus, RefreshCw, Send, Trash2, User as UserIcon } from 'lucide-react';
+import { AlertTriangle, Bot, CheckCircle2, ClipboardList, Loader2, MessageSquareText, Plus, RefreshCw, Send, Trash2, User as UserIcon } from 'lucide-react';
 import { api } from '../api';
 import { Project, User } from '../types';
 
 type OntologyChatStatus = 'not_started' | 'needs_more_information' | 'completed' | 'error';
+type OntologyPanel = 'chat' | 'output';
 
 interface OntologyChatMessage {
   _id?: string;
@@ -885,8 +886,8 @@ function buildUserFacingReport({
 
 function ReportSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-lg border border-white/10 bg-[#0a1122] p-4">
-      <h4 className="mb-3 text-sm font-semibold text-white">{title}</h4>
+    <section className="min-w-0">
+      <h4 className="mb-3 border-b border-white/10 pb-2 text-sm font-semibold text-white">{title}</h4>
       {children}
     </section>
   );
@@ -895,6 +896,111 @@ function ReportSection({ title, children }: { title: string; children: React.Rea
 function InlineList({ value }: { value: string | string[] }) {
   const items = Array.isArray(value) ? value : [value];
   return <span>{items.join(', ')}</span>;
+}
+
+function OntologyOutputPanel({ report }: { report: UserFacingReport }) {
+  const regulatoryItems = [...report.regulatory, ...report.boundaries].slice(0, 6);
+
+  return (
+    <div className="space-y-5">
+      <div className="rounded-lg border border-cyan-500/20 bg-[#071927] p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h4 className="text-base font-semibold text-white">Ontology output</h4>
+            <p className="mt-2 max-w-5xl text-sm leading-6 text-slate-300">{report.executiveSummary}</p>
+          </div>
+          <span className="rounded-full border border-cyan-500/20 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-200">
+            {report.overallAssessment}
+          </span>
+        </div>
+        <p className="mt-3 text-sm leading-6 text-slate-400">{report.overallExplanation}</p>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="space-y-6">
+          <ReportSection title="System Mapping">
+            <div className="grid gap-3 text-sm text-slate-300 md:grid-cols-2">
+              {report.overview.map((field) => (
+                <div key={field.label} className="min-h-[92px] rounded-lg border border-white/10 bg-[#050b14] p-3">
+                  <div className="mb-1 text-xs font-semibold uppercase text-slate-500">{field.label}</div>
+                  <InlineList value={field.value} />
+                </div>
+              ))}
+            </div>
+          </ReportSection>
+
+          <ReportSection title="Main Risks">
+            {report.risks.length ? (
+              <div className="space-y-3">
+                {report.risks.slice(0, 4).map((risk) => (
+                  <div key={risk.title} className="rounded-lg border border-white/10 bg-[#050b14] p-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="text-sm font-medium text-white">{risk.title}</div>
+                      <span className="rounded-full border border-white/10 px-2 py-0.5 text-xs text-slate-300">{risk.severity}</span>
+                    </div>
+                    <p className="mt-2 text-sm leading-6 text-slate-400">{risk.reason}</p>
+                    <p className="mt-2 text-xs leading-5 text-slate-500">{risk.impact}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500">No material risks identified from the current facts.</p>
+            )}
+          </ReportSection>
+
+          {regulatoryItems.length ? (
+            <ReportSection title="Regulatory Boundaries">
+              <div className="grid gap-3 lg:grid-cols-2">
+                {regulatoryItems.map((item: any) => (
+                  <div key={`${item.area || item.title}-${item.status}`} className="rounded-lg border border-white/10 bg-[#050b14] p-3">
+                    <div className="text-sm font-medium text-white">{item.area || item.title}</div>
+                    <div className="mt-1 text-xs font-semibold uppercase text-slate-500">{item.status}</div>
+                    <p className="mt-2 text-sm leading-6 text-slate-400">{item.explanation}</p>
+                  </div>
+                ))}
+              </div>
+            </ReportSection>
+          ) : null}
+        </div>
+
+        <div className="space-y-6">
+          <ReportSection title="Safeguards">
+            {report.safeguards.length ? (
+              <ul className="space-y-2 text-sm text-slate-300">
+                {report.safeguards.slice(0, 6).map((item) => (
+                  <li key={item} className="rounded-lg border border-white/10 bg-[#050b14] px-3 py-2">{item}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-slate-500">No confirmed safeguards yet.</p>
+            )}
+          </ReportSection>
+
+          <ReportSection title="Next Actions">
+            {report.actions.length ? (
+              <ul className="space-y-2 text-sm text-slate-300">
+                {report.actions.slice(0, 6).map((item) => (
+                  <li key={item} className="rounded-lg border border-white/10 bg-[#050b14] px-3 py-2">{item}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-slate-500">No additional action generated.</p>
+            )}
+          </ReportSection>
+
+          {report.missingQuestions.length ? (
+            <ReportSection title="Open Questions">
+              <ul className="space-y-2 text-sm text-slate-300">
+                {report.missingQuestions.map((item) => (
+                  <li key={item} className="rounded-lg border border-white/10 bg-[#050b14] px-3 py-2">{item}</li>
+                ))}
+              </ul>
+            </ReportSection>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function OntologyChatBox({ project, currentUser }: OntologyChatBoxProps) {
@@ -913,6 +1019,7 @@ export function OntologyChatBox({ project, currentUser }: OntologyChatBoxProps) 
   const [creating, setCreating] = useState(false);
   const [clearing, setClearing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activePanel, setActivePanel] = useState<OntologyPanel>('chat');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const statusClass = {
@@ -948,6 +1055,7 @@ export function OntologyChatBox({ project, currentUser }: OntologyChatBoxProps) 
     setMessages(payload.messages || []);
     setStatus(payload.status || 'not_started');
     setOntologyResult(payload.ontologyResult || null);
+    setActivePanel(payload.status === 'completed' && payload.ontologyResult ? 'output' : 'chat');
   };
 
   const applyEmptyChat = () => {
@@ -1150,20 +1258,6 @@ export function OntologyChatBox({ project, currentUser }: OntologyChatBoxProps) 
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <select
-            value={conversationId || ''}
-            onChange={(event) => selectConversation(event.target.value)}
-            disabled={loadingHistory || conversations.length === 0}
-            className="min-w-[220px] rounded-lg border border-white/10 bg-[#050b14] px-3 py-2 text-sm text-white outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <option value="">Blank chat</option>
-            {conversations.map((conversation) => (
-              <option key={conversation.conversationId} value={conversation.conversationId}>
-                {conversation.title || 'Ontology chat'}
-                {conversation.projectTitle ? ` - ${conversation.projectTitle}` : ''}
-              </option>
-            ))}
-          </select>
           <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${statusClass}`}>
             {status === 'completed' ? <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" /> : null}
             {status === 'error' ? <AlertTriangle className="mr-1.5 h-3.5 w-3.5" /> : null}
@@ -1195,145 +1289,187 @@ export function OntologyChatBox({ project, currentUser }: OntologyChatBoxProps) 
         </div>
       )}
 
-      <div className="rounded-lg border border-white/10 bg-[#0a1122] p-3">
-        <div className="mb-3 flex items-center justify-between">
-          <h4 className="text-sm font-semibold text-white">Chat history</h4>
-          <span className="text-xs text-slate-500">{conversations.length} chats</span>
-        </div>
-        {conversations.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-white/10 bg-[#050b14] px-3 py-3 text-sm text-slate-500">
-            No previous ontology chats yet.
-          </div>
-        ) : (
-          <div className="grid max-h-[170px] grid-cols-1 gap-2 overflow-y-auto pr-1 md:grid-cols-2 xl:grid-cols-3">
-            {conversations.map((conversation) => {
-              const isActive = conversation.conversationId === conversationId;
-              return (
-                <button
-                  key={conversation.conversationId}
-                  onClick={() => selectConversation(conversation.conversationId)}
-                  disabled={loadingHistory}
-                  className={`rounded-lg border px-3 py-2 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-                    isActive
-                      ? 'border-cyan-500/40 bg-cyan-500/10'
-                      : 'border-white/10 bg-[#050b14] hover:border-cyan-500/30 hover:bg-white/5'
-                  }`}
-                >
-                  <div className="truncate text-sm font-medium text-white">
-                    {conversation.title || 'Ontology chat'}
-                  </div>
-                  <div className="mt-1 flex items-center justify-between gap-2 text-xs text-slate-500">
-                    <span className="truncate">
-                      {conversation.projectTitle || 'General chat'}
-                    </span>
-                    <span className="flex-shrink-0">{formatTime(conversation.updatedAt)}</span>
-                  </div>
-                  {conversation.lastMessage ? (
-                    <div className="mt-1 truncate text-xs text-slate-400">
-                      {conversation.lastMessage}
-                    </div>
-                  ) : null}
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 gap-4">
-        <div className="flex min-h-[520px] flex-col overflow-hidden rounded-lg border border-white/10 bg-[#0a1122]">
-          <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-            <div className="flex items-center text-sm font-medium text-slate-300">
-              <Bot className="mr-2 h-4 w-4 text-cyan-400" />
-              {conversationTitle || 'Ontology conversation'}
+      <div className="grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)]">
+        <aside className="ontology-history-panel flex flex-col overflow-hidden rounded-lg border border-white/10 bg-[#0a1122]">
+          <div className="border-b border-white/10 px-4 py-3">
+            <div className="flex items-center justify-between gap-2">
+              <h4 className="text-sm font-semibold text-white">Chat history</h4>
+              <span className="rounded-full border border-white/10 px-2 py-0.5 text-xs text-slate-400">{conversations.length}</span>
             </div>
-            {loadingHistory && (
-              <span className="inline-flex items-center text-xs text-slate-400">
-                <RefreshCw className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                Loading
-              </span>
-            )}
           </div>
 
-          <div className="flex-1 space-y-3 overflow-y-auto p-4">
-            {!loadingHistory && messages.length === 0 && (
-              <div className="flex h-full min-h-[280px] items-center justify-center text-center">
-                <div>
-                  <Bot className="mx-auto mb-3 h-9 w-9 text-slate-600" />
-                  <p className="text-sm text-slate-400">
-                    Describe the AI system to start a new ontology chat.
-                  </p>
-                </div>
+          <div className="ontology-scroll flex-1 space-y-2 overflow-y-scroll p-3">
+            {conversations.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-white/10 bg-[#050b14] px-3 py-4 text-sm text-slate-500">
+                No previous ontology chats yet.
               </div>
-            )}
-
-            {messages.map((item, index) => {
-              const isUser = item.sender === 'user';
-              return (
-                <div key={item._id || index} className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
-                  {!isUser && (
-                    <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-cyan-300">
-                      <Bot className="h-4 w-4" />
+            ) : (
+              conversations.map((conversation) => {
+                const isActive = conversation.conversationId === conversationId;
+                return (
+                  <button
+                    key={conversation.conversationId}
+                    onClick={() => selectConversation(conversation.conversationId)}
+                    disabled={loadingHistory}
+                    className={`w-full rounded-lg border px-3 py-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                      isActive
+                        ? 'border-cyan-500/40 bg-cyan-500/10'
+                        : 'border-white/10 bg-[#050b14] hover:border-cyan-500/30 hover:bg-white/5'
+                    }`}
+                  >
+                    <div className="truncate text-sm font-medium text-white">
+                      {conversation.title || 'Ontology chat'}
                     </div>
-                  )}
-                  <div className={`max-w-[78%] rounded-lg border px-4 py-3 text-sm shadow-sm ${
-                    isUser
-                      ? 'border-blue-500/30 bg-blue-500/15 text-blue-50'
-                      : 'border-white/10 bg-[#050b14] text-slate-300'
-                  }`}>
-                    <div className="whitespace-pre-wrap leading-6">{item.text}</div>
-                    {item.createdAt && (
-                      <div className={`mt-2 text-[11px] ${isUser ? 'text-blue-200/70' : 'text-slate-500'}`}>
-                        {formatTime(item.createdAt)}
+                    <div className="mt-1 flex items-center justify-between gap-2 text-xs text-slate-500">
+                      <span className="truncate">{conversation.projectTitle || 'General chat'}</span>
+                      <span className="flex-shrink-0">{formatTime(conversation.updatedAt)}</span>
+                    </div>
+                    {conversation.lastMessage ? (
+                      <div className="ontology-history-preview mt-2 text-xs leading-5 text-slate-400">
+                        {conversation.lastMessage}
                       </div>
-                    )}
-                  </div>
-                  {isUser && (
-                    <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-blue-200">
-                      <UserIcon className="h-4 w-4" />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-
-            {sending && (
-              <div className="flex items-center gap-2 text-sm text-slate-400">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Ontology service is processing
-              </div>
+                    ) : null}
+                  </button>
+                );
+              })
             )}
-            <div ref={messagesEndRef} />
           </div>
+        </aside>
 
-          <div className="border-t border-white/10 p-4">
-            <div className="flex flex-col gap-3 md:flex-row">
-              <textarea
-                value={message}
-                onChange={(event) => setMessage(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
-                    event.preventDefault();
-                    sendMessage();
-                  }
-                }}
-                className="min-h-[96px] flex-1 resize-none rounded-lg border border-white/10 bg-[#050b14] px-4 py-3 text-sm text-white placeholder-slate-500 outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
-                placeholder={project?.title
-                  ? `Describe the AI system for ${project.title}.`
-                  : 'Describe the AI system, or select a project to attach project context.'}
-                disabled={sending || loadingHistory}
-              />
+        <section className="ontology-main-panel flex flex-col overflow-hidden rounded-lg border border-white/10 bg-[#0a1122]">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
+            <div className="min-w-0">
+              <div className="flex min-w-0 items-center text-sm font-medium text-slate-300">
+                <Bot className="mr-2 h-4 w-4 flex-shrink-0 text-cyan-400" />
+                <span className="truncate">{conversationTitle || 'Ontology conversation'}</span>
+              </div>
+              {loadingHistory && (
+                <span className="mt-1 inline-flex items-center text-xs text-slate-500">
+                  <RefreshCw className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                  Loading
+                </span>
+              )}
+            </div>
+
+            <div className="inline-flex rounded-lg border border-white/10 bg-[#050b14] p-1">
               <button
-                onClick={sendMessage}
-                disabled={!message.trim() || sending || loadingHistory}
-                className="inline-flex min-w-[130px] items-center justify-center rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={() => setActivePanel('chat')}
+                className={`inline-flex items-center rounded-md px-3 py-1.5 text-sm transition-colors ${
+                  activePanel === 'chat' ? 'bg-cyan-500/15 text-cyan-100' : 'text-slate-400 hover:text-white'
+                }`}
               >
-                {sending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-                Send
+                <MessageSquareText className="mr-1.5 h-4 w-4" />
+                Chat
+              </button>
+              <button
+                onClick={() => setActivePanel('output')}
+                className={`inline-flex items-center rounded-md px-3 py-1.5 text-sm transition-colors ${
+                  activePanel === 'output' ? 'bg-cyan-500/15 text-cyan-100' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <ClipboardList className="mr-1.5 h-4 w-4" />
+                Output
+                {userReport ? <span className="ml-2 h-1.5 w-1.5 rounded-full bg-green-400" /> : null}
               </button>
             </div>
           </div>
-        </div>
+
+          {activePanel === 'chat' ? (
+            <>
+              <div className="ontology-scroll flex-1 space-y-4 overflow-y-scroll p-4">
+                {!loadingHistory && messages.length === 0 && (
+                  <div className="flex h-full min-h-[280px] items-center justify-center text-center">
+                    <div>
+                      <Bot className="mx-auto mb-3 h-9 w-9 text-slate-600" />
+                      <p className="text-sm text-slate-400">
+                        Describe the AI system to start a new ontology chat.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {messages.map((item, index) => {
+                  const isUser = item.sender === 'user';
+                  return (
+                    <div key={item._id || index} className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
+                      {!isUser && (
+                        <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-cyan-300">
+                          <Bot className="h-4 w-4" />
+                        </div>
+                      )}
+                      <div className={`max-w-[82%] rounded-lg border px-4 py-3 text-sm shadow-sm ${
+                        isUser
+                          ? 'border-blue-500/30 bg-blue-500/15 text-blue-50'
+                          : 'border-white/10 bg-[#050b14] text-slate-300'
+                      }`}>
+                        <div className="whitespace-pre-wrap leading-6">{item.text}</div>
+                        {item.createdAt && (
+                          <div className={`mt-2 text-[11px] ${isUser ? 'text-blue-200/70' : 'text-slate-500'}`}>
+                            {formatTime(item.createdAt)}
+                          </div>
+                        )}
+                      </div>
+                      {isUser && (
+                        <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-blue-200">
+                          <UserIcon className="h-4 w-4" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {sending && (
+                  <div className="flex items-center gap-2 text-sm text-slate-400">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Ontology service is processing
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              <div className="border-t border-white/10 bg-[#08101f] p-4">
+                <div className="flex flex-col gap-3 md:flex-row">
+                  <textarea
+                    value={message}
+                    onChange={(event) => setMessage(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+                        event.preventDefault();
+                        sendMessage();
+                      }
+                    }}
+                    className="min-h-[92px] flex-1 resize-none rounded-lg border border-white/10 bg-[#050b14] px-4 py-3 text-sm text-white placeholder-slate-500 outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                    placeholder={project?.title
+                      ? `Describe the AI system for ${project.title}.`
+                      : 'Describe the AI system, or select a project to attach project context.'}
+                    disabled={sending || loadingHistory}
+                  />
+                  <button
+                    onClick={sendMessage}
+                    disabled={!message.trim() || sending || loadingHistory}
+                    className="inline-flex min-w-[130px] items-center justify-center rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {sending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+                    Send
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="ontology-scroll flex-1 overflow-y-scroll p-4">
+              {userReport ? (
+                <OntologyOutputPanel report={userReport} />
+              ) : (
+                <div className="flex h-full min-h-[280px] items-center justify-center text-center">
+                  <div>
+                    <ClipboardList className="mx-auto mb-3 h-9 w-9 text-slate-600" />
+                    <p className="text-sm text-slate-400">No ontology output yet.</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );
