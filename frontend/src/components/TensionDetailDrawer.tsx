@@ -349,41 +349,21 @@ export function TensionDetailDrawer({
                             <button
                               type="button"
                               onClick={() => {
-                                if (ev.fileData) {
-                                  try {
-                                    const dataUrl = ev.fileData as string;
-                                    const hasPrefix = dataUrl.startsWith('data:');
-                                    const [mimePart, base64Part] = hasPrefix
-                                      ? dataUrl.split(',')
-                                      : ['data:application/octet-stream;base64', dataUrl];
-                                    const mime = hasPrefix ? mimePart.split(';')[0].replace('data:', '') : 'application/octet-stream';
-                                    const byteString = atob(base64Part || '');
-                                    const bytes = new Uint8Array(byteString.length);
-                                    for (let i = 0; i < byteString.length; i++) {
-                                      bytes[i] = byteString.charCodeAt(i);
-                                    }
-                                    const blob = new Blob([bytes], { type: mime });
-                                    const url = URL.createObjectURL(blob);
-                                    const link = document.createElement('a');
-                                    link.href = url;
-                                    link.download = ev.fileName || 'evidence';
-                                    link.click();
-                                    URL.revokeObjectURL(url);
-                                  } catch (err) {
-                                    console.error('Download error:', err);
-                                    alert('Unable to download this file.');
-                                  }
+                                if (ev.fileName) {
+                                  const tensionId = tension.id || (tension as any)._id;
+                                  const downloadUrl = api(`/api/tensions/${tensionId}/evidence/${ev._id}/download`);
+                                  window.open(downloadUrl, '_blank');
                                 } else if (ev.fileUrl) {
                                   window.open(ev.fileUrl, '_blank');
                                 }
                               }}
                               className={`px-3 py-2 text-sm font-medium rounded-lg border flex items-center space-x-2 ml-4 ${
-                                ev.fileData || ev.fileUrl
+                                ev.fileName || ev.fileUrl
                                   ? 'text-blue-600 border-blue-200 hover:bg-blue-50'
                                   : 'text-gray-400 border-white/10 cursor-not-allowed'
                               }`}
-                              title={ev.fileData || ev.fileUrl ? "Download file" : "File not available"}
-                              disabled={!ev.fileData && !ev.fileUrl}
+                              title={ev.fileName || ev.fileUrl ? "Download file" : "File not available"}
+                              disabled={!ev.fileName && !ev.fileUrl}
                             >
                               <Download className="h-4 w-4" />
                               <span>Download</span>

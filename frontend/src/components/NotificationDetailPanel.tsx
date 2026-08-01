@@ -156,7 +156,7 @@ export function NotificationDetailPanel({
         <div className="flex items-center space-x-3">
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
           >
             <ArrowLeft className="h-5 w-5 text-slate-400" />
           </button>
@@ -177,7 +177,7 @@ export function NotificationDetailPanel({
           </button>
           <button
             onClick={onClose}
-            className="p-2.5 hover:bg-gray-200 rounded-lg transition-colors"
+            className="p-2.5 hover:bg-white/10 rounded-lg transition-colors"
           >
             <X className="h-6 w-6 text-slate-400" />
           </button>
@@ -202,7 +202,7 @@ export function NotificationDetailPanel({
               <div key={dateGroupIdx}>
                 {/* Date separator */}
                 <div className="text-center my-4">
-                  <span className="bg-gray-200 text-slate-400 text-xs px-3 py-1 rounded-full">
+                  <span className="bg-[#0f172a] border border-white/10 text-slate-400 text-xs px-3 py-1 rounded-full">
                     {formatDate(dateGroup.date)}
                   </span>
                 </div>

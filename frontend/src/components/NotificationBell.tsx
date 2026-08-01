@@ -342,13 +342,13 @@ export function NotificationBell({ currentUser, onNotificationClick, onNavigate 
                 <p className="text-sm">No notifications</p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-200">
+              <div className="divide-y divide-white/10">
                 {notifications.map((notification) => (
                   <button
                     key={notification._id}
                     onClick={() => handleNotificationClick(notification)}
                     className={`w-full p-4 text-left hover:bg-[#050b14] transition-colors ${
-                      !notification.isRead ? 'bg-blue-50' : ''
+                      !notification.isRead ? 'bg-blue-900/20 border-l-2 border-blue-500' : 'border-l-2 border-transparent'
                     }`}
                   >
                     <div className="flex items-start space-x-3">

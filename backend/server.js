@@ -1241,6 +1241,38 @@ app.post('/api/tensions/:id/evidence', async (req, res) => {
   }
 });
 
+// EVIDENCE DOWNLOAD
+app.get('/api/tensions/:tensionId/evidence/:evidenceId/download', async (req, res) => {
+  try {
+    const tension = await Tension.findById(req.params.tensionId);
+    if (!tension) return res.status(404).send('Tension not found');
+    const evidence = tension.evidences.id(req.params.evidenceId);
+    if (!evidence) return res.status(404).send('Evidence not found');
+
+    const fileData = evidence.fileData;
+    if (!fileData) return res.status(404).send('No file data available');
+    
+    const hasPrefix = fileData.startsWith('data:');
+    let mimeType = 'application/octet-stream';
+    let base64String = fileData;
+    
+    if (hasPrefix) {
+      const parts = fileData.split(',');
+      mimeType = parts[0].split(';')[0].replace('data:', '');
+      base64String = parts[1];
+    }
+    
+    const buffer = Buffer.from(base64String, 'base64');
+    
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Content-Disposition', `attachment; filename="${evidence.fileName || 'evidence'}"`);
+    res.send(buffer);
+  } catch (error) {
+    console.error('Download error:', error);
+    res.status(500).send('Server Error');
+  }
+});
+
 // EVIDENCE COMMENT EKLEME
 app.post('/api/tensions/:tensionId/evidence/:evidenceId/comments', async (req, res) => {
   try {

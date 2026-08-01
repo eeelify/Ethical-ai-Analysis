@@ -91,8 +91,10 @@ export function ReportAIChatPanel({ projectId, userId, isOpen, onClose }: Report
           ) : (
             chatMessages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                  msg.role === 'user' ? 'bg-cyan-600 text-white rounded-br-none' : 'bg-[#0b1221]/10 text-gray-200 rounded-bl-none border border-white/5'
+                <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-lg ${
+                  msg.role === 'user' 
+                    ? 'bg-gradient-to-br from-blue-600 to-cyan-600 text-white rounded-br-none border border-white/10' 
+                    : 'bg-[#1e293b]/80 backdrop-blur-md text-gray-100 rounded-bl-none border border-white/10'
                 }`}>
                   <p className="whitespace-pre-wrap">{msg.content}</p>
                 </div>

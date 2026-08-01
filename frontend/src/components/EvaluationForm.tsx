@@ -2298,7 +2298,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                   {activeQuestion.description && (
                     <div className="flex items-start gap-3 mt-4 bg-cyan-500/10/50 p-4 rounded-2xl border border-blue-100/50">
                       <Info className="w-5 h-5 text-cyan-400 mt-0.5 flex-shrink-0" />
-                      <p className="text-blue-900 text-base leading-relaxed">
+                      <p className="text-cyan-300 text-base leading-relaxed">
                         {activeQuestion.description}
                       </p>
                     </div>
@@ -2317,10 +2317,10 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                         const isSelected = currentAnswer === optionValue;
                         return (
                           <label key={optionValue} className={`group flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${isSelected
-                            ? 'border-blue-600 bg-cyan-500/10/50 shadow-[0_0_15px_rgba(0,0,0,0.5)]'
-                            : 'border-white/10 hover:border-blue-300 hover:bg-[#050b14]'
+                            ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.15)]'
+                            : 'border-white/10 hover:border-white/20 hover:bg-[#0f172a]/50'
                             }`}>
-                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 transition-colors ${isSelected ? 'border-blue-600 bg-blue-600' : 'border-white/20 group-hover:border-blue-400'
+                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 transition-colors ${isSelected ? 'border-blue-500 bg-blue-500' : 'border-white/20 group-hover:border-blue-400'
                               }`}>
                               <div className="w-2 h-2 rounded-full bg-[#050b14]" />
                             </div>
@@ -2332,7 +2332,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                               onChange={(e) => handleAnswerChange(activeQuestion.id, e.target.value)}
                               className="hidden"
                             />
-                            <span className={`text-lg font-medium transition-colors ${isSelected ? 'text-blue-900' : 'text-slate-300'
+                            <span className={`text-lg font-medium transition-colors ${isSelected ? 'text-blue-300' : 'text-slate-300'
                               }`}>{optionLabel}</span>
                           </label>
                         );
@@ -2391,10 +2391,10 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                         const isChecked = currentAnswers.includes(optionValue);
                         return (
                           <label key={optionValue} className={`group flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${isChecked
-                            ? 'border-blue-600 bg-cyan-500/10/50 shadow-[0_0_15px_rgba(0,0,0,0.5)]'
-                            : 'border-white/10 hover:border-blue-300 hover:bg-[#050b14]'
+                            ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.15)]'
+                            : 'border-white/10 hover:border-white/20 hover:bg-[#0f172a]/50'
                             }`}>
-                            <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center mr-4 transition-colors ${isChecked ? 'border-blue-600 bg-blue-600' : 'border-white/20 group-hover:border-blue-400'
+                            <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center mr-4 transition-colors ${isChecked ? 'border-blue-500 bg-blue-500' : 'border-white/20 group-hover:border-blue-400'
                               }`}>
                               <CheckCircle className="w-4 h-4 text-white" />
                             </div>
@@ -2409,7 +2409,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                               }}
                               className="hidden"
                             />
-                            <span className={`text-lg font-medium transition-colors ${isChecked ? 'text-blue-900' : 'text-slate-300'
+                            <span className={`text-lg font-medium transition-colors ${isChecked ? 'text-blue-300' : 'text-slate-300'
                               }`}>{optionLabel}</span>
                           </label>
                         );
@@ -2423,7 +2423,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                       <AlertTriangle className="w-5 h-5 text-orange-500" />
                       <h3 className="text-lg font-semibold text-white">Importance Level for This Question</h3>
                       {currentStage === 'assess' && (
-                        <span className="px-2.5 py-0.5 bg-red-50 text-red-600 text-xs font-medium rounded-full border border-red-100">
+                        <span className="px-2.5 py-0.5 bg-red-900/30 text-red-400 text-xs font-medium rounded-full border border-red-500/30">
                           Required
                         </span>
                       )}
@@ -2436,11 +2436,11 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                             key={level}
                             className={`relative flex flex-col items-center p-6 rounded-xl border-2 cursor-pointer transition-all duration-200 ${isSelected
                               ? level === 'low'
-                                ? 'border-green-500 bg-green-50 shadow-md'
+                                ? 'border-green-500/50 bg-green-500/10 shadow-[0_0_15px_rgba(34,197,94,0.1)]'
                                 : level === 'medium'
-                                  ? 'border-yellow-500 bg-yellow-50 shadow-md'
-                                  : 'border-red-500 bg-red-50 shadow-md'
-                              : 'border-white/10 hover:border-white/20 hover:bg-[#0a1122]'
+                                  ? 'border-yellow-500/50 bg-yellow-500/10 shadow-[0_0_15px_rgba(234,179,8,0.1)]'
+                                  : 'border-red-500/50 bg-red-500/10 shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                              : 'border-white/10 hover:border-white/20 hover:bg-[#0f172a]/50'
                               }`}
                           >
                             <input
@@ -2454,10 +2454,10 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                             <div
                               className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-colors ${isSelected
                                 ? level === 'low'
-                                  ? 'bg-green-100 text-green-600'
+                                  ? 'bg-green-500/20 text-green-400'
                                   : level === 'medium'
-                                    ? 'bg-yellow-100 text-yellow-600'
-                                    : 'bg-red-100 text-red-600'
+                                    ? 'bg-yellow-500/20 text-yellow-400'
+                                    : 'bg-red-500/20 text-red-400'
                                 : 'bg-[#0f172a] text-gray-400'
                                 }`}
                             >
@@ -2481,7 +2481,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                   <div className="mt-8 pt-6 border-t border-white/10" key={`risk-scores-${activeQuestion.id}-${riskScores[activeQuestion.id] || riskScores[activeQuestion.code || ''] || 'none'}`}>
                     <div className="flex items-center gap-2 mb-4">
                       <h3 className="text-lg font-semibold text-white">Importance Score for This Question</h3>
-                      <span className="px-2.5 py-0.5 bg-red-50 text-red-600 text-xs font-medium rounded-full border border-red-100">
+                      <span className="px-2.5 py-0.5 bg-red-900/30 text-red-400 text-xs font-medium rounded-full border border-red-500/30">
                         Required
                       </span>
                     </div>
@@ -2543,18 +2543,18 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
                         // Color scheme: 4 = highest risk (red), 0 = no risk (green)
                         const colorClasses = {
-                          red: isSelected ? 'border-2 border-red-700 bg-red-200 shadow-md' : 'border-2 border-white/10 hover:border-red-300 hover:bg-red-50',
-                          orange: isSelected ? 'border-2 border-orange-600 bg-orange-200 shadow-md' : 'border-2 border-white/10 hover:border-orange-300 hover:bg-orange-50',
-                          yellow: isSelected ? 'border-2 border-yellow-600 bg-yellow-50 shadow-md' : 'border-2 border-white/10 hover:border-yellow-300 hover:bg-yellow-50/30',
-                          blue: isSelected ? 'border-2 border-blue-500 bg-blue-50 shadow-md' : 'border-2 border-white/10 hover:border-blue-300 hover:bg-blue-50/30',
-                          green: isSelected ? 'border-2 border-green-500 bg-green-50 shadow-md' : 'border-2 border-white/10 hover:border-green-300 hover:bg-green-50/30'
+                          red: isSelected ? 'border-2 border-red-500 bg-red-900/20 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'border-2 border-white/10 hover:border-red-500/50 hover:bg-red-900/10',
+                          orange: isSelected ? 'border-2 border-orange-500 bg-orange-900/20 shadow-[0_0_15px_rgba(249,115,22,0.15)]' : 'border-2 border-white/10 hover:border-orange-500/50 hover:bg-orange-900/10',
+                          yellow: isSelected ? 'border-2 border-yellow-500 bg-yellow-900/20 shadow-[0_0_15px_rgba(234,179,8,0.15)]' : 'border-2 border-white/10 hover:border-yellow-500/50 hover:bg-yellow-900/10',
+                          blue: isSelected ? 'border-2 border-blue-500 bg-blue-900/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]' : 'border-2 border-white/10 hover:border-blue-500/50 hover:bg-blue-900/10',
+                          green: isSelected ? 'border-2 border-green-500 bg-green-900/20 shadow-[0_0_15px_rgba(34,197,94,0.15)]' : 'border-2 border-white/10 hover:border-green-500/50 hover:bg-green-900/10'
                         };
                         const bgColorClasses = {
-                          red: isSelected ? 'bg-red-100 text-red-700' : 'bg-[#0f172a] text-gray-400',
-                          orange: isSelected ? 'bg-orange-200 text-orange-800' : 'bg-[#0f172a] text-gray-400',
-                          yellow: isSelected ? 'bg-yellow-100 text-yellow-600' : 'bg-[#0f172a] text-gray-400',
-                          blue: isSelected ? 'bg-blue-100 text-blue-600' : 'bg-[#0f172a] text-gray-400',
-                          green: isSelected ? 'bg-green-100 text-green-600' : 'bg-[#0f172a] text-gray-400'
+                          red: isSelected ? 'bg-red-500/20 text-red-400' : 'bg-white/5 text-slate-400',
+                          orange: isSelected ? 'bg-orange-500/20 text-orange-400' : 'bg-white/5 text-slate-400',
+                          yellow: isSelected ? 'bg-yellow-500/20 text-yellow-400' : 'bg-white/5 text-slate-400',
+                          blue: isSelected ? 'bg-blue-500/20 text-blue-400' : 'bg-white/5 text-slate-400',
+                          green: isSelected ? 'bg-green-500/20 text-green-400' : 'bg-white/5 text-slate-400'
                         };
 
                         return (

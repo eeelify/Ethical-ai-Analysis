@@ -1436,13 +1436,13 @@ export function UserDashboard({
                                 }
                               }
 
-                              // STATE 3: User has finished evolution
+                              // STATE 3: User has finished evaluation
                               if (evolutionCompleted) {
                                 if (allExpertsFinished) {
                                   return (
                                     <div className="px-4 py-2 text-white rounded-lg text-sm flex items-center bg-green-600">
                                       <CheckCircle className="h-3 w-3 mr-2" />
-                                      Finished Evolution
+                                      Finished Evaluation
                                     </div>
                                   );
                                 } else {

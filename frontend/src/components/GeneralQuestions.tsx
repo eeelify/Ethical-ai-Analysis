@@ -564,7 +564,7 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
                       key={q.id || index}
                       onClick={() => navigateToQuestion(index)}
                       className={`w-full text-left p-3 rounded-lg mb-1 transition-all ${isCurrent
-                        ? 'bg-blue-50 border-2 border-blue-500 text-blue-900'
+                        ? 'bg-[#0f172a] border-2 border-blue-500 text-blue-300 shadow-[0_0_15px_rgba(59,130,246,0.15)]'
                         : 'hover:bg-[#050b14] border-2 border-transparent text-slate-300'
                         }`}
                     >
@@ -655,8 +655,8 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
                         <label
                           key={idx}
                           className={`group flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${isSelected
-                            ? 'border-blue-600 bg-blue-50/50 shadow-[0_0_15px_rgba(0,0,0,0.5)]'
-                            : 'border-white/10 hover:border-blue-300 hover:bg-[#0b1221]'
+                            ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.15)]'
+                            : 'border-white/10 hover:border-white/20 hover:bg-[#0f172a]/50'
                             }`}
                         >
                           <div
@@ -683,7 +683,7 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
                             className="hidden"
                           />
                           <span
-                            className={`text-lg font-medium transition-colors ${isSelected ? 'text-blue-900' : 'text-slate-300'
+                            className={`text-lg font-medium transition-colors ${isSelected ? 'text-blue-300' : 'text-slate-300'
                               }`}
                           >
                             {optionLabel}
@@ -763,18 +763,18 @@ export function GeneralQuestions({ project, currentUser, onBack, onComplete }: G
 
                       // Color scheme: 4 = highest risk (red), 0 = no risk (green)
                       const colorClasses = {
-                        red: isSelected ? 'border-red-700 bg-red-100 shadow-md ring-2 ring-red-200 ring-offset-2' : 'border-white/10 hover:border-red-300 hover:bg-red-50',
-                        orange: isSelected ? 'border-orange-600 bg-orange-100 shadow-md ring-2 ring-orange-200 ring-offset-2' : 'border-white/10 hover:border-orange-300 hover:bg-orange-50',
-                        yellow: isSelected ? 'border-yellow-600 bg-yellow-100 shadow-md ring-2 ring-yellow-200 ring-offset-2' : 'border-white/10 hover:border-yellow-300 hover:bg-yellow-50/30',
-                        blue: isSelected ? 'border-blue-500 bg-blue-50 shadow-md' : 'border-white/10 hover:border-blue-300 hover:bg-blue-50/30',
-                        green: isSelected ? 'border-green-500 bg-green-50 shadow-md' : 'border-white/10 hover:border-green-300 hover:bg-green-50/30'
+                        red: isSelected ? 'border-2 border-red-500 bg-red-900/20 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'border-2 border-white/10 hover:border-red-500/50 hover:bg-red-900/10',
+                        orange: isSelected ? 'border-2 border-orange-500 bg-orange-900/20 shadow-[0_0_15px_rgba(249,115,22,0.15)]' : 'border-2 border-white/10 hover:border-orange-500/50 hover:bg-orange-900/10',
+                        yellow: isSelected ? 'border-2 border-yellow-500 bg-yellow-900/20 shadow-[0_0_15px_rgba(234,179,8,0.15)]' : 'border-2 border-white/10 hover:border-yellow-500/50 hover:bg-yellow-900/10',
+                        blue: isSelected ? 'border-2 border-blue-500 bg-blue-900/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]' : 'border-2 border-white/10 hover:border-blue-500/50 hover:bg-blue-900/10',
+                        green: isSelected ? 'border-2 border-green-500 bg-green-900/20 shadow-[0_0_15px_rgba(34,197,94,0.15)]' : 'border-2 border-white/10 hover:border-green-500/50 hover:bg-green-900/10'
                       };
                       const bgColorClasses = {
-                        red: isSelected ? 'bg-red-200 text-red-900' : 'bg-[#0f172a] text-gray-400',
-                        orange: isSelected ? 'bg-orange-200 text-orange-900' : 'bg-[#0f172a] text-gray-400',
-                        yellow: isSelected ? 'bg-yellow-200 text-yellow-900' : 'bg-[#0f172a] text-gray-400',
-                        blue: isSelected ? 'bg-blue-100 text-blue-600' : 'bg-[#0f172a] text-gray-400',
-                        green: isSelected ? 'bg-green-100 text-green-600' : 'bg-[#0f172a] text-gray-400'
+                        red: isSelected ? 'bg-red-500/20 text-red-400' : 'bg-white/5 text-slate-400',
+                        orange: isSelected ? 'bg-orange-500/20 text-orange-400' : 'bg-white/5 text-slate-400',
+                        yellow: isSelected ? 'bg-yellow-500/20 text-yellow-400' : 'bg-white/5 text-slate-400',
+                        blue: isSelected ? 'bg-blue-500/20 text-blue-400' : 'bg-white/5 text-slate-400',
+                        green: isSelected ? 'bg-green-500/20 text-green-400' : 'bg-white/5 text-slate-400'
                       };
                       return (
                         <label
