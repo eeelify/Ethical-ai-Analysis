@@ -76,16 +76,16 @@ export function ResetPassword({ onBackToLogin }: ResetPasswordProps) {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            <div className="w-full flex flex-col justify-center px-12 bg-white lg:w-1/2 mx-auto">
+        <div className="min-h-screen bg-[#050b14] flex">
+            <div className="w-full flex flex-col justify-center px-12 bg-[#0b1221] lg:w-1/2 mx-auto">
                 <div className="max-w-md mx-auto w-full">
                     <div className="mb-8">
-                        <h1 className="text-4xl mb-2 text-gray-900 font-black tracking-tight" style={{ fontWeight: 900, fontFamily: 'Inter, sans-serif' }}>Ethical AI Analysis Platform</h1>
-                        <p className="text-xl text-gray-900 font-medium">Set New Password</p>
+                        <h1 className="text-4xl mb-2 text-white font-black tracking-tight" style={{ fontWeight: 900, fontFamily: 'Inter, sans-serif' }}>Ethical AI Analysis Platform</h1>
+                        <p className="text-xl text-white font-medium">Set New Password</p>
                     </div>
 
                     <div className="mb-6">
-                        <p className="text-base text-gray-900">
+                        <p className="text-base text-white">
                             Please set a new password for your account.
                         </p>
                     </div>
@@ -104,24 +104,24 @@ export function ResetPassword({ onBackToLogin }: ResetPasswordProps) {
                     {!message && token && (
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div>
-                                <label className="block text-sm mb-2 text-gray-700 font-semibold">New Password</label>
+                                <label className="block text-sm mb-2 text-slate-300 font-semibold">New Password</label>
                                 <input
                                     type="password"
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
-                                    className="w-full px-4 h-12 text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 box-border"
+                                    className="w-full px-4 h-12 text-base border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 box-border"
                                     placeholder="Enter your new password"
                                     required
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm mb-2 text-gray-700 font-semibold">Confirm New Password</label>
+                                <label className="block text-sm mb-2 text-slate-300 font-semibold">Confirm New Password</label>
                                 <input
                                     type="password"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full px-4 h-12 text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 box-border"
+                                    className="w-full px-4 h-12 text-base border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 box-border"
                                     placeholder="Confirm your new password"
                                     required
                                 />
@@ -140,7 +140,7 @@ export function ResetPassword({ onBackToLogin }: ResetPasswordProps) {
                     <div className="mt-6 text-center">
                         <button
                             onClick={onBackToLogin}
-                            className="w-full py-2.5 px-4 text-gray-600 hover:text-gray-800 text-base"
+                            className="w-full py-2.5 px-4 text-slate-400 hover:text-gray-200 text-base"
                         >
                             ← Back to login
                         </button>

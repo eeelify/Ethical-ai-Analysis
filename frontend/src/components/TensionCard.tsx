@@ -109,7 +109,7 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
           </span>
           <div className="relative inline-flex items-center">
             <span className={`px-2 py-1 text-xs rounded-full font-medium border ${
-              reviewState.color === 'gray' ? 'bg-white/10 text-slate-300 border-white/20' :
+              reviewState.color === 'gray' ? 'bg-[#0b1221]/10 text-slate-300 border-white/20' :
               reviewState.color === 'light-blue' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
               reviewState.color === 'blue' ? 'bg-blue-500/30 text-blue-300 border-blue-500/40' :
               reviewState.color === 'green' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
@@ -122,7 +122,7 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
               onMouseEnter={() => setShowReviewTooltip(true)}
               onMouseLeave={() => setShowReviewTooltip(false)}
               onClick={() => setShowReviewTooltip(!showReviewTooltip)}
-              className="ml-1 text-gray-400 hover:text-gray-600 focus:outline-none"
+              className="ml-1 text-gray-400 hover:text-slate-400 focus:outline-none"
             >
               <Info className="h-3 w-3" />
             </button>
@@ -165,7 +165,7 @@ export function TensionCard({ tension, currentUser, users = [], onVote, onCommen
       {/* Consensus Bar */}
       <div className="flex items-center space-x-2 mb-4">
         <span className="text-xs text-slate-400 font-medium">Consensus:</span>
-        <div className="flex-1 h-6 bg-white/5 rounded-full overflow-hidden" style={{ position: 'relative' }}>
+        <div className="flex-1 h-6 bg-[#0b1221]/5 rounded-full overflow-hidden" style={{ position: 'relative' }}>
           <div 
             style={{ 
               position: 'absolute',

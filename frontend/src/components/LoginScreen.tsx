@@ -185,7 +185,7 @@ export function LoginScreen({ onLogin, initialView = 'login', navigateTo }: Logi
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="relative z-10 p-6 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm max-w-md"
+          className="relative z-10 p-6 bg-[#0b1221]/5 border border-white/10 rounded-2xl backdrop-blur-sm max-w-md"
         >
           <div className="text-sm font-semibold text-cyan-400 mb-4 uppercase tracking-wider">Assessment Workflow</div>
           <div className="flex items-center justify-between">
@@ -227,7 +227,7 @@ export function LoginScreen({ onLogin, initialView = 'login', navigateTo }: Logi
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="w-full max-w-md bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-md shadow-2xl relative"
+          className="w-full max-w-md bg-[#0b1221]/5 border border-white/10 rounded-3xl p-8 backdrop-blur-md shadow-2xl relative"
         >
           <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent rounded-3xl pointer-events-none"></div>
           
@@ -351,7 +351,7 @@ export function LoginScreen({ onLogin, initialView = 'login', navigateTo }: Logi
                 disabled={loading}
                 className="w-full mt-4 group relative py-3.5 bg-gradient-to-r from-indigo-600 to-cyan-600 rounded-xl font-semibold text-white overflow-hidden shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all hover:shadow-[0_0_25px_rgba(34,211,238,0.4)] hover:scale-[1.02] disabled:opacity-70 disabled:hover:scale-100"
               >
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                <div className="absolute inset-0 bg-[#0b1221]/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                 <span className="relative flex items-center justify-center gap-2">
                   {loading ? 'Processing...' : (isLogin ? 'Log In' : (step === 'email' ? 'Send Verification Code' : 'Verify & Sign Up'))}
                   {!loading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}

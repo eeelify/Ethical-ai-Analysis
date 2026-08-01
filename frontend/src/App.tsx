@@ -842,11 +842,12 @@ function App() {
               setCurrentView("report-review");
             }}
             onOpenAdminReview={() => setCurrentView("admin-report-review")}
-            initialTab={(selectedProject as any).openOntologyTab ? 'ontologyReport' : ((selectedProject as any).openReportsTab ? 'reports' : ((selectedProject as any).openTensionsTab ? 'tensions' : undefined))}
-            key={(selectedProject as any).openOntologyTab ? 'ontology-tab' : ((selectedProject as any).openReportsTab ? 'reports-tab' : ((selectedProject as any).openTensionsTab ? 'tensions-tab' : 'default-tab'))}
+            initialTab={((selectedProject as any).openReportsTab ? 'reports' : ((selectedProject as any).openTensionsTab ? 'tensions' : undefined))}
+            key={((selectedProject as any).openReportsTab ? 'reports-tab' : ((selectedProject as any).openTensionsTab ? 'tensions-tab' : 'default-tab'))}
           />
         ) : null;
       case "owner-ontology-chat":
+      case "owner-reports":
         return currentUser?.role === "use-case-owner" ? (
           <UseCaseOwnerDashboard
             currentUser={currentUser}
@@ -855,11 +856,15 @@ function App() {
             projects={projects}
             onCreateUseCase={handleCreateUseCase}
             onViewUseCase={handleViewUseCase}
+            onViewProject={(project) => {
+              setSelectedProject(project);
+              setCurrentView("project-detail");
+            }}
             onDeleteUseCase={handleDeleteUseCase}
             onNavigate={setCurrentView}
             onLogout={handleLogout}
             onUpdateUser={(updatedUser) => setCurrentUser(updatedUser)}
-            dashboardSection="ontology"
+            dashboardSection={currentView === "owner-ontology-chat" ? 'ontology' : currentView === "owner-reports" ? 'reports' : 'projects'}
           />
         ) : null;
       case "tension-detail":
@@ -878,6 +883,10 @@ function App() {
             currentUser={currentUser}
             onBack={handleBackToProject}
             onViewUseCase={handleViewUseCase}
+            onViewProject={(project) => {
+              setSelectedProject(project);
+              setCurrentView("project-detail");
+            }}
           />
         ) : null;
       case "general-questions":
@@ -891,6 +900,10 @@ function App() {
               projects={projects}
               onCreateUseCase={handleCreateUseCase}
               onViewUseCase={handleViewUseCase}
+              onViewProject={(project) => {
+                setSelectedProject(project);
+                setCurrentView("project-detail");
+              }}
               onDeleteUseCase={handleDeleteUseCase}
               onNavigate={setCurrentView}
               onLogout={handleLogout}
@@ -922,6 +935,10 @@ function App() {
               onDeleteProject={handleDeleteProject}
               onNavigate={setCurrentView}
               onViewUseCase={handleViewUseCase}
+              onViewProject={(project) => {
+                setSelectedProject(project);
+                setCurrentView("project-detail");
+              }}
               onReviewReport={handleReviewReport}
               onLogout={handleLogout}
               onUpdateUser={(updatedUser) => setCurrentUser(updatedUser)}
@@ -977,6 +994,10 @@ function App() {
               projects={projects}
               onCreateUseCase={handleCreateUseCase}
               onViewUseCase={handleViewUseCase}
+              onViewProject={(project) => {
+                setSelectedProject(project);
+                setCurrentView("project-detail");
+              }}
               onDeleteUseCase={handleDeleteUseCase}
               onNavigate={setCurrentView}
               onLogout={handleLogout}
@@ -1007,6 +1028,10 @@ function App() {
               onDeleteProject={handleDeleteProject}
               onNavigate={setCurrentView}
               onViewUseCase={handleViewUseCase}
+              onViewProject={(project) => {
+                setSelectedProject(project);
+                setCurrentView("project-detail");
+              }}
               onReviewReport={handleReviewReport}
               onLogout={handleLogout}
               onUpdateUser={(updatedUser) => setCurrentUser(updatedUser)}
@@ -1061,6 +1086,10 @@ function App() {
               projects={projects}
               onCreateUseCase={handleCreateUseCase}
               onViewUseCase={handleViewUseCase}
+              onViewProject={(project) => {
+                setSelectedProject(project);
+                setCurrentView("project-detail");
+              }}
               onDeleteUseCase={handleDeleteUseCase}
               onNavigate={setCurrentView}
               onLogout={handleLogout}
@@ -1091,6 +1120,10 @@ function App() {
               onDeleteProject={handleDeleteProject}
               onNavigate={setCurrentView}
               onViewUseCase={handleViewUseCase}
+              onViewProject={(project) => {
+                setSelectedProject(project);
+                setCurrentView("project-detail");
+              }}
               onReviewReport={handleReviewReport}
               onLogout={handleLogout}
               onUpdateUser={(updatedUser) => setCurrentUser(updatedUser)}
@@ -1180,6 +1213,10 @@ function App() {
               projects={projects}
               onCreateUseCase={handleCreateUseCase}
               onViewUseCase={handleViewUseCase}
+              onViewProject={(project) => {
+                setSelectedProject(project);
+                setCurrentView("project-detail");
+              }}
               onDeleteUseCase={handleDeleteUseCase}
               onNavigate={setCurrentView}
               onLogout={handleLogout}
@@ -1214,6 +1251,10 @@ function App() {
               onDeleteProject={handleDeleteProject}
               onNavigate={setCurrentView}
               onViewUseCase={handleViewUseCase}
+              onViewProject={(project) => {
+                setSelectedProject(project);
+                setCurrentView("project-detail");
+              }}
               onReviewReport={handleReviewReport}
               onLogout={handleLogout}
               onUpdateUser={(updatedUser) => setCurrentUser(updatedUser)}
@@ -1243,6 +1284,10 @@ function App() {
               projects={projects}
               onCreateUseCase={handleCreateUseCase}
               onViewUseCase={handleViewUseCase}
+              onViewProject={(project) => {
+                setSelectedProject(project);
+                setCurrentView("project-detail");
+              }}
               onDeleteUseCase={handleDeleteUseCase}
               onNavigate={setCurrentView}
               onLogout={handleLogout}
@@ -1273,6 +1318,10 @@ function App() {
               onDeleteProject={handleDeleteProject}
               onNavigate={setCurrentView}
               onViewUseCase={handleViewUseCase}
+              onViewProject={(project) => {
+                setSelectedProject(project);
+                setCurrentView("project-detail");
+              }}
               onReviewReport={handleReviewReport}
               onLogout={handleLogout}
               onUpdateUser={(updatedUser) => setCurrentUser(updatedUser)}

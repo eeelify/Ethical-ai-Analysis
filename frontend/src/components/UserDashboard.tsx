@@ -28,6 +28,8 @@ import { ProfileModal } from "./ProfileModal";
 import { OntologyViewerTab } from "./OntologyViewerTab";
 import { api } from "../api";
 import { fetchUserProgress } from "../utils/userProgress";
+import { SharedArea } from "./SharedArea";
+import { OtherMembers } from "./OtherMembers";
 
 interface UserDashboardProps {
   currentUser: User;
@@ -109,8 +111,8 @@ export function UserDashboard({
   assignmentsRefreshToken,
 }: UserDashboardProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentTab, setCurrentTab] = useState<"assigned" | "finished" | "reports" | "ontology">(
-    () => loadUserDashboardTab("assigned") as "assigned" | "finished" | "reports" | "ontology"
+  const [currentTab, setCurrentTab] = useState<"assigned" | "finished" | "reports" | "ontology" | "shared-area" | "other-members">(
+    (loadUserDashboardTab() as any) || "assigned"
   );
 
   // Persist tab changes
@@ -814,7 +816,7 @@ export function UserDashboard({
   };
 
   return (
-    <div className="min-h-screen bg-[#0a1122] text-slate-300 flex flex-col">
+    <div className="h-screen bg-[#0a1122] text-slate-300 flex flex-col overflow-hidden">
       {/* ======= TOP BAR ======= */}
       <div className="bg-[#050b14] border-b border-white/10 shrink-0">
         <div className="px-6 py-4">
@@ -838,7 +840,7 @@ export function UserDashboard({
                     placeholder="Search projects..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-9 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:ring-2 focus:ring-cyan-500 placeholder-slate-500"
+                    className="pl-9 pr-4 py-2 bg-[#0b1221]/5 border border-white/10 rounded-lg text-sm text-white focus:ring-2 focus:ring-cyan-500 placeholder-slate-500"
                   />
                 </div>
               )}
@@ -870,7 +872,7 @@ export function UserDashboard({
               <div className="relative" ref={notificationRef}>
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className="relative p-2 text-gray-600 hover:text-white transition-colors"
+                  className="relative p-2 text-slate-400 hover:text-white transition-colors"
                 >
                   <MessageSquare className="h-5 w-5" />
                   {unreadCount > 0 && (
@@ -898,14 +900,14 @@ export function UserDashboard({
                       <h3 className="font-semibold text-white">Messages</h3>
                       <button
                         onClick={() => setShowNotifications(false)}
-                        className="p-1 hover:bg-gray-100 rounded-full"
+                        className="p-1 hover:bg-[#0f172a] rounded-full"
                       >
-                        <X className="h-4 w-4 text-gray-500" />
+                        <X className="h-4 w-4 text-slate-500" />
                       </button>
                     </div>
                     <div className="overflow-y-auto flex-1 min-h-0">
                       {unreadConversations.length === 0 ? (
-                        <div className="p-6 text-center text-gray-500">
+                        <div className="p-6 text-center text-slate-500">
                           <Bell className="h-8 w-8 text-gray-300 mx-auto mb-2" />
                           <p className="text-sm">No unread messages</p>
                         </div>
@@ -919,7 +921,7 @@ export function UserDashboard({
                                 e.stopPropagation();
                                 handleNotificationClick(conv);
                               }}
-                              className="w-full p-4 text-left hover:bg-gray-50 transition-colors"
+                              className="w-full p-4 text-left hover:bg-[#050b14] transition-colors"
                             >
                               <div className="flex items-start justify-between">
                                 <div className="flex-1 min-w-0">
@@ -931,7 +933,7 @@ export function UserDashboard({
                                       {conv.fromUserName}
                                     </div>
                                   </div>
-                                  <div className="text-xs text-gray-500 line-clamp-2">
+                                  <div className="text-xs text-slate-500 line-clamp-2">
                                     {String(conv.lastMessage || '').startsWith('[NOTIFICATION]')
                                       ? String(conv.lastMessage).replace(/^\[NOTIFICATION\]\s*/, '')
                                       : conv.lastMessage}
@@ -1003,7 +1005,7 @@ export function UserDashboard({
                   setCurrentTab("assigned");
                   onNavigate("dashboard");
                 }}
-                className={`w-full flex items-center px-3 py-2 text-slate-400 hover:bg-white/5 hover:text-white ${!showChats && currentTab !== 'reports' ? 'bg-cyan-500/10 border-r-2 border-cyan-400 text-cyan-400' : ''
+                className={`w-full flex items-center px-3 py-2 text-slate-400 hover:bg-[#0b1221]/5 hover:text-white ${!showChats && currentTab !== 'reports' ? 'bg-cyan-500/10 border-r-2 border-cyan-400 text-cyan-400' : ''
                   }`}
               >
                 <Folder className="h-4 w-4 mr-3 text-blue-600" />
@@ -1014,7 +1016,7 @@ export function UserDashboard({
                   setShowChats(false);
                   setCurrentTab("reports");
                 }}
-                className={`w-full flex items-center px-3 py-2 text-slate-400 hover:bg-white/5 hover:text-white ${!showChats && currentTab === 'reports' ? 'bg-cyan-500/10 border-r-2 border-cyan-400 text-cyan-400' : ''
+                className={`w-full flex items-center px-3 py-2 text-slate-400 hover:bg-[#0b1221]/5 hover:text-white ${!showChats && currentTab === 'reports' ? 'bg-cyan-500/10 border-r-2 border-cyan-400 text-cyan-400' : ''
                   }`}
               >
                 <FileText className="h-4 w-4 mr-3 text-orange-600" />
@@ -1025,22 +1027,22 @@ export function UserDashboard({
                   setShowChats(false);
                   setCurrentTab("ontology");
                 }}
-                className={`w-full flex items-center px-3 py-2 text-slate-400 hover:bg-white/5 hover:text-white ${!showChats && currentTab === 'ontology' ? 'bg-cyan-500/10 border-r-2 border-cyan-400 text-cyan-400' : ''
+                className={`w-full flex items-center px-3 py-2 text-slate-400 hover:bg-[#0b1221]/5 hover:text-white ${!showChats && currentTab === 'ontology' ? 'bg-cyan-500/10 border-r-2 border-cyan-400 text-cyan-400' : ''
                   }`}
               >
                 <Database className="h-4 w-4 mr-3 text-pink-600" />
                 Ontology
               </button>
               <button
-                onClick={() => onNavigate("shared-area")}
-                className="w-full flex items-center px-3 py-2 text-slate-400 hover:bg-white/5 hover:text-white"
+                onClick={() => setCurrentTab("shared-area")}
+                className={`w-full flex items-center px-3 py-2 text-slate-400 hover:bg-[#0b1221]/5 hover:text-white ${!showChats && currentTab === 'shared-area' ? 'bg-cyan-500/10 border-r-2 border-cyan-400 text-cyan-400' : ''}`}
               >
                 <MessageSquare className="h-4 w-4 mr-3 text-green-600" />
                 Shared Area
               </button>
               <button
-                onClick={() => onNavigate("other-members")}
-                className="w-full flex items-center px-3 py-2 text-slate-400 hover:bg-white/5 hover:text-white"
+                onClick={() => setCurrentTab("other-members")}
+                className={`w-full flex items-center px-3 py-2 text-slate-400 hover:bg-[#0b1221]/5 hover:text-white ${!showChats && currentTab === 'other-members' ? 'bg-cyan-500/10 border-r-2 border-cyan-400 text-cyan-400' : ''}`}
               >
                 <Users className="h-4 w-4 mr-3 text-purple-600" />
                 Other Members
@@ -1060,7 +1062,7 @@ export function UserDashboard({
         </div>
 
         {/* ======= MAIN CONTENT ======= */}
-        <div className="flex-1 p-6 overflow-y-auto bg-[#0a1122]">
+        <div className={`flex-1 w-full max-w-full min-w-0 min-h-0 ${!showChats && ["ontology", "shared-area", "other-members"].includes(currentTab) ? "overflow-hidden flex flex-col" : "p-6 overflow-y-auto"} bg-[#0a1122]`}>
           {showChats ? (
             /* ===== CHATS LIST ===== */
             <div className="max-w-4xl mx-auto">
@@ -1069,7 +1071,7 @@ export function UserDashboard({
                 <div className="text-center py-12">
                   <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                   <h3 className="text-lg text-white mb-2">No conversations yet</h3>
-                  <p className="text-gray-600">
+                  <p className="text-slate-400">
                     Start a conversation with a team member to see it here.
                   </p>
                 </div>
@@ -1105,19 +1107,19 @@ export function UserDashboard({
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between mb-1">
                               <div className="flex items-center space-x-2">
-                                <h3 className={`text-base font-medium ${hasUnread ? 'text-white' : 'text-gray-700'}`}>
+                                <h3 className={`text-base font-medium ${hasUnread ? 'text-white' : 'text-slate-300'}`}>
                                   {otherUser.name}
                                 </h3>
-                                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                                <span className="text-xs px-2 py-0.5 rounded-full bg-[#0f172a] text-slate-400">
                                   {formatRoleName(otherUser.role)}
                                 </span>
                               </div>
-                              <div className="flex items-center text-xs text-gray-500">
+                              <div className="flex items-center text-xs text-slate-500">
                                 <Clock className="h-3 w-3 mr-1" />
                                 {formatTime(conv.lastMessageTime)}
                               </div>
                             </div>
-                            <p className={`text-sm ${hasUnread ? 'text-white font-medium' : 'text-gray-600'} line-clamp-2`}>
+                            <p className={`text-sm ${hasUnread ? 'text-white font-medium' : 'text-slate-400'} line-clamp-2`}>
                               {conv.lastMessage}
                             </p>
                           </div>
@@ -1127,6 +1129,24 @@ export function UserDashboard({
                   })}
                 </div>
               )}
+            </div>
+          ) : currentTab === "shared-area" ? (
+            <div className="flex-1 min-h-0 flex flex-col p-6">
+              <SharedArea
+                currentUser={currentUser}
+                projects={projects}
+                users={users}
+                onBack={() => setCurrentTab("assigned")}
+              />
+            </div>
+          ) : currentTab === "other-members" ? (
+            <div className="flex-1 min-h-0 flex flex-col p-6">
+              <OtherMembers
+                currentUser={currentUser}
+                users={users}
+                projects={projects}
+                onBack={() => setCurrentTab("assigned")}
+              />
             </div>
           ) : currentTab === "ontology" ? (
             <OntologyViewerTab />
@@ -1140,7 +1160,7 @@ export function UserDashboard({
                       onClick={() => setCurrentTab("assigned")}
                       className={`py-2 px-1 border-b-2 text-sm ${currentTab === "assigned"
                         ? "border-blue-600 text-blue-600"
-                        : "border-transparent text-gray-500 hover:text-gray-700"
+                        : "border-transparent text-slate-500 hover:text-slate-300"
                         }`}
                     >
                       📂 Assigned ({assignedProjects.length})
@@ -1150,7 +1170,7 @@ export function UserDashboard({
                       onClick={() => setCurrentTab("finished")}
                       className={`py-2 px-1 border-b-2 text-sm ${currentTab === "finished"
                         ? "border-blue-600 text-blue-600"
-                        : "border-transparent text-gray-500 hover:text-gray-700"
+                        : "border-transparent text-slate-500 hover:text-slate-300"
                         }`}
                     >
                       ✅ Finished Projects ({finishedProjects.length})
@@ -1165,7 +1185,7 @@ export function UserDashboard({
                   {filteredProjects.map((project) => (
                     <div
                       key={project.id}
-                      className="bg-[#050b14]/50 rounded-xl border border-white/10 shadow-sm hover:shadow-[0_0_15px_rgba(34,211,238,0.1)] transition-all"
+                      className="bg-[#050b14]/50 rounded-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_15px_rgba(34,211,238,0.1)] transition-all"
                     >
                       <div className="p-6">
                         <div className="flex items-start justify-between mb-3">
@@ -1173,7 +1193,7 @@ export function UserDashboard({
                             <h3 className="text-lg font-semibold text-white">
                               {project.title}
                             </h3>
-                            <p className="text-gray-600 text-sm mt-1">
+                            <p className="text-slate-400 text-sm mt-1">
                               {project.shortDescription}
                             </p>
 
@@ -1209,7 +1229,7 @@ export function UserDashboard({
                                       >
                                         {project.status.toUpperCase()}
                                       </span>
-                                      <span className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded-full">
+                                      <span className="px-2 py-1 text-xs bg-gray-200 text-slate-300 rounded-full">
                                         {stageLabels[currentStage]}
                                       </span>
                                     </>
@@ -1223,7 +1243,7 @@ export function UserDashboard({
                           <span
                             className={`px-2 py-1 text-xs rounded-full ${project.assignedUsers.includes(currentUser.id)
                               ? "bg-green-100 text-green-800"
-                              : "bg-gray-100 text-gray-600"
+                              : "bg-[#0f172a] text-slate-400"
                               }`}
                           >
                             {project.assignedUsers.includes(currentUser.id)
@@ -1238,7 +1258,7 @@ export function UserDashboard({
                           const progressDisplay = Math.max(0, Math.min(100, progress));
                           return (
                             <div className="mt-2 mb-4">
-                              <div className="flex justify-between text-xs text-gray-600 mb-1">
+                              <div className="flex justify-between text-xs text-slate-400 mb-1">
                                 <span>Your Progress</span>
                                 <span>{progressDisplay}%</span>
                               </div>
@@ -1260,7 +1280,7 @@ export function UserDashboard({
                           <div className="flex items-center space-x-3">
                             <button
                               onClick={() => onViewProject(project)}
-                              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm"
+                              className="px-4 py-2 bg-[#0f172a] text-slate-300 rounded-lg hover:bg-gray-200 text-sm"
                             >
                               View Details
                             </button>
@@ -1376,7 +1396,7 @@ export function UserDashboard({
                               if (progress >= 100 && !evolutionCompleted) {
                                 if (isChecking || checkingTensions[projectId]) {
                                   return (
-                                    <div className="px-4 py-2 text-gray-600 rounded-lg text-sm flex items-center">
+                                    <div className="px-4 py-2 text-slate-400 rounded-lg text-sm flex items-center">
                                       <RefreshCw className="h-3 w-3 mr-2 animate-spin" />
                                       Checking experts...
                                     </div>
@@ -1385,7 +1405,7 @@ export function UserDashboard({
 
                                 if (allCompleted === false) {
                                   return (
-                                    <div className="px-4 py-2 text-gray-600 rounded-lg text-sm flex items-center bg-yellow-50 border border-yellow-200">
+                                    <div className="px-4 py-2 text-slate-400 rounded-lg text-sm flex items-center bg-yellow-50 border border-yellow-200">
                                       <Clock className="h-3 w-3 mr-2" />
                                       Waiting for other experts to complete
                                     </div>
@@ -1395,7 +1415,7 @@ export function UserDashboard({
                                 const tensionsStatus = tensionsVoted[projectId];
                                 if (tensionsStatus === false) {
                                   return (
-                                    <div className="px-4 py-2 text-gray-600 rounded-lg text-sm flex items-center bg-yellow-50 border border-yellow-200">
+                                    <div className="px-4 py-2 text-slate-400 rounded-lg text-sm flex items-center bg-yellow-50 border border-yellow-200">
                                       <Clock className="h-3 w-3 mr-2" />
                                       Waiting for all experts to vote on tensions
                                     </div>
@@ -1416,18 +1436,18 @@ export function UserDashboard({
                                 }
                               }
 
-                              // STATE 3: User has finished evolution
+                              // STATE 3: User has finished evaluation
                               if (evolutionCompleted) {
                                 if (allExpertsFinished) {
                                   return (
                                     <div className="px-4 py-2 text-white rounded-lg text-sm flex items-center bg-green-600">
                                       <CheckCircle className="h-3 w-3 mr-2" />
-                                      Finished Evolution
+                                      Finished Evaluation
                                     </div>
                                   );
                                 } else {
                                   return (
-                                    <div className="px-4 py-2 text-gray-600 rounded-lg text-sm flex items-center bg-yellow-50 border border-yellow-200">
+                                    <div className="px-4 py-2 text-slate-400 rounded-lg text-sm flex items-center bg-yellow-50 border border-yellow-200">
                                       <Clock className="h-3 w-3 mr-2" />
                                       Waiting for other experts
                                     </div>
@@ -1441,7 +1461,7 @@ export function UserDashboard({
                             {project.useCase && (
                               <button
                                 onClick={() => handleDownloadUseCase(project)}
-                                className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-800 text-sm"
+                                className="flex items-center px-3 py-2 text-slate-400 hover:text-gray-200 text-sm"
                               >
                                 <Download className="h-3 w-3 mr-1" />
                                 Use Case
@@ -1449,7 +1469,7 @@ export function UserDashboard({
                             )}
                           </div>
 
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-slate-500">
                             Created{" "}
                             {new Date(project.createdAt).toLocaleDateString()}
                           </div>
@@ -1481,7 +1501,7 @@ export function UserDashboard({
                       <h3 className="text-lg font-medium text-white mb-2">
                         No {currentTab === "assigned" ? "assigned" : "finished"} projects found
                       </h3>
-                      <p className="text-gray-600">
+                      <p className="text-slate-400">
                         {searchTerm
                           ? "No projects match your search."
                           : currentTab === "assigned"
@@ -1500,7 +1520,7 @@ export function UserDashboard({
                     <h2 className="text-xl font-semibold text-white">Project Reports</h2>
                     <button
                       onClick={fetchReports}
-                      className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-white flex items-center gap-2 transition-colors"
+                      className="px-4 py-2 text-sm font-semibold text-slate-300 hover:text-white flex items-center gap-2 transition-colors"
                     >
                       <RefreshCw className="h-4 w-4" />
                       Refresh
@@ -1508,12 +1528,12 @@ export function UserDashboard({
                   </div>
 
                   {reportsLoading ? (
-                    <div className="text-center py-12 text-gray-500">Loading reports...</div>
+                    <div className="text-center py-12 text-slate-500">Loading reports...</div>
                   ) : reports.length === 0 ? (
-                    <div className="text-center py-12 bg-gray-50 rounded-lg">
+                    <div className="text-center py-12 bg-[#050b14] rounded-lg">
                       <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                       <h3 className="text-lg font-medium text-white mb-2">No reports available</h3>
-                      <p className="text-gray-600">
+                      <p className="text-slate-400">
                         Reports for your assigned projects will appear here once they are generated.
                       </p>
                     </div>
@@ -1548,8 +1568,8 @@ export function UserDashboard({
                                 }}
                               >
                                 <h3 className="font-medium text-white mb-1">{report.title}</h3>
-                                <p className="text-sm text-gray-600 mb-2">{projectTitle}</p>
-                                <div className="flex items-center gap-4 text-xs text-gray-500">
+                                <p className="text-sm text-slate-400 mb-2">{projectTitle}</p>
+                                <div className="flex items-center gap-4 text-xs text-slate-500">
                                   <span>Created by: {generatedBy}</span>
                                   <span>•</span>
                                   <span>{generatedAt}</span>
@@ -1613,7 +1633,7 @@ export function UserDashboard({
                                   <span
                                     className={`px-2 py-1 text-xs font-medium rounded ${report.status === 'final'
                                       ? 'bg-green-100 text-green-800'
-                                      : 'bg-gray-100 text-gray-800'
+                                      : 'bg-[#0f172a] text-gray-200'
                                       }`}
                                   >
                                     {report.status === 'final' ? 'Final' : 'Archived'}
@@ -1741,13 +1761,13 @@ export function UserDashboard({
             <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold text-white">{selectedReport.title}</h2>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-slate-500 mt-1">
                   {selectedReport.projectId?.title} • {new Date(selectedReport.generatedAt || selectedReport.createdAt).toLocaleString('en-US')}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedReport(null)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-slate-400"
               >
                 <X className="h-6 w-6" />
               </button>
@@ -1757,15 +1777,15 @@ export function UserDashboard({
               {/* Report Summary Section */}
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
                 <h3 className="text-sm font-bold text-blue-900 uppercase mb-2">Report Summary (PDF Preview)</h3>
-                <div className="prose max-w-none text-gray-800 whitespace-pre-wrap text-sm">
+                <div className="prose max-w-none text-gray-200 whitespace-pre-wrap text-sm">
                   {(selectedReport as any).summary || "No summary available for this report."}
                 </div>
               </div>
 
               {/* Expert Comments Section */}
               <div>
-                <h3 className="text-sm font-bold text-gray-700 uppercase mb-2">Expert Review Comments</h3>
-                <div className="prose max-w-none whitespace-pre-wrap text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                <h3 className="text-sm font-bold text-slate-300 uppercase mb-2">Expert Review Comments</h3>
+                <div className="prose max-w-none whitespace-pre-wrap text-slate-400 bg-[#050b14] p-4 rounded-lg border border-white/5">
                   {(() => {
                     const comments = (selectedReport as any)?.expertComments;
                     if (Array.isArray(comments) && comments.length > 0) {
@@ -1808,7 +1828,7 @@ export function UserDashboard({
               </div>
               <button
                 onClick={() => setSelectedReport(null)}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                className="px-4 py-2 bg-gray-200 text-slate-300 rounded-lg hover:bg-gray-300"
               >
                 Close
               </button>

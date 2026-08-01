@@ -37,7 +37,7 @@ export function EthicalTensionSelector({
 
   return (
     <div>
-      <label className="block text-sm mb-2 text-gray-700 flex items-center">
+      <label className="block text-sm mb-2 text-slate-300 flex items-center">
         <GitBranch className="h-4 w-4 mr-2" />
         Ethical Tension
       </label>
@@ -51,13 +51,13 @@ export function EthicalTensionSelector({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Principle 1 Dropdown */}
         <div>
-          <label className="block text-sm mb-2 text-gray-700">
+          <label className="block text-sm mb-2 text-slate-300">
             Select Ethical Principle 1 *
           </label>
           <select
             value={principle1 || ''}
             onChange={(e) => onPrinciple1Change(e.target.value as EthicalPrinciple || undefined)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+            className="w-full px-4 py-3 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
             required
           >
             <option value="">Select a principle...</option>
@@ -75,13 +75,13 @@ export function EthicalTensionSelector({
 
         {/* Principle 2 Dropdown */}
         <div>
-          <label className="block text-sm mb-2 text-gray-700">
+          <label className="block text-sm mb-2 text-slate-300">
             Select Ethical Principle 2 *
           </label>
           <select
             value={principle2 || ''}
             onChange={(e) => onPrinciple2Change(e.target.value as EthicalPrinciple || undefined)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+            className="w-full px-4 py-3 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
             required
           >
             <option value="">Select a principle...</option>

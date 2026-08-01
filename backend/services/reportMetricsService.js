@@ -264,6 +264,10 @@ async function buildPrincipleScores(projectId, questionnaireKey = null, injected
         return sum;
       }, 0);
 
+      // Calculate normalized average risk (0-4)
+      const averageRisk = totalAnswers > 0 ? (roundedSum / totalAnswers) : 0;
+      const roundedAverageRisk = Math.round(averageRisk * 100) / 100;
+
       // Values are RISK scores (Cumulative Unbounded)
       result[principle] = {
         risk: roundedSum, // The aggregated risk IS the cumulative sum
@@ -276,8 +280,10 @@ async function buildPrincipleScores(projectId, questionnaireKey = null, injected
         // NEW: Total Answer Count (Sum of 'n' from all scores)
         totalAnswers: totalAnswers,
 
-        // Legacy 'avg' field -> map to SUM for safety
-        avg: roundedSum,
+        // Calculate actual normalized average per question
+        averageRisk: roundedAverageRisk,
+        // Legacy 'avg' field -> map to normalized average for safety (0-4 bounds)
+        avg: roundedAverageRisk,
 
         // NEW Importance Fields
         avgImportance: Math.round(finalAvgImportance * 100) / 100,

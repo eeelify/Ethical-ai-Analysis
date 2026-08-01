@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { ArrowLeft, CheckCircle, Sparkles, Loader2 } from "lucide-react";
+import { ArrowLeft, CheckCircle, Loader2, MessageSquare } from "lucide-react";
 import { api } from "../api";
 import { User } from "../types";
 import { UnifiedReportViewer } from "./UnifiedReportViewer";
+import { ReportAIChatPanel } from "./ReportAIChatPanel";
 
 export function AdminReportReview({
   projectId,
@@ -15,47 +16,13 @@ export function AdminReportReview({
   onBack: () => void;
   onViewReport?: (reportId: string) => void;
 }) {
-  const [messages, setMessages] = useState<{ role: 'user' | 'model'; content: string }[]>([]);
-  const [chatInput, setChatInput] = useState("");
-  const [chatting, setChatting] = useState(false);
   const [adminComment, setAdminComment] = useState("");
   const [approving, setApproving] = useState(false);
   const [approved, setApproved] = useState(false);
 
+  // Chat state
+  const [chatOpen, setChatOpen] = useState(false);
   const userId = currentUser.id || (currentUser as any)._id;
-
-  const handleSendMessage = async () => {
-    if (!chatInput.trim() || chatting) return;
-
-    const userMessage = { role: 'user' as const, content: chatInput.trim() };
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
-    setChatInput("");
-    setChatting(true);
-
-    try {
-      const res = await fetch(api(`/api/projects/${projectId}/admin-reports/chat-with-ai`), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-id": userId,
-        },
-        body: JSON.stringify({ messages: newMessages }),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        setMessages([...newMessages, { role: 'model', content: json.response }]);
-      } else {
-        const errText = await res.text();
-        console.error("Backend Error 500 details:", errText);
-        alert(`AI chat failed: ${errText}`);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setChatting(false);
-    }
-  };
 
   const handleApprove = async () => {
     setApproving(true);
@@ -81,23 +48,38 @@ export function AdminReportReview({
   };
 
   return (
-    <div className="min-h-screen bg-[#050b14] text-gray-200 p-6">
-      <div className="max-w-7xl mx-auto">
-
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={onBack}
-              className="p-2 hover:bg-gray-800 rounded-full transition-colors text-gray-400 hover:text-white"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <div>
-              <h1 className="text-2xl font-bold text-white">Review Reports</h1>
-              <p className="text-gray-400 text-sm mt-1">Admin report review and approval panel</p>
-            </div>
+    <div className="min-h-screen bg-[#050b14] text-gray-200 p-6 flex flex-col h-screen overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8 shrink-0">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={onBack}
+            className="p-2 hover:bg-gray-800 rounded-full transition-colors text-gray-400 hover:text-white"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div>
+            <h1 className="text-2xl font-bold text-white">Review Reports</h1>
+            <p className="text-gray-400 text-sm mt-1">Admin report review and approval panel</p>
           </div>
+        </div>
+        <div className="flex items-center gap-4">
+          {!chatOpen && (
+            <button
+              onClick={() => setChatOpen(true)}
+              className="group relative flex items-center gap-3 px-6 py-3 rounded-xl overflow-hidden transition-all duration-300 shadow-[0_0_20px_rgba(8,145,178,0.3)] hover:shadow-[0_0_30px_rgba(8,145,178,0.5)] hover:-translate-y-0.5 bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-400/30"
+            >
+              <div className="absolute inset-0 bg-[#0b1221]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <MessageSquare className="w-5 h-5 text-white relative z-10" />
+              <span className="text-base font-bold text-white relative z-10 tracking-wide">Ask AI Assistant</span>
+              
+              {/* Optional animated ping effect for extra visibility */}
+              <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
+              </span>
+            </button>
+          )}
           {approved && (
             <div className="flex items-center gap-2 text-emerald-400 bg-emerald-400/10 px-4 py-2 rounded-lg border border-emerald-400/20">
               <CheckCircle className="w-5 h-5" />
@@ -105,73 +87,18 @@ export function AdminReportReview({
             </div>
           )}
         </div>
+      </div>
 
-        {/* Reports — reuse exact same component as ProjectDetail reports tab */}
-        <UnifiedReportViewer
-          projectId={projectId}
-          userId={userId}
-          currentUserRole="admin"
-          onViewExpertReport={onViewReport}
-        />
-
-        {/* Gemini Chat */}
-        <div className="mt-8 bg-gradient-to-br from-blue-900/10 to-purple-900/10 border border-blue-500/20 rounded-xl p-6 flex flex-col h-[480px]">
-          <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
-            <Sparkles className="w-5 h-5 text-blue-400" />
-            Discuss Reports with Gemini
-          </h2>
-
-          {/* Chat messages */}
-          <div className="flex-1 bg-[#050b14]/50 border border-gray-800 rounded-lg p-4 overflow-y-auto mb-4 flex flex-col gap-4">
-            {messages.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-gray-500 gap-3">
-                <Sparkles className="w-8 h-8 opacity-20" />
-                <p className="text-sm text-center max-w-md">
-                  Ask Gemini anything about both reports. For example: "What are the main contradictions between the expert and ontology reports?" or "Summarize the critical risks."
-                </p>
-              </div>
-            ) : (
-              messages.map((msg, idx) => (
-                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] p-3 rounded-lg text-sm leading-relaxed ${
-                    msg.role === 'user'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-800 text-gray-200 border border-gray-700'
-                  }`}>
-                    {msg.content}
-                  </div>
-                </div>
-              ))
-            )}
-            {chatting && (
-              <div className="flex justify-start">
-                <div className="max-w-[80%] p-3 rounded-lg text-sm bg-gray-800 text-gray-400 border border-gray-700 flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" /> Gemini is thinking...
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Chat input */}
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder="Ask a question about the reports..."
-              className="flex-1 bg-[#121b2f] border border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-200 focus:outline-none focus:border-blue-500"
-              disabled={chatting}
-            />
-            <button
-              onClick={handleSendMessage}
-              disabled={chatting || !chatInput.trim()}
-              className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            >
-              Send
-            </button>
-          </div>
-        </div>
+      <div className="flex-1 flex gap-6 overflow-hidden">
+        {/* Main Content Area */}
+        <div className={`flex-1 overflow-y-auto pb-12 pr-2 custom-scrollbar transition-all duration-300 ${chatOpen ? 'mr-[450px]' : ''}`}>
+          {/* Reports — reuse exact same component as ProjectDetail reports tab */}
+          <UnifiedReportViewer
+            projectId={projectId}
+            userId={userId}
+            currentUserRole="admin"
+            onViewExpertReport={onViewReport}
+          />
 
         {/* Admin Approve Section */}
         <div className="mt-6 bg-[#0b1221] border border-gray-800 rounded-xl p-6 shadow-lg">
@@ -193,7 +120,15 @@ export function AdminReportReview({
             </button>
           </div>
         </div>
+        </div>
 
+        {/* Chat Panel Sidebar */}
+        <ReportAIChatPanel
+          projectId={projectId}
+          userId={userId}
+          isOpen={chatOpen}
+          onClose={() => setChatOpen(false)}
+        />
       </div>
     </div>
   );

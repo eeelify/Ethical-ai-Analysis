@@ -133,7 +133,7 @@ const severityClass = (severity = "") => {
   if (value.includes("high")) return "bg-orange-50 text-orange-700 border-orange-200";
   if (value.includes("medium")) return "bg-yellow-50 text-yellow-800 border-yellow-200";
   if (value.includes("low")) return "bg-blue-50 text-blue-700 border-blue-200";
-  return "bg-gray-50 text-gray-700 border-gray-200";
+  return "bg-[#050b14] text-slate-300 border-white/10";
 };
 
 const riskClass = (risk = "") => {
@@ -142,7 +142,7 @@ const riskClass = (risk = "") => {
   if (value.includes("high")) return "bg-orange-100 text-orange-800 border-orange-200";
   if (value.includes("limited") || value.includes("medium")) return "bg-yellow-100 text-yellow-800 border-yellow-200";
   if (value.includes("minimal") || value.includes("low")) return "bg-blue-100 text-blue-800 border-blue-200";
-  return "bg-gray-100 text-gray-700 border-gray-200";
+  return "bg-[#0f172a] text-slate-300 border-white/10";
 };
 
 const buildTraceGraph = (steps: TraceStep[] = []) => {
@@ -235,10 +235,10 @@ function Chip({ children, className = "" }: { children: React.ReactNode; classNa
 
 function EmptyState({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center">
+    <div className="rounded-xl border border-dashed border-white/20 bg-[#0b1221] p-8 text-center">
       <Sparkles className="mx-auto mb-3 h-8 w-8 text-gray-300" />
-      <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
-      <p className="mt-1 text-sm text-gray-500">{description}</p>
+      <h3 className="text-sm font-semibold text-white">{title}</h3>
+      <p className="mt-1 text-sm text-slate-500">{description}</p>
     </div>
   );
 }
@@ -256,20 +256,20 @@ function KnowledgeTraceGraph({ traceSteps }: { traceSteps: TraceStep[] }) {
   const legendItems = Object.values(TRACE_STEP_META).sort((a, b) => a.level - b.level);
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5">
+    <div className="rounded-xl border border-white/10 bg-[#0b1221] p-5">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h3 className="flex items-center text-base font-semibold text-gray-900">
+          <h3 className="flex items-center text-base font-semibold text-white">
             <Network className="mr-2 h-5 w-5 text-indigo-600" />
             Knowledge-Based Reasoning Graph
           </h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-slate-500">
             Trace steps are grouped as ontology nodes and linked by the inferred reasoning path.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           {legendItems.map((item) => (
-            <span key={item.label} className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs text-gray-700">
+            <span key={item.label} className="inline-flex items-center rounded-full border border-white/10 bg-[#050b14] px-2.5 py-1 text-xs text-slate-300">
               <span className="mr-1.5 h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
               {item.label}
             </span>
@@ -277,7 +277,7 @@ function KnowledgeTraceGraph({ traceSteps }: { traceSteps: TraceStep[] }) {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-slate-50">
+      <div className="overflow-x-auto rounded-xl border border-white/10 bg-slate-50">
         <svg
           width={graph.width}
           height={graph.height}
@@ -328,13 +328,13 @@ function KnowledgeTraceGraph({ traceSteps }: { traceSteps: TraceStep[] }) {
             <g key={node.id}>
               <foreignObject x={node.x} y={node.y} width={GRAPH_NODE_WIDTH} height={GRAPH_NODE_HEIGHT}>
                 <div
-                  className="flex h-full flex-col justify-center rounded-xl border bg-white px-3 shadow-sm"
+                  className="flex h-full flex-col justify-center rounded-xl border bg-[#0b1221] px-3 shadow-[0_0_15px_rgba(0,0,0,0.5)]"
                   style={{ borderColor: node.color, backgroundColor: node.bg }}
                 >
                   <div className="truncate text-[10px] font-bold uppercase tracking-wide" style={{ color: node.color }}>
                     {node.label}
                   </div>
-                  <div className="mt-1 line-clamp-2 text-sm font-semibold leading-tight text-gray-900" title={node.value}>
+                  <div className="mt-1 line-clamp-2 text-sm font-semibold leading-tight text-white" title={node.value}>
                     {node.value}
                   </div>
                 </div>
@@ -353,7 +353,7 @@ function ReportValue({ value, depth = 0 }: { value: unknown; depth?: number }) {
   }
 
   if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-    return <div className="whitespace-pre-wrap leading-relaxed text-gray-700">{String(value)}</div>;
+    return <div className="whitespace-pre-wrap leading-relaxed text-slate-300">{String(value)}</div>;
   }
 
   if (Array.isArray(value)) {
@@ -361,7 +361,7 @@ function ReportValue({ value, depth = 0 }: { value: unknown; depth?: number }) {
     return (
       <ul className="space-y-2">
         {value.map((item, index) => (
-          <li key={index} className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm">
+          <li key={index} className="rounded-lg border border-white/10 bg-[#050b14] p-3 text-sm">
             <ReportValue value={item} depth={depth + 1} />
           </li>
         ))}
@@ -376,8 +376,8 @@ function ReportValue({ value, depth = 0 }: { value: unknown; depth?: number }) {
     return (
       <div className="space-y-3">
         {entries.map(([key, item]) => (
-          <section key={key} className={depth === 0 ? "rounded-xl border border-gray-200 bg-white p-4" : ""}>
-            <h4 className="mb-2 text-sm font-semibold capitalize text-gray-900">{normalizeLabel(key)}</h4>
+          <section key={key} className={depth === 0 ? "rounded-xl border border-white/10 bg-[#0b1221] p-4" : ""}>
+            <h4 className="mb-2 text-sm font-semibold capitalize text-white">{normalizeLabel(key)}</h4>
             <ReportValue value={item} depth={depth + 1} />
           </section>
         ))}
@@ -385,7 +385,7 @@ function ReportValue({ value, depth = 0 }: { value: unknown; depth?: number }) {
     );
   }
 
-  return <pre className="text-xs text-gray-600">{JSON.stringify(value, null, 2)}</pre>;
+  return <pre className="text-xs text-slate-400">{JSON.stringify(value, null, 2)}</pre>;
 }
 
 export function OntologyAssessment({ currentUser, onBack }: OntologyAssessmentProps) {
@@ -409,7 +409,7 @@ export function OntologyAssessment({ currentUser, onBack }: OntologyAssessmentPr
   }, [analysis, matchedKeywords]);
 
   const serviceBadge = {
-    checking: "bg-gray-100 text-gray-700 border-gray-200",
+    checking: "bg-[#0f172a] text-slate-300 border-white/10",
     online: "bg-green-100 text-green-800 border-green-200",
     offline: "bg-red-100 text-red-800 border-red-200",
     disabled: "bg-yellow-100 text-yellow-800 border-yellow-200",
@@ -512,7 +512,7 @@ export function OntologyAssessment({ currentUser, onBack }: OntologyAssessmentPr
     <button
       onClick={() => setActiveTab(tab)}
       className={`inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-        activeTab === tab ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-gray-100"
+        activeTab === tab ? "bg-blue-600 text-white" : "bg-[#0b1221] text-slate-300 hover:bg-[#0f172a]"
       }`}
     >
       <Icon className="mr-2 h-4 w-4" />
@@ -521,20 +521,20 @@ export function OntologyAssessment({ currentUser, onBack }: OntologyAssessmentPr
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="border-b border-gray-200 bg-white">
+    <div className="min-h-screen bg-[#050b14]">
+      <div className="border-b border-white/10 bg-[#0b1221]">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           <div className="flex items-center gap-4">
             <button
               onClick={onBack}
-              className="inline-flex items-center rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-slate-300 hover:bg-[#050b14]"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
             </button>
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">Ontology Assessment</h1>
-              <p className="text-sm text-gray-500">
+              <h1 className="text-2xl font-semibold text-white">Ontology Assessment</h1>
+              <p className="text-sm text-slate-500">
                 Run a standalone ontology-based assessment outside the normal project workflow.
               </p>
             </div>
@@ -548,7 +548,7 @@ export function OntologyAssessment({ currentUser, onBack }: OntologyAssessmentPr
             <button
               onClick={checkHealth}
               disabled={loading === "health"}
-              className="inline-flex items-center rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+              className="inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-300 hover:bg-[#050b14] disabled:opacity-60"
             >
               {loading === "health" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
               Check
@@ -559,46 +559,46 @@ export function OntologyAssessment({ currentUser, onBack }: OntologyAssessmentPr
 
       <main className="mx-auto max-w-7xl px-6 py-6">
         <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-4">
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Current user</p>
-            <p className="mt-2 text-sm font-semibold text-gray-900">{currentUser.name}</p>
-            <p className="text-xs capitalize text-gray-500">{currentUser.role.replace(/-/g, " ")}</p>
+          <div className="rounded-xl border border-white/10 bg-[#0b1221] p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Current user</p>
+            <p className="mt-2 text-sm font-semibold text-white">{currentUser.name}</p>
+            <p className="text-xs capitalize text-slate-500">{currentUser.role.replace(/-/g, " ")}</p>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Final risk</p>
-            <p className="mt-2 text-sm font-semibold text-gray-900">{analysis?.final_risk_level || "Not analyzed"}</p>
-            <p className="text-xs text-gray-500">Ontology classification</p>
+          <div className="rounded-xl border border-white/10 bg-[#0b1221] p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Final risk</p>
+            <p className="mt-2 text-sm font-semibold text-white">{analysis?.final_risk_level || "Not analyzed"}</p>
+            <p className="text-xs text-slate-500">Ontology classification</p>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Composite score</p>
-            <p className="mt-2 text-sm font-semibold text-gray-900">
+          <div className="rounded-xl border border-white/10 bg-[#0b1221] p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Composite score</p>
+            <p className="mt-2 text-sm font-semibold text-white">
               {typeof analysis?.composite_score === "number" ? analysis.composite_score.toFixed(2) : "Not available"}
             </p>
-            <p className="text-xs text-gray-500">Deterministic scoring</p>
+            <p className="text-xs text-slate-500">Deterministic scoring</p>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Trace steps</p>
-            <p className="mt-2 text-sm font-semibold text-gray-900">{trace?.trace?.length || 0}</p>
-            <p className="text-xs text-gray-500">Explainability chain</p>
+          <div className="rounded-xl border border-white/10 bg-[#0b1221] p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Trace steps</p>
+            <p className="mt-2 text-sm font-semibold text-white">{trace?.trace?.length || 0}</p>
+            <p className="text-xs text-slate-500">Explainability chain</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[390px,1fr]">
           <aside className="space-y-4">
-            <div className="rounded-xl border border-gray-200 bg-white p-5">
-              <label className="block text-sm font-medium text-gray-700">System name</label>
+            <div className="rounded-xl border border-white/10 bg-[#0b1221] p-5">
+              <label className="block text-sm font-medium text-slate-300">System name</label>
               <input
                 value={systemName}
                 onChange={(event) => setSystemName(event.target.value)}
-                className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="mt-2 w-full rounded-lg border border-white/20 px-3 py-2 text-sm text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 placeholder="Example: Student Risk Predictor"
               />
 
-              <label className="mt-4 block text-sm font-medium text-gray-700">AI system description</label>
+              <label className="mt-4 block text-sm font-medium text-slate-300">AI system description</label>
               <textarea
                 value={text}
                 onChange={(event) => setText(event.target.value)}
-                className="mt-2 h-56 w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm leading-6 text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="mt-2 h-56 w-full resize-none rounded-lg border border-white/20 px-3 py-2 text-sm leading-6 text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 placeholder="Describe inputs, purpose, users, automation level, affected people, and safeguards."
               />
 
@@ -620,7 +620,7 @@ export function OntologyAssessment({ currentUser, onBack }: OntologyAssessmentPr
                 <button
                   onClick={runTrace}
                   disabled={loading !== null}
-                  className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 disabled:opacity-60"
+                  className="inline-flex items-center justify-center rounded-lg border border-white/20 bg-[#0b1221] px-4 py-2.5 text-sm font-medium text-gray-200 hover:bg-[#050b14] disabled:opacity-60"
                 >
                   {loading === "trace" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GitBranch className="mr-2 h-4 w-4" />}
                   Explain Reasoning
@@ -655,52 +655,52 @@ export function OntologyAssessment({ currentUser, onBack }: OntologyAssessmentPr
                 ) : (
                   <>
                     <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-                      <div className="rounded-xl border border-gray-200 bg-white p-5">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                      <div className="rounded-xl border border-white/10 bg-[#0b1221] p-5">
+                        <div className="flex items-center gap-2 text-sm font-semibold text-white">
                           <ShieldAlert className="h-4 w-4 text-red-500" />
                           Risk Classification
                         </div>
                         <div className="mt-3 flex flex-wrap gap-2">
                           {inferredRisks.length > 0 ? inferredRisks.map((risk) => (
                             <Chip key={risk} className={riskClass(risk)}>{risk}</Chip>
-                          )) : <span className="text-sm text-gray-500">No risk inferred</span>}
+                          )) : <span className="text-sm text-slate-500">No risk inferred</span>}
                         </div>
                       </div>
 
-                      <div className="rounded-xl border border-gray-200 bg-white p-5">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                      <div className="rounded-xl border border-white/10 bg-[#0b1221] p-5">
+                        <div className="flex items-center gap-2 text-sm font-semibold text-white">
                           <Activity className="h-4 w-4 text-purple-500" />
                           Categories
                         </div>
                         <div className="mt-3 flex flex-wrap gap-2">
                           {(analysis.inferred_categories || []).length > 0 ? analysis.inferred_categories?.map((category) => (
                             <Chip key={category} className="bg-purple-50 text-purple-700 border-purple-200">{category}</Chip>
-                          )) : <span className="text-sm text-gray-500">No category inferred</span>}
+                          )) : <span className="text-sm text-slate-500">No category inferred</span>}
                         </div>
                       </div>
 
-                      <div className="rounded-xl border border-gray-200 bg-white p-5">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                      <div className="rounded-xl border border-white/10 bg-[#0b1221] p-5">
+                        <div className="flex items-center gap-2 text-sm font-semibold text-white">
                           <BookOpen className="h-4 w-4 text-blue-500" />
                           Regulations
                         </div>
                         <div className="mt-3 flex flex-wrap gap-2">
                           {(analysis.inferred_regulations || []).length > 0 ? analysis.inferred_regulations?.map((regulation) => (
                             <Chip key={regulation} className="bg-blue-50 text-blue-700 border-blue-200">{regulation}</Chip>
-                          )) : <span className="text-sm text-gray-500">No regulation inferred</span>}
+                          )) : <span className="text-sm text-slate-500">No regulation inferred</span>}
                         </div>
                       </div>
                     </div>
 
-                    <div className="rounded-xl border border-gray-200 bg-white p-5">
-                      <h3 className="mb-4 text-base font-semibold text-gray-900">Matched Keywords</h3>
+                    <div className="rounded-xl border border-white/10 bg-[#0b1221] p-5">
+                      <h3 className="mb-4 text-base font-semibold text-white">Matched Keywords</h3>
                       {matchedKeywords.length === 0 ? (
-                        <p className="text-sm text-gray-500">No keyword matches returned.</p>
+                        <p className="text-sm text-slate-500">No keyword matches returned.</p>
                       ) : (
                         <div className="overflow-x-auto">
                           <table className="min-w-full divide-y divide-gray-200 text-sm">
                             <thead>
-                              <tr className="text-left text-xs uppercase tracking-wide text-gray-500">
+                              <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
                                 <th className="py-2 pr-4">Keyword</th>
                                 <th className="py-2 pr-4">Category</th>
                                 <th className="py-2 pr-4">Risks</th>
@@ -710,10 +710,10 @@ export function OntologyAssessment({ currentUser, onBack }: OntologyAssessmentPr
                             <tbody className="divide-y divide-gray-100">
                               {matchedKeywords.map((match, index) => (
                                 <tr key={`${match.keyword}-${index}`}>
-                                  <td className="py-3 pr-4 font-medium text-gray-900">{match.keyword}</td>
-                                  <td className="py-3 pr-4 text-gray-700">{match.mapped_category}</td>
-                                  <td className="py-3 pr-4 text-gray-600">{(match.risks || []).join(", ") || "-"}</td>
-                                  <td className="py-3 pr-4 text-gray-600">{(match.regulations || []).join(", ") || "-"}</td>
+                                  <td className="py-3 pr-4 font-medium text-white">{match.keyword}</td>
+                                  <td className="py-3 pr-4 text-slate-300">{match.mapped_category}</td>
+                                  <td className="py-3 pr-4 text-slate-400">{(match.risks || []).join(", ") || "-"}</td>
+                                  <td className="py-3 pr-4 text-slate-400">{(match.regulations || []).join(", ") || "-"}</td>
                                 </tr>
                               ))}
                             </tbody>
@@ -723,23 +723,23 @@ export function OntologyAssessment({ currentUser, onBack }: OntologyAssessmentPr
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                      <div className="rounded-xl border border-gray-200 bg-white p-5">
-                        <h3 className="mb-4 flex items-center text-base font-semibold text-gray-900">
+                      <div className="rounded-xl border border-white/10 bg-[#0b1221] p-5">
+                        <h3 className="mb-4 flex items-center text-base font-semibold text-white">
                           <AlertTriangle className="mr-2 h-5 w-5 text-orange-500" />
                           Ethical Impacts
                         </h3>
                         {(analysis.ethical_analysis || []).length === 0 ? (
-                          <p className="text-sm text-gray-500">No ethical impacts returned.</p>
+                          <p className="text-sm text-slate-500">No ethical impacts returned.</p>
                         ) : (
                           <div className="space-y-3">
                             {analysis.ethical_analysis?.map((item, index) => (
-                              <div key={`${item.principle}-${index}`} className="rounded-lg border border-gray-200 p-4">
+                              <div key={`${item.principle}-${index}`} className="rounded-lg border border-white/10 p-4">
                                 <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                                  <h4 className="font-semibold text-gray-900">{item.principle}</h4>
+                                  <h4 className="font-semibold text-white">{item.principle}</h4>
                                   <Chip className={severityClass(item.severity)}>{item.severity || "Unrated"}</Chip>
                                 </div>
-                                <p className="text-sm text-gray-600">{item.reason}</p>
-                                <p className="mt-2 text-sm text-gray-600">{item.impact}</p>
+                                <p className="text-sm text-slate-400">{item.reason}</p>
+                                <p className="mt-2 text-sm text-slate-400">{item.impact}</p>
                                 {item.harm_type && <p className="mt-2 text-xs font-medium text-orange-700">Harm: {item.harm_type}</p>}
                               </div>
                             ))}
@@ -747,45 +747,45 @@ export function OntologyAssessment({ currentUser, onBack }: OntologyAssessmentPr
                         )}
                       </div>
 
-                      <div className="rounded-xl border border-gray-200 bg-white p-5">
-                        <h3 className="mb-4 flex items-center text-base font-semibold text-gray-900">
+                      <div className="rounded-xl border border-white/10 bg-[#0b1221] p-5">
+                        <h3 className="mb-4 flex items-center text-base font-semibold text-white">
                           <ShieldAlert className="mr-2 h-5 w-5 text-red-500" />
                           Tensions and Safeguards
                         </h3>
                         <div className="space-y-4">
                           <div>
-                            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Detected safeguards</p>
+                            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Detected safeguards</p>
                             <div className="flex flex-wrap gap-2">
                               {(analysis.detected_safeguards || []).length > 0 ? analysis.detected_safeguards?.map((item) => (
                                 <Chip key={item} className="bg-green-50 text-green-700 border-green-200">
                                   <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
                                   {item}
                                 </Chip>
-                              )) : <span className="text-sm text-gray-500">No safeguards detected</span>}
+                              )) : <span className="text-sm text-slate-500">No safeguards detected</span>}
                             </div>
                           </div>
                           <div>
-                            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Missing safeguards</p>
+                            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Missing safeguards</p>
                             <div className="flex flex-wrap gap-2">
                               {(analysis.missing_safeguards || []).length > 0 ? analysis.missing_safeguards?.map((item) => (
                                 <Chip key={item} className="bg-red-50 text-red-700 border-red-200">{item}</Chip>
-                              )) : <span className="text-sm text-gray-500">No missing safeguards returned</span>}
+                              )) : <span className="text-sm text-slate-500">No missing safeguards returned</span>}
                             </div>
                           </div>
                           <div>
-                            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Ethical tensions</p>
+                            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Ethical tensions</p>
                             {(analysis.ethical_tensions || []).length > 0 ? (
                               <div className="space-y-2">
                                 {analysis.ethical_tensions?.map((tension, index) => (
-                                  <div key={`${tension.name}-${index}`} className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm">
-                                    <div className="font-semibold text-gray-900">{tension.name}</div>
-                                    {tension.description && <div className="mt-1 text-gray-600">{tension.description}</div>}
+                                  <div key={`${tension.name}-${index}`} className="rounded-lg border border-white/10 bg-[#050b14] p-3 text-sm">
+                                    <div className="font-semibold text-white">{tension.name}</div>
+                                    {tension.description && <div className="mt-1 text-slate-400">{tension.description}</div>}
                                     {tension.recommendation && <div className="mt-2 text-xs text-blue-700">{tension.recommendation}</div>}
                                   </div>
                                 ))}
                               </div>
                             ) : (
-                              <span className="text-sm text-gray-500">No tensions returned</span>
+                              <span className="text-sm text-slate-500">No tensions returned</span>
                             )}
                           </div>
                         </div>
@@ -803,17 +803,17 @@ export function OntologyAssessment({ currentUser, onBack }: OntologyAssessmentPr
                 ) : (
                   <>
                     <KnowledgeTraceGraph traceSteps={trace.trace} />
-                    <div className="rounded-xl border border-gray-200 bg-white p-5">
-                      <h3 className="mb-4 text-base font-semibold text-gray-900">Reasoning Timeline</h3>
+                    <div className="rounded-xl border border-white/10 bg-[#0b1221] p-5">
+                      <h3 className="mb-4 text-base font-semibold text-white">Reasoning Timeline</h3>
                       <div className="space-y-3">
                         {trace.trace.map((step, index) => (
-                          <div key={`${step.step}-${step.value}-${index}`} className="flex gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+                          <div key={`${step.step}-${step.value}-${index}`} className="flex gap-3 rounded-lg border border-white/10 bg-[#050b14] p-4">
                             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
                               {index + 1}
                             </div>
                             <div>
-                              <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">{normalizeLabel(step.step)}</div>
-                              <div className="mt-1 text-sm font-medium text-gray-900">{step.value}</div>
+                              <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{normalizeLabel(step.step)}</div>
+                              <div className="mt-1 text-sm font-medium text-white">{step.value}</div>
                             </div>
                           </div>
                         ))}
@@ -830,14 +830,14 @@ export function OntologyAssessment({ currentUser, onBack }: OntologyAssessmentPr
                   <EmptyState title="No ontology report yet" description="Run Generate Report to create a GraphRAG-backed report." />
                 ) : (
                   <>
-                    <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-5">
+                    <div className="flex items-center justify-between rounded-xl border border-white/10 bg-[#0b1221] p-5">
                       <div>
-                        <h3 className="text-base font-semibold text-gray-900">Generated Ontology Report</h3>
-                        <p className="text-sm text-gray-500">System: {report.system || systemName || "Standalone AI System"}</p>
+                        <h3 className="text-base font-semibold text-white">Generated Ontology Report</h3>
+                        <p className="text-sm text-slate-500">System: {report.system || systemName || "Standalone AI System"}</p>
                       </div>
                       <button
                         onClick={downloadReportJson}
-                        className="inline-flex items-center rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        className="inline-flex items-center rounded-lg border border-white/20 px-3 py-2 text-sm font-medium text-slate-300 hover:bg-[#050b14]"
                       >
                         <FileText className="mr-2 h-4 w-4" />
                         Download JSON

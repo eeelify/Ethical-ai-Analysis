@@ -9,7 +9,7 @@ interface OntologyReportViewerProps {
 export function OntologyReportViewer({ report, onBack }: OntologyReportViewerProps) {
   if (!report) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#050b14] flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">No report data found.</p>
           <button onClick={onBack} className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
@@ -55,22 +55,22 @@ export function OntologyReportViewer({ report, onBack }: OntologyReportViewerPro
     if (l.includes('high') || l.includes('critical')) return 'bg-red-100 text-red-800 border-red-200';
     if (l.includes('medium')) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
     if (l.includes('low')) return 'bg-green-100 text-green-800 border-green-200';
-    return 'bg-gray-100 text-gray-800 border-gray-200';
+    return 'bg-[#0f172a] text-gray-200 border-white/10';
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-[#050b14] pb-20">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b sticky top-0 z-10">
+      <div className="bg-[#0b1221] shadow-[0_0_15px_rgba(0,0,0,0.5)] border-b sticky top-0 z-10">
         <div className="px-6 py-4 flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center space-x-4">
             <button
               onClick={onBack}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-[#0f172a] rounded-full transition-colors"
             >
-              <ArrowLeft className="h-5 w-5 text-gray-600" />
+              <ArrowLeft className="h-5 w-5 text-slate-400" />
             </button>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+            <h1 className="text-2xl font-bold text-white flex items-center">
               <BrainCircuit className="h-6 w-6 mr-2 text-indigo-600" />
               Ontology-Based Ethical Report
             </h1>
@@ -85,34 +85,34 @@ export function OntologyReportViewer({ report, onBack }: OntologyReportViewerPro
         
         {/* Risk Scores Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center space-x-4">
+          <div className="bg-[#0b1221] p-6 rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-white/10 flex items-center space-x-4">
             <div className={`p-3 rounded-lg ${getRiskColor(riskLevel)}`}>
               <Target className="h-8 w-8" />
             </div>
             <div>
-              <p className="text-sm text-gray-500 font-medium">Composite Risk Score</p>
+              <p className="text-sm text-slate-500 font-medium">Composite Risk Score</p>
               <div className="flex items-baseline gap-2">
-                <p className="text-3xl font-black text-gray-900">{compositeScore !== null ? compositeScore : 'N/A'}</p>
+                <p className="text-3xl font-black text-white">{compositeScore !== null ? compositeScore : 'N/A'}</p>
                 <p className="text-sm font-semibold text-gray-400">/ 100</p>
               </div>
               <p className="text-xs text-gray-400 mt-1">Higher score = Higher risk</p>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center space-x-4">
+          <div className="bg-[#0b1221] p-6 rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-white/10 flex items-center space-x-4">
             <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
               <Shield className="h-8 w-8" />
             </div>
             <div>
-              <p className="text-sm text-gray-500 font-medium">Final Risk Assessment</p>
-              <p className="text-sm font-medium text-gray-800 mt-1 leading-relaxed">{finalRisk}</p>
+              <p className="text-sm text-slate-500 font-medium">Final Risk Assessment</p>
+              <p className="text-sm font-medium text-gray-200 mt-1 leading-relaxed">{finalRisk}</p>
             </div>
           </div>
         </div>
 
         {/* Dimension Breakdown */}
         {safetyComponents.length > 0 && (
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <div className="bg-[#0b1221] p-6 rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-white/10">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
               <BarChart3 className="h-5 w-5 mr-2 text-blue-500" />
               Dimension Breakdown (Risk Levels)
             </h3>
@@ -126,10 +126,10 @@ export function OntologyReportViewer({ report, onBack }: OntologyReportViewerPro
                 return (
                   <div key={c.name} className="flex flex-col">
                     <div className="flex justify-between text-sm mb-1.5">
-                      <span className="font-medium text-gray-700 capitalize">{c.name} Security</span>
-                      <span className="font-bold text-gray-900">{c.value}/100</span>
+                      <span className="font-medium text-slate-300 capitalize">{c.name} Security</span>
+                      <span className="font-bold text-white">{c.value}/100</span>
                     </div>
-                    <div className="w-full bg-gray-100 rounded-full h-2">
+                    <div className="w-full bg-[#0f172a] rounded-full h-2">
                       <div className={`h-2 rounded-full ${colorClass}`} style={{ width: `${c.value}%` }} />
                     </div>
                     <p className="text-[11px] text-gray-400 mt-1 text-right">Higher = Riskier</p>
@@ -142,8 +142,8 @@ export function OntologyReportViewer({ report, onBack }: OntologyReportViewerPro
 
         {/* Violations & Tensions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <div className="bg-[#0b1221] p-6 rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-white/10">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
               <AlertTriangle className="h-5 w-5 mr-2 text-red-500" />
               Ethical Violations
             </h3>
@@ -162,12 +162,12 @@ export function OntologyReportViewer({ report, onBack }: OntologyReportViewerPro
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-500 italic">No ethical violations detected.</p>
+              <p className="text-slate-500 italic">No ethical violations detected.</p>
             )}
           </div>
           
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <div className="bg-[#0b1221] p-6 rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-white/10">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
               <Scale className="h-5 w-5 mr-2 text-orange-500" />
               Ethical Tensions
             </h3>
@@ -186,48 +186,48 @@ export function OntologyReportViewer({ report, onBack }: OntologyReportViewerPro
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-500 italic">No ethical tensions detected.</p>
+              <p className="text-slate-500 italic">No ethical tensions detected.</p>
             )}
           </div>
         </div>
 
         {/* Regulations */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+        <div className="bg-[#0b1221] p-6 rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-white/10">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
             <ExternalLink className="h-5 w-5 mr-2 text-blue-500" />
             Legal & Policy Regulations
           </h3>
           {regulations.length > 0 ? (
             <ul className="list-disc pl-5 space-y-2">
               {regulations.map((r: any, i: number) => (
-                <li key={i} className="text-gray-700">
+                <li key={i} className="text-slate-300">
                   {typeof r === 'string' ? r : (r.regulation || r.description || r.title || "Regulation")}
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-gray-500 italic">No specific regulations flagged.</p>
+            <p className="text-slate-500 italic">No specific regulations flagged.</p>
           )}
         </div>
 
         {/* Generated Summary */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Ontology-Generated Report</h3>
-          <div className="prose max-w-none text-gray-800 bg-gray-50 p-6 rounded-lg whitespace-pre-wrap font-sans">
+        <div className="bg-[#0b1221] p-6 rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-white/10">
+          <h3 className="text-lg font-semibold text-white mb-4">Ontology-Generated Report</h3>
+          <div className="prose max-w-none text-gray-200 bg-[#050b14] p-6 rounded-lg whitespace-pre-wrap font-sans">
             {generatedReport || "Report summary is empty."}
           </div>
         </div>
 
         {/* Reasoning Trace */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-800 text-gray-300">
+          <div className="bg-gray-900 p-6 rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-gray-800 text-gray-300">
             <h3 className="text-lg font-semibold text-white mb-4">Reasoning Trace (SWRL)</h3>
             <pre className="text-sm overflow-x-auto whitespace-pre-wrap bg-gray-950 p-4 rounded-lg font-mono">
               {reasoning || "No reasoning trace available."}
             </pre>
           </div>
           
-          <div className="bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-800 text-gray-300">
+          <div className="bg-gray-900 p-6 rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-gray-800 text-gray-300">
             <h3 className="text-lg font-semibold text-white mb-4">Ontology Evidence</h3>
             <pre className="text-sm overflow-x-auto whitespace-pre-wrap bg-gray-950 p-4 rounded-lg font-mono">
               {evidence || "No ontology evidence available."}

@@ -25,7 +25,7 @@ export function SeverityDistributionChart({ tensions }: SeverityDistributionChar
 
   if (tensions.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-slate-500">
         <BarChart3 className="h-12 w-12 mx-auto mb-2 text-gray-300" />
         <p className="text-sm">No tensions data available</p>
       </div>
@@ -35,7 +35,7 @@ export function SeverityDistributionChart({ tensions }: SeverityDistributionChar
   return (
     <div>
       <div className="mb-4">
-        <h3 className="text-sm text-gray-700 mb-2 flex items-center">
+        <h3 className="text-sm text-slate-300 mb-2 flex items-center">
           <BarChart3 className="h-4 w-4 mr-2" />
           Tension Severity Distribution
         </h3>
@@ -68,33 +68,33 @@ export function SeverityDistributionChart({ tensions }: SeverityDistributionChar
           <div className="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center">
               <div className="w-3 h-3 rounded-full bg-red-500 mr-2" />
-              <span className="text-sm text-gray-700">High Concern</span>
+              <span className="text-sm text-slate-300">High Concern</span>
             </div>
             <div className="text-right">
-              <div className="text-lg text-gray-900">{distribution.high.count}</div>
-              <div className="text-xs text-gray-600">{distribution.high.percentage}%</div>
+              <div className="text-lg text-white">{distribution.high.count}</div>
+              <div className="text-xs text-slate-400">{distribution.high.percentage}%</div>
             </div>
           </div>
 
           <div className="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
             <div className="flex items-center">
               <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2" />
-              <span className="text-sm text-gray-700">Medium Concern</span>
+              <span className="text-sm text-slate-300">Medium Concern</span>
             </div>
             <div className="text-right">
-              <div className="text-lg text-gray-900">{distribution.medium.count}</div>
-              <div className="text-xs text-gray-600">{distribution.medium.percentage}%</div>
+              <div className="text-lg text-white">{distribution.medium.count}</div>
+              <div className="text-xs text-slate-400">{distribution.medium.percentage}%</div>
             </div>
           </div>
 
           <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
             <div className="flex items-center">
               <div className="w-3 h-3 rounded-full bg-green-500 mr-2" />
-              <span className="text-sm text-gray-700">Low Concern</span>
+              <span className="text-sm text-slate-300">Low Concern</span>
             </div>
             <div className="text-right">
-              <div className="text-lg text-gray-900">{distribution.low.count}</div>
-              <div className="text-xs text-gray-600">{distribution.low.percentage}%</div>
+              <div className="text-lg text-white">{distribution.low.count}</div>
+              <div className="text-xs text-slate-400">{distribution.low.percentage}%</div>
             </div>
           </div>
         </div>

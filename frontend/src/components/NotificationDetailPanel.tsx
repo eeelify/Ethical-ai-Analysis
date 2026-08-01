@@ -152,19 +152,19 @@ export function NotificationDetailPanel({
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="bg-gray-50 border-b border-gray-200 p-4 flex items-center justify-between shrink-0">
+      <div className="bg-[#050b14] border-b border-white/10 p-4 flex items-center justify-between shrink-0">
         <div className="flex items-center space-x-3">
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
           >
-            <ArrowLeft className="h-5 w-5 text-gray-600" />
+            <ArrowLeft className="h-5 w-5 text-slate-400" />
           </button>
           <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center">
             {otherUser.name?.charAt(0) || 'U'}
           </div>
           <div>
-            <div className="font-medium text-gray-900">{otherUser.name}</div>
+            <div className="font-medium text-white">{otherUser.name}</div>
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -177,9 +177,9 @@ export function NotificationDetailPanel({
           </button>
           <button
             onClick={onClose}
-            className="p-2.5 hover:bg-gray-200 rounded-lg transition-colors"
+            className="p-2.5 hover:bg-white/10 rounded-lg transition-colors"
           >
-            <X className="h-6 w-6 text-gray-600" />
+            <X className="h-6 w-6 text-slate-400" />
           </button>
         </div>
       </div>
@@ -187,12 +187,12 @@ export function NotificationDetailPanel({
       {/* Messages */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto bg-gray-50 p-4"
+        className="flex-1 overflow-y-auto bg-[#050b14] p-4"
       >
         {loading && messages.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">Loading messages...</div>
+          <div className="text-center text-slate-500 py-8">Loading messages...</div>
         ) : messages.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">
+          <div className="text-center text-slate-500 py-8">
             <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-2" />
             <p>No messages yet.</p>
           </div>
@@ -202,7 +202,7 @@ export function NotificationDetailPanel({
               <div key={dateGroupIdx}>
                 {/* Date separator */}
                 <div className="text-center my-4">
-                  <span className="bg-gray-200 text-gray-600 text-xs px-3 py-1 rounded-full">
+                  <span className="bg-[#0f172a] border border-white/10 text-slate-400 text-xs px-3 py-1 rounded-full">
                     {formatDate(dateGroup.date)}
                   </span>
                 </div>
@@ -221,7 +221,7 @@ export function NotificationDetailPanel({
                         className={`max-w-[70%] rounded-lg px-4 py-2 ${
                           isFromMe
                             ? 'bg-blue-600 text-white'
-                            : 'bg-white text-gray-900 border border-gray-200'
+                            : 'bg-[#0b1221] text-white border border-white/10'
                         }`}
                       >
                         {!isFromMe && (
@@ -235,7 +235,7 @@ export function NotificationDetailPanel({
                             : msg.text}
                         </div>
                         <div className={`text-xs mt-1 ${
-                          isFromMe ? 'text-blue-100' : 'text-gray-500'
+                          isFromMe ? 'text-blue-100' : 'text-slate-500'
                         }`}>
                           {formatTime(msg.createdAt)}
                         </div>

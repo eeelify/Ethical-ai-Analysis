@@ -203,7 +203,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
       {/* KPI Cards - Expanded grid for 5 cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Card 1: Overall Risk (Normalized Avg) */}
-        <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border">
+        <div className="bg-[#050b14] p-4 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-400">Normalized Avg ERC</p>
@@ -216,7 +216,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
         </div>
 
         {/* Card 2: Cumulative Risk Volume (ADDED) */}
-        <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border">
+        <div className="bg-[#050b14] p-4 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-400">Cumulative Risk Data</p>
@@ -231,7 +231,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
           </div>
         </div>
 
-        <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border">
+        <div className="bg-[#050b14] p-4 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-400">Team Completion</p>
@@ -243,7 +243,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
           </div>
         </div>
 
-        <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border">
+        <div className="bg-[#050b14] p-4 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-400">Evidence Coverage</p>
@@ -255,7 +255,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
           </div>
         </div>
 
-        <div className="bg-[#050b14] p-4 rounded-lg shadow-sm border">
+        <div className="bg-[#050b14] p-4 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-400">Disputed Tensions</p>
@@ -269,7 +269,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
       </div>
 
       {/* Principle Bar Chart */}
-      <div className="bg-[#050b14] p-6 rounded-lg shadow-sm border">
+      <div className="bg-[#050b14] p-6 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border">
         <h3 className="text-lg font-semibold mb-4">Ethical Principles Score Overview</h3>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3">
@@ -325,7 +325,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
       </div>
 
       {/* Role × Principle Heatmap */}
-      <div className="bg-[#050b14] p-6 rounded-lg shadow-sm border">
+      <div className="bg-[#050b14] p-6 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border">
         <h3 className="text-lg font-semibold mb-4">Role × Principle Score Matrix</h3>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
@@ -370,7 +370,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
       </div>
 
       {/* Top Risky Questions */}
-      <div className="bg-[#050b14] p-6 rounded-lg shadow-sm border">
+      <div className="bg-[#050b14] p-6 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border">
         <h3 className="text-lg font-semibold mb-4">Top Risky Questions</h3>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
@@ -424,7 +424,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
       </div>
 
       {/* Tensions Table */}
-      <div className="bg-[#050b14] p-6 rounded-lg shadow-sm border">
+      <div className="bg-[#050b14] p-6 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border">
         <h3 className="text-lg font-semibold mb-4">Ethical Tensions</h3>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
@@ -454,7 +454,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
                     <span className={`px-2 py-1 rounded text-xs font-semibold ${t.reviewState === 'Accepted' ? 'bg-green-100 text-green-800' :
                       t.reviewState === 'Disputed' ? 'bg-red-100 text-red-800' :
                         t.reviewState === 'Under review' ? 'bg-blue-100 text-blue-800' :
-                          'bg-gray-100 text-slate-200'
+                          'bg-[#0f172a] text-slate-200'
                       }`}>
                       {t.reviewState}
                     </span>
@@ -473,7 +473,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
                   <td className="px-4 py-2 text-center border-b">
                     <div className="flex flex-wrap gap-1 justify-center">
                       {Object.entries(t.evidenceTypes).slice(0, 3).map(([type, count]) => (
-                        <span key={type} className="px-2 py-0.5 bg-gray-100 text-xs rounded">
+                        <span key={type} className="px-2 py-0.5 bg-[#0f172a] text-xs rounded">
                           {type} ({count})
                         </span>
                       ))}
@@ -488,7 +488,7 @@ export function AnalyticsDashboard({ projectId, questionnaireKey = 'general-v1',
       </div>
 
       {/* Evidence Coverage Donut */}
-      <div className="bg-[#050b14] p-6 rounded-lg shadow-sm border">
+      <div className="bg-[#050b14] p-6 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border">
         <h3 className="text-lg font-semibold mb-4">Evidence Coverage</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2">

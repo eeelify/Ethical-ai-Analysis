@@ -227,7 +227,7 @@ export function ExpertQuestionManager() {
                     <p className="text-slate-400 text-sm mt-1">Manage standard evaluation questions</p>
                 </div>
                 <div className="flex space-x-3 items-center">
-                    <div className="flex items-center space-x-2 bg-[#050b14] px-3 py-1.5 border border-white/10 rounded-lg shadow-sm">
+                    <div className="flex items-center space-x-2 bg-[#050b14] px-3 py-1.5 border border-white/10 rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)]">
                         <span className="text-sm font-medium text-slate-300">Questionnaire Key:</span>
                         <select
                             value={questionnaireKey}
@@ -244,14 +244,14 @@ export function ExpertQuestionManager() {
                     </div>
                     <button
                         onClick={fetchQuestions}
-                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 bg-[#050b14] border border-white/10 rounded-lg transition-colors shadow-sm"
+                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 bg-[#050b14] border border-white/10 rounded-lg transition-colors shadow-[0_0_15px_rgba(0,0,0,0.5)]"
                         title="Refresh Questions"
                     >
                         <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin text-blue-600' : ''}`} />
                     </button>
                     <button
                         onClick={() => handleOpenModal()}
-                        className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
+                        className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-[0_0_15px_rgba(0,0,0,0.5)]"
                     >
                         <Plus className="h-5 w-5" />
                         <span>Add Question</span>
@@ -259,7 +259,7 @@ export function ExpertQuestionManager() {
                 </div>
             </div>
 
-            <div className="bg-[#050b14] rounded-xl shadow-sm border border-white/10 flex-1 overflow-hidden flex flex-col">
+            <div className="bg-[#050b14] rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-white/10 flex-1 overflow-hidden flex flex-col">
                 <div className="overflow-x-auto flex-1">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-[#0a1122] sticky top-0 z-[5]">
@@ -336,7 +336,7 @@ export function ExpertQuestionManager() {
                                         required
                                         value={formData.code || ''}
                                         onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                                        className="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full border border-white/20 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
                                         placeholder="e.g. H1, T12"
                                     />
                                 </div>
@@ -346,7 +346,7 @@ export function ExpertQuestionManager() {
                                         type="number"
                                         value={formData.order || ''}
                                         onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                                        className="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full border border-white/20 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
                                         placeholder="Auto-assigned if empty"
                                     />
                                 </div>
@@ -362,7 +362,7 @@ export function ExpertQuestionManager() {
                                             ...formData,
                                             principleLabel: { ...formData.principleLabel, en: e.target.value }
                                         })}
-                                        className="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full border border-white/20 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
                                     >
                                         <option value="" disabled>Select a principle...</option>
                                         <option value="HUMAN AGENCY & OVERSIGHT">HUMAN AGENCY & OVERSIGHT</option>
@@ -387,7 +387,7 @@ export function ExpertQuestionManager() {
                                         ...formData,
                                         text: { ...formData.text, en: e.target.value }
                                     })}
-                                    className="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full border border-white/20 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
 
@@ -397,7 +397,7 @@ export function ExpertQuestionManager() {
                                     <select
                                         value={formData.answerType || 'single_choice'}
                                         onChange={(e) => setFormData({ ...formData, answerType: e.target.value })}
-                                        className="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full border border-white/20 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
                                     >
                                         <option value="single_choice">Single Choice (Radio)</option>
                                         <option value="open_text">Open Text</option>
@@ -410,7 +410,7 @@ export function ExpertQuestionManager() {
                                         id="required_checkbox"
                                         checked={formData.required !== false}
                                         onChange={(e) => setFormData({ ...formData, required: e.target.checked })}
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white/20 rounded"
                                     />
                                     <label htmlFor="required_checkbox" className="ml-2 block text-sm text-white">
                                         Required Question
@@ -425,14 +425,14 @@ export function ExpertQuestionManager() {
                                         <h4 className="text-sm font-bold text-white">Answer Options</h4>
                                         <div className="flex flex-wrap items-center">
                                             <span className="text-xs text-slate-400 font-medium mr-2">Quick Fill:</span>
-                                            <button type="button" onClick={() => applyTemplate('2')} className="text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1.5 rounded transition-colors shadow-sm mr-2">2 Options</button>
-                                            <button type="button" onClick={() => applyTemplate('3')} className="text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1.5 rounded transition-colors shadow-sm mr-2">3 Options</button>
-                                            <button type="button" onClick={() => applyTemplate('4')} className="text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1.5 rounded transition-colors shadow-sm mr-2">4 Options</button>
+                                            <button type="button" onClick={() => applyTemplate('2')} className="text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1.5 rounded transition-colors shadow-[0_0_15px_rgba(0,0,0,0.5)] mr-2">2 Options</button>
+                                            <button type="button" onClick={() => applyTemplate('3')} className="text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1.5 rounded transition-colors shadow-[0_0_15px_rgba(0,0,0,0.5)] mr-2">3 Options</button>
+                                            <button type="button" onClick={() => applyTemplate('4')} className="text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1.5 rounded transition-colors shadow-[0_0_15px_rgba(0,0,0,0.5)] mr-2">4 Options</button>
                                             <div className="w-px h-4 bg-gray-300 mx-2 hidden sm:block"></div>
                                             <button
                                                 type="button"
                                                 onClick={addOption}
-                                                className="text-xs font-medium text-blue-700 hover:bg-blue-100 flex items-center bg-blue-50 border border-blue-200 px-2.5 py-1.5 rounded transition-colors shadow-sm ml-2"
+                                                className="text-xs font-medium text-blue-700 hover:bg-blue-100 flex items-center bg-blue-50 border border-blue-200 px-2.5 py-1.5 rounded transition-colors shadow-[0_0_15px_rgba(0,0,0,0.5)] ml-2"
                                             >
                                                 <Plus className="h-3.5 w-3.5 mr-1" /> Custom
                                             </button>
@@ -454,7 +454,7 @@ export function ExpertQuestionManager() {
                                                                 type="text"
                                                                 value={opt.key}
                                                                 onChange={(e) => handleOptionChange(idx, 'key', e.target.value)}
-                                                                className="w-full border border-gray-300 rounded p-1.5 text-xs"
+                                                                className="w-full border border-white/20 rounded p-1.5 text-xs"
                                                                 placeholder="e.g. yes, opt_1"
                                                             />
                                                         </div>
@@ -466,7 +466,7 @@ export function ExpertQuestionManager() {
                                                                         type="text"
                                                                         value={opt.label.en}
                                                                         onChange={(e) => handleOptionChange(idx, 'label', e.target.value, 'en')}
-                                                                        className="w-full border border-gray-300 rounded p-1.5 text-xs"
+                                                                        className="w-full border border-white/20 rounded p-1.5 text-xs"
                                                                     />
                                                                 </div>
                                                             </div>
@@ -480,7 +480,7 @@ export function ExpertQuestionManager() {
                                                                 max="1"
                                                                 value={opt.answerScore !== undefined ? opt.answerScore : ''}
                                                                 onChange={(e) => handleOptionChange(idx, 'answerScore', parseFloat(e.target.value) || 0)}
-                                                                className="w-full border border-gray-300 rounded p-1.5 text-xs"
+                                                                className="w-full border border-white/20 rounded p-1.5 text-xs"
                                                             />
                                                         </div>
                                                     </div>
@@ -503,13 +503,13 @@ export function ExpertQuestionManager() {
                         <div className="px-6 py-4 border-t border-white/10 bg-[#0a1122] flex justify-end space-x-3 rounded-b-xl shrink-0">
                             <button
                                 onClick={handleCloseModal}
-                                className="px-4 py-2 text-sm font-medium text-slate-300 bg-[#050b14] border border-gray-300 rounded-lg hover:bg-[#0a1122]"
+                                className="px-4 py-2 text-sm font-medium text-slate-300 bg-[#050b14] border border-white/20 rounded-lg hover:bg-[#0a1122]"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={saveQuestion}
-                                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center shadow-sm"
+                                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center shadow-[0_0_15px_rgba(0,0,0,0.5)]"
                             >
                                 <Save className="h-4 w-4 mr-2" />
                                 {editingQuestion ? 'Save Changes' : 'Create Question'}

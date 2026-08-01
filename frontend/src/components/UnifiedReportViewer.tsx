@@ -1,14 +1,12 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { FileText, Cpu, Loader2, Play, Download, ExternalLink, AlertTriangle, CheckCircle2, AlertCircle, XCircle, ChevronRight } from "lucide-react";
+import { FileText, Cpu, Loader2, Play, Download, ExternalLink, AlertTriangle, CheckCircle2, AlertCircle, XCircle, ChevronRight, MessageSquare } from "lucide-react";
 import { api } from "../api";
+import { ReportAIChatPanel } from './ReportAIChatPanel';
 
 interface UnifiedReportViewerProps {
   projectId: string;
   userId: string;
-  onGenerateOntology?: () => void;
-  generating?: boolean;
   onViewExpertReport?: (reportId: string) => void;
-  onViewOntologyReport?: () => void;
   refreshTrigger?: number;
   currentUserRole?: string;
   onReviewReports?: () => void;
@@ -50,7 +48,7 @@ function ScoreMeter({ score, color }: { score: number; color: string }) {
   const clipped = Math.max(0, Math.min(100, score));
   return (
     <div className="w-full">
-      <div className="flex justify-between text-xs text-gray-500 mb-1">
+      <div className="flex justify-between text-xs text-slate-500 mb-1">
         <span>0 (Safe)</span>
         <span>100 (High Risk)</span>
       </div>
@@ -77,7 +75,7 @@ function PrincipleBar({ name, value, max, suffix = "" }: { name: string; value: 
       <div className="w-full bg-[#1a2744] rounded-full h-1.5">
         <div className={`h-1.5 rounded-full ${colorClass}`} style={{ width: `${pct}%` }} />
       </div>
-      <p className="text-[10px] text-gray-500 mt-1 text-right">Higher = Riskier</p>
+      <p className="text-[10px] text-slate-500 mt-1 text-right">Higher = Riskier</p>
     </div>
   );
 }
@@ -127,7 +125,7 @@ function ExpertReportCard({
         </div>
         <div>
           <h2 className="text-lg font-bold text-white">Expert Evaluation Report</h2>
-          <p className="text-xs text-gray-500">Multi-expert quantitative & qualitative assessment</p>
+          <p className="text-xs text-slate-500">Multi-expert quantitative & qualitative assessment</p>
         </div>
       </div>
 
@@ -136,7 +134,7 @@ function ExpertReportCard({
           <div className="flex items-center justify-between mb-3">
             <div>
               <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Risk Score</p>
-              <p className={`text-4xl font-black ${band.color}`}>{riskScore}<span className="text-lg font-medium text-gray-500">/100</span></p>
+              <p className={`text-4xl font-black ${band.color}`}>{riskScore}<span className="text-lg font-medium text-slate-500">/100</span></p>
             </div>
             <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-semibold ${band.color} ${band.bg} ${band.border}`}>
               <BandIcon className="w-4 h-4" />
@@ -144,7 +142,7 @@ function ExpertReportCard({
             </div>
           </div>
           <ScoreMeter score={riskScore} color={riskScore >= 75 ? "bg-red-500" : riskScore >= 50 ? "bg-orange-500" : riskScore >= 25 ? "bg-amber-500" : "bg-emerald-500"} />
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-slate-500 mt-2">
             Cumulative Risk Volume (CRV): <span className="text-gray-300 font-medium">{crv !== undefined ? crv : "N/A"}</span>
             {ercAvg !== undefined && <> · Avg ERC: <span className="text-gray-300 font-medium">{typeof ercAvg === "number" ? ercAvg.toFixed(2) : ercAvg}</span></>}
           </p>
@@ -188,7 +186,7 @@ function ExpertReportCard({
               </button>
             </>
           ) : (
-            <div className="text-center text-sm text-gray-500 italic py-3">No expert report generated yet.</div>
+            <div className="text-center text-sm text-slate-500 italic py-3">No expert report generated yet.</div>
           )}
         </div>
       </div>
@@ -196,153 +194,14 @@ function ExpertReportCard({
   );
 }
 
-// ─── Ontology Card ────────────────────────────────────────────────────────────
 
-function OntologyReportCard({
-  ontologyReport,
-  onGenerate,
-  generating,
-  apiBase,
-  userId,
-  onViewReport,
-}: {
-  ontologyReport: any;
-  onGenerate?: () => void;
-  generating?: boolean;
-  apiBase: (path: string) => string;
-  userId: string;
-  onViewReport?: () => void;
-}) {
-  const baseResult = ontologyReport?.ontologyResult ?? ontologyReport?.report ?? ontologyReport?.data ?? ontologyReport ?? {};
-  let result = baseResult.report ?? baseResult.data ?? baseResult;
-  if (result?.report) {
-    result = result.report;
-  }
-
-  const rawScore: number = result?.composite_risk_score ?? result?.scoreBreakdown?.overallRiskScore ?? result?.overallRiskScore;
-  const riskScore = ontologyScore(rawScore);
-  const band = getRiskBand(riskScore);
-  const BandIcon = band.icon;
-
-  const components = result?.score_components ?? result?.scoreBreakdown?.components ?? [];
-  const tensions: any[] = result?.ethical_tensions ?? result?.ethicalTensions ?? [];
-  const recommendations: string[] = result?.recommendations ?? result?.recommendedActions ?? [];
-  const execSummary: string = result?.executive_summary ?? result?.executiveSummary ?? "";
-
-  // The components array might be an array of objects or an object map
-  const safetyComponents = Array.isArray(components) 
-    ? components.map((c: any) => ({
-        name: c.name || c.key,
-        value: typeof c.score === "number" ? Math.round(c.score) : 50
-      }))
-    : Object.entries(components).map(([key, val]: [string, any]) => ({
-        name: key.replace(/_/g, " ").replace(/score/g, "").trim(),
-        value: typeof val === "number" ? Math.round(val) : 50,
-      }));
-
-  const ontologyId = ontologyReport?._id?.toString() ?? ontologyReport?.id;
-
-  const handleViewDetailed = () => {
-    if (!ontologyId) return;
-    window.open(apiBase(`/api/ontology-reports/${ontologyId}/view-pdf?userId=${userId}`), '_blank');
-  };
-
-  return (
-    <div className="bg-[#0b1221] border border-gray-800 rounded-2xl overflow-hidden shadow-xl flex flex-col h-full">
-      <div className="px-6 py-5 border-b border-gray-800 flex items-center gap-3">
-        <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center">
-          <Cpu className="text-purple-400 w-5 h-5" />
-        </div>
-        <div>
-          <h2 className="text-lg font-bold text-white">Ontology AI Report</h2>
-          <p className="text-xs text-gray-500">Automated ontology-based ethical analysis</p>
-        </div>
-      </div>
-
-      <div className="p-6 flex flex-col gap-6 flex-1">
-        {ontologyReport ? (
-          <>
-            <div className={`rounded-xl p-4 border ${band.bg} ${band.border}`}>
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Risk Score</p>
-                  <p className={`text-4xl font-black ${band.color}`}>{riskScore}<span className="text-lg font-medium text-gray-500">/100</span></p>
-                </div>
-                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-semibold ${band.color} ${band.bg} ${band.border}`}>
-                  <BandIcon className="w-4 h-4" />
-                  {band.label}
-                </div>
-              </div>
-              <ScoreMeter score={riskScore} color={riskScore >= 75 ? "bg-red-500" : riskScore >= 50 ? "bg-orange-500" : riskScore >= 25 ? "bg-amber-500" : "bg-emerald-500"} />
-              <p className="text-xs text-gray-500 mt-2">
-                Raw Risk Score: <span className="text-gray-300 font-medium">{rawScore !== undefined ? rawScore : "N/A"}</span>
-              </p>
-            </div>
-
-            {safetyComponents.length > 0 && (
-              <div>
-                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Dimension Breakdown</p>
-                <div className="space-y-2.5">
-                  {safetyComponents.map((c) => (
-                    <PrincipleBar key={c.name} name={c.name} value={c.value} max={100} />
-                  ))}
-                </div>
-              </div>
-            )}
-
-
-
-            <div className="mt-auto flex flex-col gap-2">
-              <button
-                onClick={handleViewDetailed}
-                disabled={!ontologyId}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <ExternalLink className="w-4 h-4" /> View Full Report
-              </button>
-              <button
-                onClick={() => {
-                  if (!ontologyId) return;
-                  window.open(apiBase(`/api/ontology-reports/${ontologyId}/view-pdf?userId=${userId}`), '_blank');
-                }}
-                disabled={!ontologyId}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1a2744] hover:bg-purple-900/30 border border-purple-500/30 text-purple-400 text-sm font-medium rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <Download className="w-4 h-4" /> Download PDF
-              </button>
-            </div>
-          </>
-        ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-center gap-4">
-            <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center">
-              <Cpu className="w-8 h-8 text-gray-600" />
-            </div>
-            <div>
-              <h3 className="text-gray-300 font-semibold">Not Generated Yet</h3>
-              <p className="text-gray-500 text-sm mt-1 max-w-sm">AI ontology analysis hasn't been run for this project.</p>
-            </div>
-            {onGenerate && (
-              <button
-                onClick={onGenerate}
-                disabled={generating}
-                className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-50"
-              >
-                {generating ? <><Loader2 className="w-4 h-4 animate-spin" />Generating...</> : <><Play className="w-4 h-4" />Generate Ontology Report</>}
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function UnifiedReportViewer({ projectId, userId, onGenerateOntology, generating, refreshTrigger, onViewExpertReport, onViewOntologyReport, currentUserRole, onReviewReports }: UnifiedReportViewerProps) {
-  const [loading, setLoading] = useState(true);
+export function UnifiedReportViewer({ projectId, userId, refreshTrigger, onViewExpertReport, currentUserRole, onReviewReports }: UnifiedReportViewerProps) {
   const [data, setData] = useState<any>(null);
-  const prevGenerating = useRef(generating);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchReports = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -363,16 +222,6 @@ export function UnifiedReportViewer({ projectId, userId, onGenerateOntology, gen
     fetchReports();
   }, [fetchReports, refreshTrigger]);
 
-  // Re-fetch silently when generation finishes (generating: true -> false)
-  useEffect(() => {
-    if (prevGenerating.current === true && generating === false) {
-      // Generation just finished — wait a moment then refresh
-      const timer = setTimeout(() => fetchReports(true), 1500);
-      return () => clearTimeout(timer);
-    }
-    prevGenerating.current = generating;
-  }, [generating, fetchReports]);
-
   // Poll every 20 seconds to stay in sync
   useEffect(() => {
     const interval = setInterval(() => fetchReports(true), 20000);
@@ -389,22 +238,43 @@ export function UnifiedReportViewer({ projectId, userId, onGenerateOntology, gen
   }
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 transition-all duration-300 ${isChatOpen ? 'mr-[450px]' : ''}`}>
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-white">Reports</h2>
           <p className="text-gray-400 text-sm mt-1">Both reports use the <strong className="text-gray-200">EU AI Act Risk Scale (0–100)</strong> — higher score = higher risk.</p>
         </div>
-        {currentUserRole === 'admin' && onReviewReports && (
-          <button
-            onClick={onReviewReports}
-            className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          >
-            <AlertTriangle className="w-4 h-4" />
-            Review & Publish
-          </button>
-        )}
+        <div className="flex gap-2">
+          {currentUserRole === 'admin' && (
+            <button
+              onClick={() => setIsChatOpen(true)}
+              className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-[0_0_15px_rgba(8,145,178,0.3)]"
+            >
+              <MessageSquare className="w-4 h-4" />
+              Ask AI
+            </button>
+          )}
+          {currentUserRole === 'admin' && onReviewReports && (
+            <button
+              onClick={onReviewReports}
+              className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-[0_0_15px_rgba(217,119,6,0.3)]"
+            >
+              <AlertTriangle className="w-4 h-4" />
+              Review & Publish
+            </button>
+          )}
+        </div>
       </div>
+      
+      {/* Ask AI Chat Panel */}
+      {currentUserRole === 'admin' && (
+        <ReportAIChatPanel
+          projectId={projectId}
+          userId={userId}
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+        />
+      )}
 
       {/* Score key */}
       <div className="flex flex-wrap gap-3 text-xs">
@@ -420,22 +290,13 @@ export function UnifiedReportViewer({ projectId, userId, onGenerateOntology, gen
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+      <div className="grid grid-cols-1 gap-6 items-start">
         <ExpertReportCard
           expertReport={data?.expertReport}
           userId={userId}
           apiBase={api}
           onViewReport={onViewExpertReport}
         />
-        <div className="flex-1 min-w-[320px]">
-          <OntologyReportCard
-            ontologyReport={data?.ontologyReport}
-            onGenerate={onGenerateOntology}
-            generating={generating}
-            apiBase={api}
-            userId={userId}
-          />
-        </div>
       </div>
     </div>
   );

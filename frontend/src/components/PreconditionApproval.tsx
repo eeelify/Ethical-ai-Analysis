@@ -123,18 +123,18 @@ export function PreconditionApproval({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-[#050b14] flex flex-col">
       {/* Header */}
-      <div className="bg-white shadow-sm px-6 py-4">
+      <div className="bg-[#0b1221] shadow-[0_0_15px_rgba(0,0,0,0.5)] px-6 py-4">
         <div className="flex items-center">
 
-          <h1 className="text-xl text-gray-900">Ethical AI Analysis Platform</h1>
+          <h1 className="text-xl text-white">Ethical AI Analysis Platform</h1>
         </div>
       </div>
 
       {/* Content */}
       <div className="flex-1 flex items-center justify-center px-6 py-12">
-        <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="max-w-3xl mx-auto bg-[#0b1221] rounded-lg shadow-lg overflow-hidden">
           {/* Colored Header */}
           <div className="px-8 py-6" style={{ backgroundColor: roleColor }}>
             <div className="flex items-center text-white">
@@ -147,16 +147,16 @@ export function PreconditionApproval({
           <div className="px-8 py-8 space-y-8">
             {/* Role disclaimer + responsibilities */}
             <div>
-              <h3 className="text-lg font-semibold mb-3 text-gray-900">
+              <h3 className="text-lg font-semibold mb-3 text-white">
                 Role-Specific Disclaimer
               </h3>
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-slate-300 leading-relaxed">
                 {content.disclaimer}
               </p>
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">
+              <h3 className="text-lg font-semibold mb-4 text-white">
                 Core Responsibilities
               </h3>
               <ul className="space-y-3">
@@ -166,23 +166,23 @@ export function PreconditionApproval({
                       className="h-5 w-5 mr-3 mt-0.5"
                       style={{ color: roleColor }}
                     />
-                    <span className="text-gray-700">{responsibility}</span>
+                    <span className="text-slate-300">{responsibility}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
             {/* Conflict of Interest section (Ethical AI Analysis rationale) */}
-            <div className="border border-gray-200 rounded-lg p-5 bg-gray-50">
-              <h3 className="text-lg font-semibold mb-3 text-gray-900">
+            <div className="border border-white/10 rounded-lg p-5 bg-[#050b14]">
+              <h3 className="text-lg font-semibold mb-3 text-white">
                 Conflict of Interest and Impartiality Declaration
               </h3>
-              <p className="text-gray-700 text-sm leading-relaxed mb-4">
+              <p className="text-slate-300 text-sm leading-relaxed mb-4">
                 The Ethical AI Analysis methodology requires independence and impartiality of inspectors. 
                 All members of the inspection team must ensure that their participation does not 
                 compromise the objectivity, fairness, and integrity of the assessment process.
               </p>
-              <ol className="list-[lower-alpha] ml-5 space-y-2 text-sm text-gray-700 mb-4">
+              <ol className="list-[lower-alpha] ml-5 space-y-2 text-sm text-slate-300 mb-4">
                 <li>
                   No conflict of interest exists between the inspector and the entity or organisation 
                   or AI system under inspection.
@@ -198,11 +198,11 @@ export function PreconditionApproval({
                 </li>
               </ol>
 
-              <p className="text-gray-700 text-sm leading-relaxed mb-4">
+              <p className="text-slate-300 text-sm leading-relaxed mb-4">
                 Within the Ethical AI Analysis methodology, the assessment of these three conditions 
                 determines whether the inspection can proceed:
               </p>
-              <ul className="list-disc ml-5 space-y-1 text-sm text-gray-700 mb-4">
+              <ul className="list-disc ml-5 space-y-1 text-sm text-slate-300 mb-4">
                 <li>
                   If conditions (a), (b), and (c) are satisfied, the assessment can proceed as a{' '}
                   <span className="font-semibold">"GO"</span>.
@@ -220,11 +220,11 @@ export function PreconditionApproval({
               </ul>
 
               {/* Checkboxes */}
-              <div className="space-y-3 text-sm text-gray-700">
+              <div className="space-y-3 text-sm text-slate-300">
                 <label className="flex items-start cursor-pointer">
                   <input
                     type="checkbox"
-                    className="mt-1 h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-700"
+                    className="mt-1 h-4 w-4 rounded border-white/20 text-white focus:ring-gray-700"
                     checked={conflictChecks.entity}
                     onChange={() => handleCheckboxChange('entity')}
                   />
@@ -238,7 +238,7 @@ export function PreconditionApproval({
                 <label className="flex items-start cursor-pointer">
                   <input
                     type="checkbox"
-                    className="mt-1 h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-700"
+                    className="mt-1 h-4 w-4 rounded border-white/20 text-white focus:ring-gray-700"
                     checked={conflictChecks.vendors}
                     onChange={() => handleCheckboxChange('vendors')}
                   />
@@ -253,7 +253,7 @@ export function PreconditionApproval({
                 <label className="flex items-start cursor-pointer">
                   <input
                     type="checkbox"
-                    className="mt-1 h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-700"
+                    className="mt-1 h-4 w-4 rounded border-white/20 text-white focus:ring-gray-700"
                     checked={conflictChecks.bias}
                     onChange={() => handleCheckboxChange('bias')}
                   />
@@ -288,7 +288,7 @@ export function PreconditionApproval({
 
             {/* Footer actions */}
             <div className="flex items-center justify-between pt-2">
-              <div className="text-xs text-gray-600 max-w-md">
+              <div className="text-xs text-slate-400 max-w-md">
                 By continuing, you formally confirm the above declarations and
                 agree to follow the Ethical AI Analysis methodology and its principles
                 of independence, impartiality and responsibility.

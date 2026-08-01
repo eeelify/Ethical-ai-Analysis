@@ -1744,7 +1744,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
   return (
     <div className="min-h-screen bg-[#0a1122] flex flex-col">
       {/* Header */}
-      <div className="bg-[#050b14] shadow-sm border-b sticky top-0 z-[9999]">
+      <div className="bg-[#050b14] shadow-[0_0_15px_rgba(0,0,0,0.5)] border-b sticky top-0 z-[9999]">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -1779,8 +1779,8 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
       <div className="flex-1 px-4 py-8 pb-32 max-w-5xl mx-auto w-full flex flex-col">
         {/* Stage Navigation Tabs */}
-        <div className="bg-[#050b14] rounded-2xl shadow-sm border border-white/5 p-2 mb-8 flex justify-between items-center sticky top-[88px] z-40 backdrop-blur-sm bg-[#050b14]/90">
-          <div className="flex space-x-1 bg-gray-100/50 p-1 rounded-xl">
+        <div className="bg-[#050b14] rounded-2xl shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-white/5 p-2 mb-8 flex justify-between items-center sticky top-[88px] z-40 backdrop-blur-sm bg-[#050b14]/90">
+          <div className="flex space-x-1 bg-[#0f172a]/50 p-1 rounded-xl">
             {stages.map((stage) => (
               <button
                 key={stage.key}
@@ -1798,7 +1798,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
           {currentStage !== 'resolve' && currentStage !== 'set-up' && (
             <button
               onClick={() => setShowAddQuestion(true)}
-              className="px-4 py-2 text-sm font-bold text-blue-700 bg-cyan-500/10 border border-blue-200 rounded-xl hover:bg-blue-100 transition-all flex items-center shadow-sm"
+              className="px-4 py-2 text-sm font-bold text-blue-700 bg-cyan-500/10 border border-blue-200 rounded-xl hover:bg-blue-100 transition-all flex items-center shadow-[0_0_15px_rgba(0,0,0,0.5)]"
             >
               <Plus className="h-4 w-4 mr-2" /> Add Question
             </button>
@@ -1862,7 +1862,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                     </div>
                     <div className="space-y-3 max-h-80 overflow-y-auto">
                       {generalRisks.length === 0 ? (
-                        <div className="text-center py-8 bg-[#050b14] rounded-lg border-2 border-dashed border-gray-300">
+                        <div className="text-center py-8 bg-[#050b14] rounded-lg border-2 border-dashed border-white/20">
                           <AlertTriangle className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                           <p className="text-sm text-slate-400 italic">No risks added yet.</p>
                         </div>
@@ -1918,7 +1918,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                             setGeneralRisks(updated);
                                             setIsDraft(true);
                                           }}
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                          className="w-full px-3 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                           placeholder="Enter risk title..."
                                         />
                                       </div>
@@ -1933,7 +1933,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                             setIsDraft(true);
                                           }}
                                           rows={2}
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                                          className="w-full px-3 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
                                           placeholder="Add description..."
                                         />
                                       </div>
@@ -1947,7 +1947,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                             setGeneralRisks(updated);
                                             setIsDraft(true);
                                           }}
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                          className="w-full px-3 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                         >
                                           {riskSeverityOptions.map(opt => (
                                             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -1989,7 +1989,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                         <div className="text-xs text-slate-400 mt-1">{risk.description}</div>
                                       )}
                                       <div className="flex items-center gap-2 text-xs text-slate-400">
-                                        <span className="px-2 py-0.5 bg-gray-100 rounded-full border border-white/10">
+                                        <span className="px-2 py-0.5 bg-[#0f172a] rounded-full border border-white/10">
                                           {relatedQuestions.length} related question(s)
                                         </span>
                                         <span className="text-gray-400">Click to edit</span>
@@ -2116,7 +2116,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
                   <div className="space-y-4">
                     {generalRisks.length === 0 ? (
-                      <div className="text-center py-8 bg-[#050b14] rounded-lg border-2 border-dashed border-gray-300">
+                      <div className="text-center py-8 bg-[#050b14] rounded-lg border-2 border-dashed border-white/20">
                         <AlertTriangle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                         <p className="text-sm text-slate-400 italic mb-6">No risks added yet. Click "Add Risk" to start.</p>
                         <button
@@ -2153,7 +2153,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                       setGeneralRisks(updated);
                                       setIsDraft(true);
                                     }}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                     placeholder="Enter risk title..."
                                   />
                                 </div>
@@ -2170,7 +2170,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                                       setIsDraft(true);
                                     }}
                                     rows={2}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                                    className="w-full px-4 py-2 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
                                     placeholder="Enter risk description (optional)..."
                                   />
                                 </div>
@@ -2205,7 +2205,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                       <div className="font-semibold text-white">Questions</div>
                       <button
                         type="button"
-                        className="p-2 rounded-lg hover:bg-gray-100"
+                        className="p-2 rounded-lg hover:bg-[#0f172a]"
                         onClick={() => setShowQuestionNav(false)}
                         aria-label="Close questions"
                       >
@@ -2243,7 +2243,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
               {/* Desktop: left question list */}
               <div className="hidden md:block md:w-56 lg:w-64 shrink-0">
-                <div className="bg-[#050b14] rounded-2xl shadow-sm border border-white/5 p-3 md:sticky md:top-[180px] max-h-[calc(100vh-200px)] overflow-y-auto">
+                <div className="bg-[#050b14] rounded-2xl shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-white/5 p-3 md:sticky md:top-[180px] max-h-[calc(100vh-200px)] overflow-y-auto">
                   <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-2 pb-2">
                     Questions
                   </div>
@@ -2274,7 +2274,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
               <div className="bg-[#050b14] rounded-3xl shadow-xl shadow-gray-200/50 border border-white/5 overflow-hidden flex flex-col flex-1 animate-in fade-in slide-in-from-bottom-4 duration-300 min-h-0 mb-24">
                 <div className="p-8 border-b border-white/5 bg-[#050b14]">
                   <div className="flex flex-wrap items-center gap-3 mb-4">
-                    <span className="px-3 py-1 bg-gray-100 text-slate-400 text-sm font-medium rounded-full">
+                    <span className="px-3 py-1 bg-[#0f172a] text-slate-400 text-sm font-medium rounded-full">
                       Question {currentQuestionIndex + 1} of {currentQuestions.length}
                     </span>
                     <button
@@ -2298,7 +2298,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                   {activeQuestion.description && (
                     <div className="flex items-start gap-3 mt-4 bg-cyan-500/10/50 p-4 rounded-2xl border border-blue-100/50">
                       <Info className="w-5 h-5 text-cyan-400 mt-0.5 flex-shrink-0" />
-                      <p className="text-blue-900 text-base leading-relaxed">
+                      <p className="text-cyan-300 text-base leading-relaxed">
                         {activeQuestion.description}
                       </p>
                     </div>
@@ -2317,10 +2317,10 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                         const isSelected = currentAnswer === optionValue;
                         return (
                           <label key={optionValue} className={`group flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${isSelected
-                            ? 'border-blue-600 bg-cyan-500/10/50 shadow-sm'
-                            : 'border-white/10 hover:border-blue-300 hover:bg-[#050b14]'
+                            ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.15)]'
+                            : 'border-white/10 hover:border-white/20 hover:bg-[#0f172a]/50'
                             }`}>
-                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 transition-colors ${isSelected ? 'border-blue-600 bg-blue-600' : 'border-gray-300 group-hover:border-blue-400'
+                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 transition-colors ${isSelected ? 'border-blue-500 bg-blue-500' : 'border-white/20 group-hover:border-blue-400'
                               }`}>
                               <div className="w-2 h-2 rounded-full bg-[#050b14]" />
                             </div>
@@ -2332,7 +2332,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                               onChange={(e) => handleAnswerChange(activeQuestion.id, e.target.value)}
                               className="hidden"
                             />
-                            <span className={`text-lg font-medium transition-colors ${isSelected ? 'text-blue-900' : 'text-slate-300'
+                            <span className={`text-lg font-medium transition-colors ${isSelected ? 'text-blue-300' : 'text-slate-300'
                               }`}>{optionLabel}</span>
                           </label>
                         );
@@ -2391,10 +2391,10 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                         const isChecked = currentAnswers.includes(optionValue);
                         return (
                           <label key={optionValue} className={`group flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${isChecked
-                            ? 'border-blue-600 bg-cyan-500/10/50 shadow-sm'
-                            : 'border-white/10 hover:border-blue-300 hover:bg-[#050b14]'
+                            ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.15)]'
+                            : 'border-white/10 hover:border-white/20 hover:bg-[#0f172a]/50'
                             }`}>
-                            <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center mr-4 transition-colors ${isChecked ? 'border-blue-600 bg-blue-600' : 'border-gray-300 group-hover:border-blue-400'
+                            <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center mr-4 transition-colors ${isChecked ? 'border-blue-500 bg-blue-500' : 'border-white/20 group-hover:border-blue-400'
                               }`}>
                               <CheckCircle className="w-4 h-4 text-white" />
                             </div>
@@ -2409,7 +2409,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                               }}
                               className="hidden"
                             />
-                            <span className={`text-lg font-medium transition-colors ${isChecked ? 'text-blue-900' : 'text-slate-300'
+                            <span className={`text-lg font-medium transition-colors ${isChecked ? 'text-blue-300' : 'text-slate-300'
                               }`}>{optionLabel}</span>
                           </label>
                         );
@@ -2423,7 +2423,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                       <AlertTriangle className="w-5 h-5 text-orange-500" />
                       <h3 className="text-lg font-semibold text-white">Importance Level for This Question</h3>
                       {currentStage === 'assess' && (
-                        <span className="px-2.5 py-0.5 bg-red-50 text-red-600 text-xs font-medium rounded-full border border-red-100">
+                        <span className="px-2.5 py-0.5 bg-red-900/30 text-red-400 text-xs font-medium rounded-full border border-red-500/30">
                           Required
                         </span>
                       )}
@@ -2436,11 +2436,11 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                             key={level}
                             className={`relative flex flex-col items-center p-6 rounded-xl border-2 cursor-pointer transition-all duration-200 ${isSelected
                               ? level === 'low'
-                                ? 'border-green-500 bg-green-50 shadow-md'
+                                ? 'border-green-500/50 bg-green-500/10 shadow-[0_0_15px_rgba(34,197,94,0.1)]'
                                 : level === 'medium'
-                                  ? 'border-yellow-500 bg-yellow-50 shadow-md'
-                                  : 'border-red-500 bg-red-50 shadow-md'
-                              : 'border-white/10 hover:border-gray-300 hover:bg-[#0a1122]'
+                                  ? 'border-yellow-500/50 bg-yellow-500/10 shadow-[0_0_15px_rgba(234,179,8,0.1)]'
+                                  : 'border-red-500/50 bg-red-500/10 shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                              : 'border-white/10 hover:border-white/20 hover:bg-[#0f172a]/50'
                               }`}
                           >
                             <input
@@ -2454,11 +2454,11 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                             <div
                               className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-colors ${isSelected
                                 ? level === 'low'
-                                  ? 'bg-green-100 text-green-600'
+                                  ? 'bg-green-500/20 text-green-400'
                                   : level === 'medium'
-                                    ? 'bg-yellow-100 text-yellow-600'
-                                    : 'bg-red-100 text-red-600'
-                                : 'bg-gray-100 text-gray-400'
+                                    ? 'bg-yellow-500/20 text-yellow-400'
+                                    : 'bg-red-500/20 text-red-400'
+                                : 'bg-[#0f172a] text-gray-400'
                                 }`}
                             >
                               {level === 'low' && <CheckCircle className="w-6 h-6" />}
@@ -2481,7 +2481,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                   <div className="mt-8 pt-6 border-t border-white/10" key={`risk-scores-${activeQuestion.id}-${riskScores[activeQuestion.id] || riskScores[activeQuestion.code || ''] || 'none'}`}>
                     <div className="flex items-center gap-2 mb-4">
                       <h3 className="text-lg font-semibold text-white">Importance Score for This Question</h3>
-                      <span className="px-2.5 py-0.5 bg-red-50 text-red-600 text-xs font-medium rounded-full border border-red-100">
+                      <span className="px-2.5 py-0.5 bg-red-900/30 text-red-400 text-xs font-medium rounded-full border border-red-500/30">
                         Required
                       </span>
                     </div>
@@ -2543,18 +2543,18 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
 
                         // Color scheme: 4 = highest risk (red), 0 = no risk (green)
                         const colorClasses = {
-                          red: isSelected ? 'border-2 border-red-700 bg-red-200 shadow-md' : 'border-2 border-white/10 hover:border-red-300 hover:bg-red-50',
-                          orange: isSelected ? 'border-2 border-orange-600 bg-orange-200 shadow-md' : 'border-2 border-white/10 hover:border-orange-300 hover:bg-orange-50',
-                          yellow: isSelected ? 'border-2 border-yellow-600 bg-yellow-50 shadow-md' : 'border-2 border-white/10 hover:border-yellow-300 hover:bg-yellow-50/30',
-                          blue: isSelected ? 'border-2 border-blue-500 bg-blue-50 shadow-md' : 'border-2 border-white/10 hover:border-blue-300 hover:bg-blue-50/30',
-                          green: isSelected ? 'border-2 border-green-500 bg-green-50 shadow-md' : 'border-2 border-white/10 hover:border-green-300 hover:bg-green-50/30'
+                          red: isSelected ? 'border-2 border-red-500 bg-red-900/20 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'border-2 border-white/10 hover:border-red-500/50 hover:bg-red-900/10',
+                          orange: isSelected ? 'border-2 border-orange-500 bg-orange-900/20 shadow-[0_0_15px_rgba(249,115,22,0.15)]' : 'border-2 border-white/10 hover:border-orange-500/50 hover:bg-orange-900/10',
+                          yellow: isSelected ? 'border-2 border-yellow-500 bg-yellow-900/20 shadow-[0_0_15px_rgba(234,179,8,0.15)]' : 'border-2 border-white/10 hover:border-yellow-500/50 hover:bg-yellow-900/10',
+                          blue: isSelected ? 'border-2 border-blue-500 bg-blue-900/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]' : 'border-2 border-white/10 hover:border-blue-500/50 hover:bg-blue-900/10',
+                          green: isSelected ? 'border-2 border-green-500 bg-green-900/20 shadow-[0_0_15px_rgba(34,197,94,0.15)]' : 'border-2 border-white/10 hover:border-green-500/50 hover:bg-green-900/10'
                         };
                         const bgColorClasses = {
-                          red: isSelected ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-400',
-                          orange: isSelected ? 'bg-orange-200 text-orange-800' : 'bg-gray-100 text-gray-400',
-                          yellow: isSelected ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-400',
-                          blue: isSelected ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400',
-                          green: isSelected ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
+                          red: isSelected ? 'bg-red-500/20 text-red-400' : 'bg-white/5 text-slate-400',
+                          orange: isSelected ? 'bg-orange-500/20 text-orange-400' : 'bg-white/5 text-slate-400',
+                          yellow: isSelected ? 'bg-yellow-500/20 text-yellow-400' : 'bg-white/5 text-slate-400',
+                          blue: isSelected ? 'bg-blue-500/20 text-blue-400' : 'bg-white/5 text-slate-400',
+                          green: isSelected ? 'bg-green-500/20 text-green-400' : 'bg-white/5 text-slate-400'
                         };
 
                         return (
@@ -2617,7 +2617,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
               </div>
             </div>
           ) : (
-            <div className="text-center py-32 bg-[#050b14] rounded-3xl shadow-sm border border-dashed border-white/10 flex flex-col items-center justify-center">
+            <div className="text-center py-32 bg-[#050b14] rounded-3xl shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-dashed border-white/10 flex flex-col items-center justify-center">
               <div className="w-24 h-24 bg-[#0a1122] rounded-full flex items-center justify-center mb-6 ring-8 ring-gray-50/50">
                 <Info className="w-12 h-12 text-gray-300" />
               </div>
@@ -2644,7 +2644,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
             <>
               <button
                 onClick={() => setShowReviewScreen(false)}
-                className="flex items-center px-6 py-3 rounded-xl font-semibold transition-all border-2 text-slate-300 bg-[#050b14] border-white/10 hover:bg-[#0a1122] hover:border-gray-300 shadow-sm"
+                className="flex items-center px-6 py-3 rounded-xl font-semibold transition-all border-2 text-slate-300 bg-[#050b14] border-white/10 hover:bg-[#0a1122] hover:border-white/20 shadow-[0_0_15px_rgba(0,0,0,0.5)]"
               >
                 <ChevronLeft className="w-5 h-5 mr-2" /> Back to Questions
               </button>
@@ -2675,7 +2675,7 @@ export function EvaluationForm({ project, currentUser, onBack, onSubmit }: Evalu
                 disabled={currentStage === 'set-up'}
                 className={`flex items-center px-6 py-3 rounded-xl font-semibold transition-all border-2 ${currentStage === 'set-up'
                   ? 'text-gray-300 border-white/5 cursor-not-allowed bg-[#0a1122]'
-                  : 'text-slate-300 bg-[#050b14] border-white/10 hover:bg-[#0a1122] hover:border-gray-300 shadow-sm'
+                  : 'text-slate-300 bg-[#050b14] border-white/10 hover:bg-[#0a1122] hover:border-white/20 shadow-[0_0_15px_rgba(0,0,0,0.5)]'
                   }`}
               >
                 <ChevronLeft className="w-5 h-5 mr-2" /> Previous
@@ -2777,7 +2777,7 @@ function AddQuestionModal({ currentStage, onClose, onAdd }: AddQuestionModalProp
               Adding to <span className="font-semibold text-blue-600 uppercase">{currentStage}</span> stage
             </p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-slate-400 transition-colors bg-[#0a1122] p-2 rounded-full hover:bg-gray-100">
+          <button onClick={onClose} className="text-gray-400 hover:text-slate-400 transition-colors bg-[#0a1122] p-2 rounded-full hover:bg-[#0f172a]">
             <XCircle className="w-6 h-6" />
           </button>
         </div>
@@ -2886,7 +2886,7 @@ function AddQuestionModal({ currentStage, onClose, onAdd }: AddQuestionModalProp
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 rounded-xl text-slate-300 font-medium hover:bg-gray-100 transition-colors border-2 border-transparent hover:border-white/10"
+              className="px-6 py-3 rounded-xl text-slate-300 font-medium hover:bg-[#0f172a] transition-colors border-2 border-transparent hover:border-white/10"
             >
               Cancel
             </button>

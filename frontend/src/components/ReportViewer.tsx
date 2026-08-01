@@ -58,10 +58,10 @@ export function ReportViewer({ reportId, currentUser, onBack }: ReportViewerProp
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#050b14] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading report...</p>
+          <p className="text-slate-400">Loading report...</p>
         </div>
       </div>
     );
@@ -69,7 +69,7 @@ export function ReportViewer({ reportId, currentUser, onBack }: ReportViewerProp
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#050b14] flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">Error: {error}</p>
           <button
@@ -85,24 +85,24 @@ export function ReportViewer({ reportId, currentUser, onBack }: ReportViewerProp
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#050b14]">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b sticky top-0 z-10">
+      <div className="bg-[#0b1221] shadow-[0_0_15px_rgba(0,0,0,0.5)] border-b sticky top-0 z-10">
         <div className="px-6 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-semibold text-gray-900">Report Viewer</h1>
+            <h1 className="text-xl font-semibold text-white">Report Viewer</h1>
           </div>
           <div className="flex items-center space-x-3">
             <button
               onClick={handleOpenInNewTab}
-              className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="flex items-center px-4 py-2 text-sm font-medium text-slate-300 bg-[#0b1221] border border-white/20 rounded-lg hover:bg-[#050b14]"
             >
               <ExternalLink className="h-4 w-4 mr-2" />
               Open in New Tab
             </button>
             <button
               onClick={handleDownloadHTML}
-              className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="flex items-center px-4 py-2 text-sm font-medium text-slate-300 bg-[#0b1221] border border-white/20 rounded-lg hover:bg-[#050b14]"
             >
               <Download className="h-4 w-4 mr-2" />
               Download HTML
@@ -120,7 +120,7 @@ export function ReportViewer({ reportId, currentUser, onBack }: ReportViewerProp
 
       {/* PDF Viewer */}
       <div className="p-6">
-        <div className="bg-white rounded-lg shadow-sm border" style={{ minHeight: '800px' }}>
+        <div className="bg-[#0b1221] rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)] border" style={{ minHeight: '800px' }}>
           {reportUrl && (
             <iframe
               src={reportUrl}
