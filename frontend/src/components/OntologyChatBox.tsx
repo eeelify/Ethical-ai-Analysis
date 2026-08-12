@@ -644,11 +644,13 @@ function buildRegulatoryItems(result: Record<string, unknown> | null, facts: Rec
     .map((item) => {
       const record = toRecord(item);
       const missing = readStringArray(record.missingConditions).map(labelize).join(', ');
+      const references = readStringArray(record.legalReferences).join(', ');
+      const details = [references ? `References: ${references}` : '', missing ? `Missing / verify: ${missing}` : ''].filter(Boolean).join(' · ');
       return {
         area: labelize(record.value || 'Regulatory review'),
         status: readableRegulatoryStatus(record.applicabilityStatus || record.status),
         explanation: readableText(record.reason) || 'This legal area may apply depending on implementation details.',
-        additionalInformation: missing || 'No additional information identified from the current facts.'
+        additionalInformation: details || 'No additional information identified from the current facts.'
       };
     });
 
@@ -949,13 +951,16 @@ function OntologyOutputPanel({ report }: { report: UserFacingReport }) {
           </ReportSection>
 
           {regulatoryItems.length ? (
-            <ReportSection title="Regulatory Boundaries">
+            <ReportSection title="Legal & Regulatory Boundaries">
               <div className="grid gap-3 lg:grid-cols-2">
                 {regulatoryItems.map((item: any) => (
                   <div key={`${item.area || item.title}-${item.status}`} className="rounded-lg border border-white/10 bg-[#050b14] p-3">
                     <div className="text-sm font-medium text-white">{item.area || item.title}</div>
                     <div className="mt-1 text-xs font-semibold uppercase text-slate-500">{item.status}</div>
                     <p className="mt-2 text-sm leading-6 text-slate-400">{item.explanation}</p>
+                    {item.additionalInformation ? (
+                      <p className="mt-2 text-xs leading-5 text-slate-500">{item.additionalInformation}</p>
+                    ) : null}
                   </div>
                 ))}
               </div>

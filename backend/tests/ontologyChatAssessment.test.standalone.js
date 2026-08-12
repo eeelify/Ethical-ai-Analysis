@@ -456,7 +456,9 @@ function runConversationalEducationFlow() {
 
   assert.strictEqual(teacherOnly.state.confirmedFacts.userRole, 'Teacher', 'Teacher role should be retained');
   assert.strictEqual(teacherOnly.state.confirmedFacts.educationContext, true, 'Teacher message should establish education context');
-  assert.ok(/what do you use the ai for/i.test(teacherOnly.reply), 'Teacher-only message should ask what the AI is used for');
+  assert.strictEqual(teacherOnly.status, 'needs_more_information', 'Teacher-only message should be incomplete without an AI purpose');
+  assert.ok(/do not yet know what the AI does/i.test(teacherOnly.reply), 'Teacher-only reply should state the missing purpose without asking a chat question');
+  assert.strictEqual(teacherOnly.raw.stateLifecycle.selected_next_question, null, 'Teacher-only message should not select a follow-up question for chat');
   assertConversationalReply(teacherOnly, 'teacher-only');
 
   const lessonPlans = assessOntologyChat({
@@ -471,7 +473,8 @@ function runConversationalEducationFlow() {
 
   assert.strictEqual(lessonPlans.state.confirmedFacts.lessonPlanningPurpose, true, 'Lesson planning purpose should be extracted');
   assert.ok(/lower impact|accuracy|suitability/i.test(lessonPlans.reply), 'Lesson planning should receive short practical advice');
-  assert.ok(/student names|personal information/i.test(lessonPlans.reply), 'Lesson planning should ask only the relevant personal-data question');
+  assert.strictEqual(/student names|personal information/i.test(lessonPlans.reply), false, 'Completed lesson planning output should not ask optional personal-data questions in chat');
+  assert.ok(/Ontology output:/i.test(lessonPlans.reply), 'Lesson planning should produce output from the current facts');
   assertConversationalReply(lessonPlans, 'lesson-plans');
 
   const essayStart = assessOntologyChat({
@@ -487,7 +490,7 @@ function runConversationalEducationFlow() {
   assert.strictEqual(essayStart.state.confirmedFacts.essayScoringPurpose, true, 'Essay scoring should be extracted');
   assert.strictEqual(essayStart.state.confirmedFacts.evaluatesLearningOutcome, true, 'Essay scoring should map to educational assessment');
   assert.ok(/educational assessment/i.test(essayStart.reply), 'Essay scoring should be recognized as educational assessment');
-  assert.ok(/directly determine the final grade|review it and decide/i.test(essayStart.reply), 'Essay scoring should ask about final-grade impact');
+  assert.strictEqual(essayStart.raw.stateLifecycle.selected_next_question, null, 'Essay scoring should not select a final-grade follow-up question for chat');
   assertConversationalReply(essayStart, 'essay-start');
 
   const humanReview = assessOntologyChat({
@@ -506,7 +509,8 @@ function runConversationalEducationFlow() {
   assert.strictEqual(humanReview.state.confirmedFacts.teacherFinalGradeDecision, true, 'Teacher final decision should be retained');
   assert.strictEqual(humanReview.state.confirmedFacts.humanReviewAvailable, true, 'Human oversight should be inferred from teacher review');
   assert.strictEqual(/directly determine the final grade/i.test(humanReview.reply), false, 'The bot must not ask the final-grade question again');
-  assert.ok(/explanation|students receive/i.test(humanReview.reply), 'After final decision is known, the next question should move to explanation or recourse');
+  assert.strictEqual(/students receive|Can students ask|Do students receive/i.test(humanReview.reply), false, 'Completed human-review output should not ask optional explanation or recourse questions in chat');
+  assert.ok(/Ontology output:/i.test(humanReview.reply), 'After final decision is known, current facts should produce ontology output');
   assertConversationalReply(humanReview, 'human-review');
 
   const correction = assessOntologyChat({
@@ -548,6 +552,123 @@ function runConversationalEducationFlow() {
   console.log('Conversational education flow regression passed.');
 }
 
+function runTutorAISupportOutputRegression() {
+  const message = 'TutorAI is an AI system used to provide educational support to students. Students ask questions about topics they do not understand, and the system generates explanations, examples, analogies, and study guidance. It does not grade exams, rank students, decide admissions, or make official academic decisions.';
+  const result = assessOntologyChat({
+    project: null,
+    messages: [{ sender: 'user', text: message, _id: 'tutor-ai-turn-1' }],
+    previousState: {},
+    chatId: 'tutor-ai-chat'
+  });
+
+  const facts = result.state.confirmedFacts;
+  const regulatoryText = allText(result.ontologyResult.regulatoryConsiderations);
+  assert.strictEqual(result.status, 'completed', 'TutorAI support description should produce output from current facts');
+  assert.strictEqual(facts.fullyAutomatedDecision, false, 'TutorAI should not be treated as fully automated official decision-making');
+  assert.strictEqual(facts.assignsAcademicGrade, false, 'Negated grading should be preserved');
+  assert.strictEqual(facts.educationAdmissionsPurpose, undefined, 'Negated admissions language must not trigger admissions classification');
+  assert.strictEqual(facts.recommendsAdmissionsOutcome, undefined, 'Negated acceptance/rejection language must not trigger admissions recommendations');
+  assert.ok(/Ontology output:/i.test(result.reply), 'TutorAI should include ontology output in the chat response');
+  assert.strictEqual(/Does the system use personal data/i.test(result.reply), false, 'Completed TutorAI output must not ask optional personal-data questions in chat');
+  assert.strictEqual(/human-reviewed/i.test(result.reply), false, 'Non-automated official outcome should not imply human review when no official outcome exists');
+  assert.strictEqual(result.raw.stateLifecycle.selected_next_question, null, 'Completed TutorAI output should not select a follow-up question');
+  assert.ok(/EU AI Act Article 50 transparency/i.test(regulatoryText), 'TutorAI output should mention EU AI Act Article 50 transparency obligations');
+  assert.ok(/EU AI Act Annex III education high-risk boundary/i.test(regulatoryText), 'TutorAI output should mention the EU AI Act Annex III education high-risk boundary');
+  assert.ok(/GDPR \/ KVKK personal-data boundary/i.test(regulatoryText), 'TutorAI output should include the GDPR/KVKK personal-data boundary check');
+
+  console.log('TutorAI support output regression passed.');
+}
+
+function runTutorAIFullNarrativeRegression() {
+  const message = [
+    'Tutor AI is a student-specific educational chatbot based on a Transformer-based Large Language Model.',
+    'It is designed to provide natural-language academic support to students by answering questions, explaining concepts, providing examples and analogies, asking guiding questions, and adapting responses according to the student knowledge level and the context of the interaction.',
+    'Runtime data includes student-entered text and chat histories.',
+    'The system is not used for official grading, examination evaluation, student ranking, admission, certification, or direct measurement of academic achievement.',
+    'Tutor AI does not perform fully automated formal decision-making concerning students, because it does not autonomously determine grades, admissions, disciplinary outcomes, or other official academic decisions.',
+    'However, its pedagogical content generation and learning guidance processes are highly automated and generally occur without human approval before the response is presented to the student.'
+  ].join(' ');
+  const result = assessOntologyChat({
+    project: null,
+    messages: [{ sender: 'user', text: message, _id: 'tutor-ai-full-turn-1' }],
+    previousState: {},
+    llmFacts: [
+      {
+        fact: 'educationAdmissionsPurpose',
+        value: true,
+        source: 'LLM_EXTRACTED',
+        sourceText: 'The system is not used for official grading, examination evaluation, student ranking, admission, certification, or direct measurement of academic achievement.',
+        messageIndex: 0,
+        sourceMessageId: 'tutor-ai-full-turn-1'
+      },
+      {
+        fact: 'recommendsAdmissionsOutcome',
+        value: true,
+        source: 'LLM_EXTRACTED',
+        sourceText: 'Tutor AI does not perform fully automated formal decision-making concerning students, because it does not autonomously determine grades, admissions, disciplinary outcomes, or other official academic decisions.',
+        messageIndex: 0,
+        sourceMessageId: 'tutor-ai-full-turn-1'
+      },
+      {
+        fact: 'fullyAutomatedDecision',
+        value: true,
+        source: 'LLM_EXTRACTED',
+        sourceText: 'However, its pedagogical content generation and learning guidance processes are highly automated and generally occur without human approval before the response is presented to the student.',
+        messageIndex: 0,
+        sourceMessageId: 'tutor-ai-full-turn-1'
+      }
+    ],
+    chatId: 'tutor-ai-full-chat'
+  });
+
+  const facts = result.state.confirmedFacts;
+  const regulatoryText = allText(result.ontologyResult.regulatoryConsiderations);
+  assert.strictEqual(result.status, 'completed', 'Full TutorAI narrative should complete from current facts');
+  assert.strictEqual((result.state.contradictions || []).length, 0, 'Automated content generation must not contradict formal decision negation');
+  assert.strictEqual(facts.educationAdmissionsPurpose, undefined, 'Negated admission wording must not become an admissions use case');
+  assert.strictEqual(facts.recommendsAdmissionsOutcome, undefined, 'Negated admissions wording must not become an admissions recommendation');
+  assert.strictEqual(facts.fullyAutomatedDecision, false, 'Automated educational content generation is not a formal fully automated decision');
+  assert.strictEqual(facts.systemInputs, 'Student-entered text; Chat histories', 'Runtime student text and chat history should be the extracted inputs');
+  assert.strictEqual(facts.adaptiveLearningSupport, true, 'Adaptive learning support should be recognized');
+  assert.ok(result.raw.stateMergeStats.llmFactsDroppedByEvidenceGuard >= 3, 'Unsupported LLM admissions/automation facts should be dropped');
+  assert.ok(/Legal references:/i.test(result.reply), 'Chat reply should include legal references in the ontology output');
+  assert.strictEqual(/Does the AI output directly decide an outcome/i.test(result.reply), false, 'TutorAI full output must not append an outcome-decision question');
+  assert.ok(/EU AI Act Article 50/i.test(regulatoryText), 'Full TutorAI output should cite EU AI Act Article 50');
+  assert.ok(/Annex III point 3\(b\)/i.test(regulatoryText), 'Full TutorAI output should cite the Annex III education learning-process boundary');
+  assert.ok(/GDPR Article 22/i.test(regulatoryText), 'Full TutorAI output should cite GDPR Article 22 for profiling review');
+  assert.ok(/KVKK Law No\. 6698/i.test(regulatoryText), 'Full TutorAI output should cite KVKK');
+
+  console.log('TutorAI full narrative regression passed.');
+}
+
+function runMedicalTriageRegression() {
+  const message = 'MediAssist is an AI system used in a hospital to support doctors during patient triage. It analyzes patient symptoms, medical history, current medications, vital signs, laboratory results, and doctor notes. The system produces a triage priority recommendation and highlights possible risk factors for the doctor. The AI does not diagnose patients, prescribe treatment, or make final medical decisions. A licensed doctor reviews every AI recommendation before any triage or treatment action is taken. The doctor can change, ignore, or reject the AI recommendation. Patients are informed that AI support may be used during triage. Patient records are stored in the hospital system and access is limited to authorized clinical staff. The system does not use facial recognition, emotion detection, biometric identification, or automated patient exclusion. The hospital has not yet documented the exact data retention period, model monitoring process, or independent clinical validation results.';
+  const result = assessOntologyChat({
+    project: null,
+    messages: [{ sender: 'user', text: message, _id: 'medical-turn-1' }],
+    previousState: {},
+    chatId: 'medical-chat'
+  });
+
+  const facts = result.state.confirmedFacts;
+  const regulatoryText = allText(result.ontologyResult.regulatoryConsiderations);
+  assert.strictEqual(result.status, 'completed', 'Medical triage support should produce output from current facts');
+  assert.strictEqual(result.raw.stateLifecycle.selected_next_question, null, 'Medical triage output should not select a follow-up question');
+  assert.strictEqual(facts.clinicalTriagePurpose, true, 'Clinical triage purpose should be recognized');
+  assert.strictEqual(facts.healthcareContext, true, 'Healthcare context should be recognized');
+  assert.strictEqual(facts.providesMedicalDiagnosis, false, 'Negated diagnosis should not become diagnosis=true');
+  assert.strictEqual(facts.influencesMedicalTreatment, false, 'Negated treatment/prescription should not become treatment influence=true');
+  assert.strictEqual(facts.retentionPeriodDefined, false, 'Undocumented retention should not become a defined retention period');
+  assert.strictEqual(facts.fullyAutomatedDecision, false, 'Doctor-reviewed triage support should not be fully automated');
+  assert.ok(/ClinicalTriageDecisionSupport/i.test(allText(result.ontologyResult.classifications)), 'Clinical triage decision support should be mapped');
+  assert.ok(/Regulation \(EU\) 2024\/1689 Article 6\(1\)/i.test(regulatoryText), 'Medical triage should cite EU AI Act Article 6(1) boundary');
+  assert.ok(/Article 15 accuracy, robustness, and cybersecurity/i.test(regulatoryText), 'Medical triage should cite EU AI Act Article 15');
+  assert.ok(/GDPR Article 9/i.test(regulatoryText), 'Medical triage should cite GDPR Article 9 health-data review');
+  assert.ok(/KVKK Law No\. 6698 Article 6/i.test(regulatoryText), 'Medical triage should cite KVKK special-category data review');
+
+  console.log('Medical triage regression passed.');
+}
+
 function runStickyConflictRecoveryRegression() {
   const staleConflict = assessOntologyChat({
     project: null,
@@ -580,7 +701,8 @@ function runStickyConflictRecoveryRegression() {
 
   assert.strictEqual((staleConflict.state.contradictions || []).length, 0, 'Stale contradictions should not keep the chat stuck');
   assert.strictEqual(/conflict|contradictory/i.test(staleConflict.reply), false, 'Stale conflict state should not be repeated to the user');
-  assert.ok(/what do you use the ai for/i.test(staleConflict.reply), 'Teacher-only recovery should ask for the AI purpose');
+  assert.ok(/do not yet know what the AI does/i.test(staleConflict.reply), 'Teacher-only recovery should state the missing AI purpose');
+  assert.strictEqual(staleConflict.raw.stateLifecycle.selected_next_question, null, 'Teacher-only recovery should not select a follow-up question for chat');
 
   const compatibleRole = assessOntologyChat({
     project: null,
@@ -678,7 +800,7 @@ function runExplicitContradictionRegression() {
   assert.strictEqual(facts.educationContext, true, 'Teacher essay scoring should be in the education domain');
   assert.ok(/essay/i.test(purposeText) && /feedback/i.test(purposeText), 'Purpose should include essay scoring and feedback generation');
   assert.strictEqual(facts.assignsAcademicGrade, undefined, 'Unsupported LLM grade-assignment inference from essay scoring should be dropped');
-  assert.ok(/directly determine the final grade|review it and decide/i.test(result.reply), 'The next question should ask whether the AI score determines the final grade');
+  assert.strictEqual(result.raw.stateLifecycle.selected_next_question, null, 'Essay scoring should not select a final-grade follow-up question for chat');
 
   const first = assessOntologyChat({
     project: null,
@@ -752,7 +874,8 @@ function runExactTeacherReviewMultiTurnRegression() {
     chatId: 'teacher-review-chat'
   });
 
-  assert.ok(/directly determine the final grade|review it and decide/i.test(first.reply), 'First response should ask the final-grade clarification');
+  assert.ok(/educational assessment|student outcome|teacher meaningfully reviews/i.test(first.reply), 'First response should explain the educational assessment boundary');
+  assert.strictEqual(first.raw.stateLifecycle.selected_next_question, null, 'First response should not select a final-grade clarification question for chat');
 
   const secondMessage = 'I review every AI-generated score and feedback before using it. I can change or reject the AI’s recommendation, and I make the final grading decision myself.';
   const second = assessOntologyChat({
@@ -798,13 +921,13 @@ function runExactTeacherReviewMultiTurnRegression() {
   assert.ok(/change or reject/i.test(second.reply), 'Second response should use change/reject authority from the second message');
   assert.ok(/does not determine the final grade/i.test(second.reply), 'Second response should recognize that AI does not decide the final grade');
   assert.strictEqual(/what do you use the ai for/i.test(second.reply), false, 'Second response must not ask the purpose again');
-  assert.strictEqual(/EduSelect|ClaimAssist|admissions|insurance claim/i.test(text), false, 'Teacher review chat must not contain data from other chats');
-  assert.ok(/explanation|review a score|correction|appeal|personal data|fair|fairness/i.test(second.reply), 'Next question should concern explanation, correction, appeal, personal data, or fairness');
+  assert.strictEqual(/EduSelect|ClaimAssist|insurance claim/i.test(text), false, 'Teacher review chat must not contain data from other chats');
+  assert.ok(/explanation|review a score|correction|appeal|personal data|fair|fairness|human review/i.test(second.reply), 'Completed output should still surface material education assessment issues');
   assert.strictEqual(second.raw.stateLifecycle.chat_id, 'teacher-review-chat', 'Lifecycle log should carry the stable chat ID');
   assert.strictEqual(second.raw.stateLifecycle.state_storage_key, 'ontology-chat:teacher-review-chat', 'Lifecycle log should carry the state storage key');
   assert.ok(Object.keys(second.raw.stateLifecycle.loaded_previous_state.confirmedFacts || {}).length > 0, 'Lifecycle log should show previous state was loaded');
   assert.ok(Object.keys(second.raw.stateLifecycle.merged_state || {}).length >= Object.keys(first.state.confirmedFacts || {}).length, 'Lifecycle log should show merged state');
-  assert.ok(second.raw.stateLifecycle.selected_next_question, 'Lifecycle log should show selected next question');
+  assert.strictEqual(second.raw.stateLifecycle.selected_next_question, null, 'Completed output should not select a follow-up question for chat');
 
   console.log('Exact teacher review multi-turn regression passed.');
 }
@@ -834,7 +957,8 @@ function runRecruitmentRankingContinuationRegression() {
   assert.strictEqual(firstFacts.processesApplicantSkills, true, 'Skills input should be extracted');
   assert.strictEqual(firstFacts.processesCoverLetters, true, 'Cover letters input should be extracted');
   assert.ok(/employment recruitment|job applicants|applicant/i.test(first.reply), 'First response should recognize recruitment ranking');
-  assert.ok(/automatically reject|shortlist|HR review/i.test(first.reply), 'First response should ask about HR review or automatic rejection/shortlisting');
+  assert.ok(/bias|accuracy|privacy|transparency|over-reliance/i.test(first.reply), 'First response should summarize material recruitment issues');
+  assert.strictEqual(first.raw.stateLifecycle.selected_next_question, null, 'First recruitment response should not select a follow-up question for chat');
   assert.strictEqual(/I can continue the assessment from the facts you have provided so far/i.test(first.reply), false, 'First response must not use the generic continuation fallback');
   assert.strictEqual(/EduSelect|student essays|insurance claim|workforce scheduling/i.test(firstText), false, 'Recruitment chat must not contain unrelated project data');
 
@@ -857,7 +981,8 @@ function runRecruitmentRankingContinuationRegression() {
   assert.strictEqual(secondFacts.processesApplicantCVs, true, 'Second turn should preserve CV input');
   assert.strictEqual(secondFacts.processesCoverLetters, true, 'Second turn should preserve cover-letter input');
   assert.ok(/employment recruitment|job applicants|applicant ranking|access to work/i.test(second.reply), 'Second response should use preserved recruitment facts');
-  assert.ok(/automatically reject|shortlist|HR review|explanation|correct|human review|fairness|retained|security/i.test(second.reply), 'Second response should ask a material recruitment follow-up');
+  assert.ok(/automatically reject|shortlist|HR review|explanation|correct|human review|fairness|retained|security|bias|privacy|over-reliance/i.test(second.reply), 'Second response should surface material recruitment issues');
+  assert.strictEqual(second.raw.stateLifecycle.selected_next_question, null, 'Second recruitment response should not select a follow-up question for chat');
   assert.strictEqual(/what do you use the ai for/i.test(second.reply), false, 'Second response must not ask the purpose again');
   assert.strictEqual(/I can continue the assessment from the facts you have provided so far/i.test(second.reply), false, 'Second response must not repeat the generic continuation fallback');
   assert.strictEqual(/EduSelect|student essays|insurance claim|manufacturing/i.test(secondText), false, 'Second recruitment turn must not contain data from other chats');
@@ -984,7 +1109,8 @@ function runEcommerceSupportContinuationRegression() {
   assert.ok(/Purchase History/i.test(String(firstFacts.systemInputs)), 'Purchase history input should be extracted');
   assert.ok(/Customers/i.test(String(firstFacts.affectedPersons)), 'Customers should be affected stakeholders');
   assert.ok(/Support agents/i.test(String(firstFacts.primaryUsers)), 'Support agents should be primary users');
-  assert.ok(/directly decide|person review|change or reject/i.test(first.reply), 'First e-commerce response should ask about outcome decision boundary');
+  assert.ok(/accuracy|privacy|directly decides|explanation|review/i.test(first.reply), 'First e-commerce response should summarize material support issues');
+  assert.strictEqual(first.raw.stateLifecycle.selected_next_question, null, 'First e-commerce response should not select a follow-up question for chat');
   assert.strictEqual(/what do you use the ai for/i.test(first.reply), false, 'First e-commerce response must not ask purpose again');
 
   const secondMessage = 'The AI system does not directly decide outcomes. It provides suggestions (such as response drafts or refund recommendations), but a human support agent reviews the AI output and retains full authority to approve, edit, or reject it before any action is executed.';
@@ -1178,6 +1304,23 @@ function runEcommerceSupportContinuationRegression() {
   assert.strictEqual(/what do you use the ai for/i.test(resolvedShortAnswer.reply), false, 'Short contradiction resolution must not restart the chat');
   assert.ok(resolvedShortAnswer.raw.stateMergeStats.contextualResolutionsApplied >= 1, 'Lifecycle stats should report contextual resolution');
 
+  const resolvedFirstOneAnswer = assessOntologyChat({
+    project: null,
+    messages: [
+      { sender: 'user', text: firstMessage, _id: 'ecommerce-transcript-turn-1' },
+      { sender: 'system', text: first.reply, _id: 'assistant-ecommerce-transcript-turn-1' },
+      { sender: 'user', text: transcriptSecondMessage, _id: 'ecommerce-transcript-turn-2' },
+      { sender: 'system', text: 'You previously said Fully automated decision was Fully automated decision is false, but you now said it was Fully automated decision is true. Which one is correct?', _id: 'assistant-ecommerce-transcript-turn-2' },
+      { sender: 'user', text: 'first one', _id: 'ecommerce-transcript-turn-3' }
+    ],
+    previousState: staleContradictionState,
+    chatId: 'ecommerce-support-chat'
+  });
+
+  assert.strictEqual(resolvedFirstOneAnswer.state.confirmedFacts.fullyAutomatedDecision, false, 'Ordinal answer should resolve to the previously stated boolean value');
+  assert.strictEqual((resolvedFirstOneAnswer.state.contradictions || []).length, 0, 'Ordinal contradiction resolution should clear stale contradictions');
+  assert.strictEqual(/Which one is correct/i.test(resolvedFirstOneAnswer.reply), false, 'Resolved ordinal answer must not ask the same contradiction again');
+
   console.log('E-commerce support continuation regression passed.');
 }
 
@@ -1245,7 +1388,8 @@ function runGenericSystemContinuationRegression() {
   assert.ok(/Flag, detection, or classification/i.test(String(firstFacts.systemOutputs)), 'Generic output should be extracted');
   assert.ok(/Customers/i.test(String(firstFacts.affectedPersons)), 'Affected customers should be extracted');
   assert.strictEqual(firstFacts.processesPersonalData, true, 'Customer profile and transaction data should be treated as personal-data relevant');
-  assert.ok(/flag suspicious transactions|accuracy|privacy|human review|directly decide/i.test(first.reply), 'Generic first response should be specific and ask a material next question');
+  assert.ok(/flag suspicious transactions|accuracy|privacy|human review|directly decide|directly decides|explanation|review/i.test(first.reply), 'Generic first response should summarize material issues');
+  assert.strictEqual(first.raw.stateLifecycle.selected_next_question, null, 'Generic first response should not select a follow-up question for chat');
   assert.strictEqual(/what do you use the ai for/i.test(first.reply), false, 'Generic first response must not ask the purpose again');
   assert.strictEqual(/I can continue the assessment from the facts you have provided so far/i.test(first.reply), false, 'Generic first response must not use the generic continuation fallback');
   assert.strictEqual(/EduSelect|student essays|job applicants|insurance claim/i.test(firstText), false, 'Generic chat must not contain unrelated project data');
@@ -1284,6 +1428,9 @@ runShiftFairRegression();
 runEduSelectRegression();
 runClaimAssistRegression();
 runConversationalEducationFlow();
+runTutorAISupportOutputRegression();
+runTutorAIFullNarrativeRegression();
+runMedicalTriageRegression();
 runStickyConflictRecoveryRegression();
 runExplicitContradictionRegression();
 runSessionIsolationRegression();

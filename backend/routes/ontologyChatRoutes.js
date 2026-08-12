@@ -432,6 +432,101 @@ async function syncConversationFactsToGraph({ project, userId, state }) {
   }
 }
 
+function collectConversationUserText(conversation, maxLength = 12000) {
+  const text = (conversation?.messages || [])
+    .filter((message) => message?.sender === 'user' && message?.text)
+    .map((message) => String(message.text).trim())
+    .filter(Boolean)
+    .join('\n\n');
+  return text.length > maxLength ? text.slice(text.length - maxLength) : text;
+}
+
+function extractGraphRagLegalReferences(graphRagResult) {
+  const inferred = graphRagResult?.inferred_data || {};
+  const report = graphRagResult?.report || {};
+  return Array.from(new Set([
+    ...(graphRagResult?.legal_sources_used || []),
+    ...(inferred.inferred_regulations || []),
+    ...(report.citation_sources || [])
+  ].filter(Boolean).map((item) => String(item).trim()).filter(Boolean)));
+}
+
+async function buildOntologyGraphAugmentation({ project, conversation, assessment }) {
+  const text = collectConversationUserText(conversation);
+  if (!text) {
+    return {
+      status: 'skipped',
+      source: 'NEO4J_GRAPHRAG',
+      reason: 'No user text was available for graph augmentation.'
+    };
+  }
+
+  const systemName = assessment?.state?.confirmedFacts?.systemName ||
+    project?.title ||
+    conversation?.projectTitle ||
+    'Ontology Chat Assessment';
+
+  const [graphTraceResult, graphRagResult] = await Promise.allSettled([
+    ontologyService.graphTrace({ text }),
+    ontologyService.generateReport({ system_name: systemName, text })
+  ]);
+
+  const graphTrace = graphTraceResult.status === 'fulfilled'
+    ? graphTraceResult.value
+    : null;
+  const graphRag = graphRagResult.status === 'fulfilled'
+    ? graphRagResult.value
+    : null;
+  const legalReferences = extractGraphRagLegalReferences(graphRag);
+
+  return {
+    status: graphTrace || graphRag ? 'completed' : 'skipped',
+    source: 'NEO4J_GRAPHRAG',
+    graphTraceStatus: graphTraceResult.status === 'fulfilled' ? 'completed' : 'failed',
+    graphRagStatus: graphRagResult.status === 'fulfilled' ? 'completed' : 'failed',
+    graphTraceError: graphTraceResult.status === 'rejected' ? graphTraceResult.reason?.message || String(graphTraceResult.reason) : null,
+    graphRagError: graphRagResult.status === 'rejected' ? graphRagResult.reason?.message || String(graphRagResult.reason) : null,
+    matchedKeywords: (graphRag?.inferred_data?.matched_keywords || []).slice(0, 8),
+    inferredCategories: graphRag?.inferred_data?.inferred_categories || [],
+    inferredRegulations: graphRag?.inferred_data?.inferred_regulations || [],
+    legalReferences,
+    legalSourcesUsed: graphRag?.legal_sources_used || [],
+    graphTrace: graphTrace?.trace || [],
+    graphExplanations: graphTrace?.explanations || [],
+    geminiModel: graphRag?.gemini_model || null
+  };
+}
+
+function applyOntologyGraphAugmentation(assessment, graphAugmentation) {
+  if (!assessment || !graphAugmentation) return;
+
+  assessment.ontologyResult.reasoningTrace.neo4jGraphRagAugmentation = graphAugmentation;
+  assessment.raw.neo4jGraphRagAugmentation = graphAugmentation;
+
+  const legalReferences = graphAugmentation.legalReferences || [];
+  if (!legalReferences.length) return;
+
+  const existingItems = assessment.ontologyResult.regulatoryConsiderations || [];
+  const existingReferenceText = JSON.stringify(existingItems);
+  const unseenReferences = legalReferences.filter((reference) => !existingReferenceText.includes(reference));
+  if (!unseenReferences.length) return;
+
+  assessment.ontologyResult.regulatoryConsiderations = [
+    ...existingItems,
+    {
+      value: 'Neo4j / GraphRAG retrieved legal context',
+      applicabilityStatus: 'graph_context_reference',
+      confidence: 0.52,
+      reason: 'The ontology API returned graph/GraphRAG legal context for the conversation text. These references are shown as retrieved context and should be interpreted together with the deterministic ontology conclusions above.',
+      supportingFacts: [],
+      missingConditions: ['verify final legal applicability for the jurisdiction, provider/deployer role, and deployment date'],
+      legalReferences: unseenReferences.slice(0, 10),
+      evidence: [],
+      ruleIds: ['NEO4J_GRAPHRAG_LEGAL_CONTEXT_01']
+    }
+  ];
+}
+
 async function runOntologyAssessment(project, conversation, userId) {
   const previousState = getConversationFactState(conversation);
   const chatId = String(conversation._id);
@@ -458,6 +553,13 @@ async function runOntologyAssessment(project, conversation, userId) {
 
   assessment.ontologyResult.reasoningTrace.graphFactPersistence = graphSync;
   assessment.raw.graphFactPersistence = graphSync;
+
+  const graphAugmentation = await buildOntologyGraphAugmentation({
+    project,
+    conversation,
+    assessment
+  });
+  applyOntologyGraphAugmentation(assessment, graphAugmentation);
 
   return assessment;
 }
