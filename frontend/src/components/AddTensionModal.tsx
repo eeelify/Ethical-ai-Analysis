@@ -152,12 +152,12 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
 
           <div>
             <label className="block text-sm font-bold mb-1 text-slate-300">Claim *</label>
-            <input type="text" value={claim} onChange={(e) => setClaim(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="State the core conflict briefly..." required />
+            <input type="text" value={claim} onChange={(e) => setClaim(e.target.value)} className="w-full px-4 py-2 border border-white/10 bg-[#0f172a] text-white rounded-lg focus:ring-2 focus:ring-blue-500 placeholder-slate-400" placeholder="State the core conflict briefly..." required />
           </div>
 
           <div>
             <label className="block text-sm font-bold mb-1 text-slate-300">Argument *</label>
-            <textarea value={argument} onChange={(e) => setArgument(e.target.value)} rows={3} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Explain your reasoning..." required />
+            <textarea value={argument} onChange={(e) => setArgument(e.target.value)} rows={3} className="w-full px-4 py-2 border border-white/10 bg-[#0f172a] text-white rounded-lg focus:ring-2 focus:ring-blue-500 placeholder-slate-400" placeholder="Explain your reasoning..." required />
           </div>
 
           <div>
@@ -166,7 +166,7 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
               <select
                 value={evidenceType}
                 onChange={(e) => setEvidenceType(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-white/10 bg-[#0f172a] text-white rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select evidence type…</option>
                 <option value="Policy / Standard">Policy / Standard</option>
@@ -178,10 +178,10 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
               </select>
             </div>
             <label className="block text-sm font-bold mb-1 text-slate-300">Evidence (Optional)</label>
-            <textarea value={evidence} onChange={(e) => setEvidence(e.target.value)} rows={2} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 mb-2" placeholder="Describe supporting evidence..." />
+            <textarea value={evidence} onChange={(e) => setEvidence(e.target.value)} rows={2} className="w-full px-4 py-2 border border-white/10 bg-[#0f172a] text-white rounded-lg focus:ring-2 focus:ring-blue-500 placeholder-slate-400 mb-2" placeholder="Describe supporting evidence..." />
             
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-            <button type="button" onClick={() => fileInputRef.current?.click()} className={`flex items-center text-sm px-3 py-1.5 rounded-md border transition-colors ${selectedFile ? 'text-green-700 bg-green-50 border-green-200' : 'text-slate-400 hover:text-blue-600 bg-[#050b14]'}`}>
+            <button type="button" onClick={() => fileInputRef.current?.click()} className={`flex items-center text-sm px-3 py-1.5 rounded-md border border-white/10 transition-colors ${selectedFile ? 'text-green-400 bg-green-500/20 border-green-500/30' : 'text-slate-400 hover:text-blue-400 bg-[#0f172a]'}`}>
               {selectedFile ? <><Check className="h-4 w-4 mr-2" />{selectedFile.name}</> : <><Upload className="h-4 w-4 mr-2" /> Upload File</>}
             </button>
           </div>
@@ -216,8 +216,8 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
                   onClick={() => setSeverity(level)}
                   className={`py-3 px-4 rounded-lg border-2 flex flex-col items-center justify-center transition-all ${
                     severity === level 
-                      ? (level === 1 ? 'border-green-500 bg-green-50 text-green-700' : level === 2 ? 'border-yellow-500 bg-yellow-50 text-yellow-700' : 'border-red-500 bg-red-50 text-red-700') + ' font-bold'
-                      : 'border-white/10 text-slate-500'
+                      ? (level === 1 ? 'border-green-500/50 bg-green-500/20 text-green-400' : level === 2 ? 'border-yellow-500/50 bg-yellow-500/20 text-yellow-400' : 'border-red-500/50 bg-red-500/20 text-red-400') + ' font-bold'
+                      : 'border-white/10 bg-[#0f172a] text-slate-500 hover:bg-[#0f172a]/70'
                   }`}
                 >
                   <div className={`w-3 h-3 rounded-full mb-1 ${severity === level ? (level === 1 ? 'bg-green-500' : level === 2 ? 'bg-yellow-500' : 'bg-red-500') : 'bg-gray-300'}`} />
@@ -280,7 +280,7 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
                     value={impactDescription}
                     onChange={(e) => setImpactDescription(e.target.value)}
                     rows={2}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-white/10 bg-[#0f172a] text-white rounded-lg focus:ring-2 focus:ring-blue-500 placeholder-slate-400"
                     placeholder="Who is impacted and how? (1–2 sentences)"
                   />
                 </div>
@@ -307,7 +307,7 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
                     value={proposedMitigations}
                     onChange={(e) => setProposedMitigations(e.target.value)}
                     rows={4}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-white/10 bg-[#0f172a] text-white rounded-lg focus:ring-2 focus:ring-blue-500 placeholder-slate-400"
                     placeholder="List proposed mitigations as bullet points…"
                     required
                   />
@@ -319,7 +319,7 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
                   <select
                     value={tradeoffDecision}
                     onChange={(e) => setTradeoffDecision(e.target.value)}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-white/10 bg-[#0f172a] text-white rounded-lg focus:ring-2 focus:ring-blue-500"
                     required
                   >
                     <option value="Prioritize Principle 1">Prioritize Principle 1</option>
@@ -336,7 +336,7 @@ export function AddTensionModal({ onClose, onSave }: AddTensionModalProps) {
                       value={tradeoffRationale}
                       onChange={(e) => setTradeoffRationale(e.target.value)}
                       rows={3}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-white/10 bg-[#0f172a] text-white rounded-lg focus:ring-2 focus:ring-blue-500 placeholder-slate-400"
                       placeholder="Why this trade-off?"
                       required
                     />
